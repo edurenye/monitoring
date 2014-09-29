@@ -167,26 +167,6 @@ function monitoring_sensor_action_title($action, SensorInfo $sensor_info) {
 }
 
 /**
- * Implements hook_permission().
- */
-function monitoring_permission() {
-  return array(
-    'administer monitoring' => array(
-      'title' => t('Administer monitoring'),
-    ),
-    'monitoring reports' => array(
-      'title' => t('View monitoring reports'),
-    ),
-    'monitoring verbose' => array(
-      'title' => t('Display verbose monitoring sensor info'),
-    ),
-    'monitoring force run' => array(
-      'title' => t('Force run monitoring sensor execution'),
-    ),
-  );
-}
-
-/**
  * Saves sensor settings.
  *
  * @param string $sensor_name

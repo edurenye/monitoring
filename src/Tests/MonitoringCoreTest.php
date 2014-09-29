@@ -637,7 +637,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $vocabulary = $this->createVocabulary();
 
     entity_create('field_storage_config', array(
-      'name' => 'term_reference',
+      'field_name' => 'term_reference',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
@@ -652,7 +652,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       ),
     ))->save();
 
-    entity_create('field_instance_config', array(
+    entity_create('field_config', array(
       'label' => 'Term reference',
       'field_name' => 'term_reference',
       'entity_type' => 'node',
@@ -671,7 +671,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     ))->save();
 
     entity_create('field_storage_config', array(
-      'name' => 'term_reference2',
+      'field_name' => 'term_reference2',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
@@ -686,7 +686,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       ),
     ))->save();
 
-    entity_create('field_instance_config', array(
+    entity_create('field_config', array(
       'label' => 'Term reference 2',
       'field_name' => 'term_reference2',
       'entity_type' => 'node',

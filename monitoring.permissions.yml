@@ -1,0 +1,8 @@
+administer monitoring:
+  title: 'Administer monitoring'  
+monitoring reports:
+  title: 'View monitoring reports'  
+monitoring verbose:
+  title: 'Display verbose monitoring sensor info'  
+monitoring force run:
+  title: 'Force run monitoring sensor execution'
