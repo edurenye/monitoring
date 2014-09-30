@@ -18,7 +18,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   id = "monitoring_sensor_result",
  *   label = @Translation("Monitoring sensor result"),
  *   base_table = "monitoring_sensor_result",
- *   fieldable = FALSE,
  *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "record_id",

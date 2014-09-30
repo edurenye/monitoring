@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring\Plugin\rest\resource;
 
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -80,7 +81,7 @@ class MonitoringSensorResultResource extends ResourceBase {
       '_method' => 'GET',
       '_permission' => "restful get $this->pluginId",
     ), array(
-      '_access_mode' => 'ANY',
+      '_access_mode' => AccessManagerInterface::ACCESS_MODE_ANY,
     ));
     foreach ($this->serializerFormats as $format_name) {
       // Expose one route per available format.
