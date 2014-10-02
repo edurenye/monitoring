@@ -7,6 +7,7 @@
 namespace Drupal\monitoring_demo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 
 /**
  * Simple front page controller for the monitoring_demo module.
@@ -20,12 +21,12 @@ class FrontPage extends ControllerBase {
       ),
       'report' => array(
         '#type' => 'item',
-        '#title' => l(t('Monitoring sensors overview'), 'admin/reports/monitoring'),
+        '#title' => \Drupal::l(t('Monitoring sensors overview'), Url::fromRoute('monitoring.sensor_list')),
         '#description' => t('Basic dashboard showing the sensor list with their status and information.'),
       ),
       'configuration' => array(
         '#type' => 'item',
-        '#title' => l(t('Monitoring sensors settings'), 'admin/config/system/monitoring'),
+        '#title' =>\Drupal::l(t('Monitoring sensors settings'), Url::fromRoute('monitoring.sensors_overview_settings')),
         '#description' => t('Monitoring sensors configuration page. See this page for the complete list of the available sensors.'),
       ),
       'sensor_enabled_modules' => array(
@@ -35,9 +36,9 @@ class FrontPage extends ControllerBase {
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(
-            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => url('admin/config/system/monitoring/sensors/enabled_modules'))),
-            t('<a href="@url">Disable</a> Dashboard module and enable Book module.', array('@url' => url('admin/modules'))),
-            t('Visit the <a href="@url">sensors overview page</a> to see the reported issue.', array('@url' => url('admin/reports/monitoring/sensors'))),
+            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('monitoring.detail_form', array('monitoring_sensor' => 'enabled_modules')))),
+            t('<a href="@url">Disable</a> Dashboard module and enable Book module.', array('@url' => Url::fromRoute('system.modules_list')->toString())),
+            t('Visit the <a href="@url">sensors overview page</a> to see the reported issue.', array('@url' => Url::fromRoute('monitoring.sensor_list')->toString())),
           )
         ),
       ),

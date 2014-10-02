@@ -9,6 +9,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\node\NodeTypeInterface;
@@ -348,7 +349,7 @@ function theme_monitoring_overview_summary($variables) {
     ));
   $output .= '</div>';
   if (\Drupal::currentUser()->hasPermission('monitoring force run')) {
-    $output .= '<div class="monitoring-overview-summary-actions-right">' . l(t('Force execute all'), 'monitoring/sensors/force') . '</div>';
+    $output .= '<div class="monitoring-overview-summary-actions-right">' . \Drupal::l(t('Force execute all'), Url::fromRoute('monitoring.force_run_all')) . '</div>';
   }
   if (!empty($variables['oldest_sensor_label'])) {
     $output .= '<div class="monitoring-overview-summary-actions-right">' . t('Sensor %sensor (%category) cached before %before.', array('%sensor' => $variables['oldest_sensor_label'], '%before' => $variables['oldest_sensor_called_before'], '%category' => $variables['oldest_sensor_category'])) . '</div>';

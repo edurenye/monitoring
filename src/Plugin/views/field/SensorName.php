@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring\Plugin\views\field;
 
+use Drupal\Core\Url;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
@@ -35,6 +36,6 @@ class SensorName extends FieldPluginBase {
       $label = t('Disappeared sensor @name', array('@name' => $value));
     }
 
-    return l($label, 'admin/reports/monitoring/sensors/' . $value);
+    return \Drupal::l($label, Url::fromRoute('monitoring.detail_form', array('monitoring_sensor' => $value)));
   }
 }
