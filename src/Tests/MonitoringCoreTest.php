@@ -163,14 +163,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // ======= Watchdog 404 in last 24 hours tests ======= //
 
-    watchdog('page not found', 'not/found');
+    \Drupal::logger('page not found')->notice('not/found');
     $result = $this->runSensor('dblog_404');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), '1 watchdog events in 1 day, not/found');
     $this->assertEqual($result->getValue(), 1);
 
     for ($i = 1; $i <= 20; $i++) {
-      watchdog('page not found', 'not/found');
+      \Drupal::logger('page not found')->notice('not/found');
     }
 
     $result = $this->runSensor('dblog_404');
@@ -178,7 +178,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isWarning());
 
     for ($i = 0; $i <= 100; $i++) {
-      watchdog('page not found', 'not/found/another');
+      \Drupal::logger('page not found')->notice('not/found/another');
     }
 
     $result = $this->runSensor('dblog_404');
@@ -192,13 +192,13 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $usage = \Drupal::service('file.usage');
     $usage->add($file, 'monitoring_test', 'test_object', 123456789);
     for ($i = 0; $i <= 5; $i++) {
-      watchdog('image', 'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
+      \Drupal::logger('image')->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
         array(
           '%source_image_path' => $file->getFileUri(),
           '%derivative_path' => 'hash://styles/preview/1234.jpeg',
         ));
     }
-    watchdog('image', 'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
+    \Drupal::logger('image')->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
       array(
         '%source_image_path' => 'public://portrait-pictures/bluemouse.jpeg',
         '%derivative_path' => 'hash://styles/preview/5678.jpeg',
@@ -215,7 +215,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // ======= Watchdog sensor tests ======= //
 
     // Create watchdog entry with severity alert.
-    watchdog('test', 'test message', array(), WATCHDOG_ALERT);
+    \Drupal::logger('test')->alert('test message');
 
     // Run sensor and test the output.
     $severities = monitoring_event_severities();
@@ -224,9 +224,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // ======= SensorUserFailedLogins tests ======= //
 
-    watchdog('user', 'Login attempt failed for %user.', array('%user' => 'user1'), WATCHDOG_NOTICE);
-    watchdog('user', 'Login attempt failed for %user.', array('%user' => 'user1'), WATCHDOG_NOTICE);
-    watchdog('user', 'Login attempt failed for %user.', array('%user' => 'user2'), WATCHDOG_NOTICE);
+    \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
+    \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
+    \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user2'));
 
     $result = $this->runSensor('user_failed_logins');
     $this->assertEqual($result->getValue(), 3);
@@ -235,9 +235,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // ======= Sensor user_session_logouts tests ======= //
 
-    watchdog('user', 'Session closed for %name.', array('%user' => 'user1'), WATCHDOG_NOTICE);
-    watchdog('user', 'Session closed for %name.', array('%user' => 'user1'), WATCHDOG_NOTICE);
-    watchdog('user', 'Session closed for %name.', array('%user' => 'user2'), WATCHDOG_NOTICE);
+    \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user1'));
+    \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user1'));
+    \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user2'));
 
     $result = $this->runSensor('user_session_logouts');
     $this->assertEqual($result->getValue(), 3);

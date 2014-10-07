@@ -105,7 +105,7 @@ class SensorDisappearedSensors extends SensorConfigurable {
     // If we have new sensors add it to available list.
     if (!empty($new_sensors)) {
       \Drupal::state()->set('monitoring.available_sensors', $available_sensors + $new_sensors);
-      watchdog('monitoring', '@count new sensor/s added: @names',
+      \Drupal::logger('monitoring')->notice('@count new sensor/s added: @names',
         array('@count' => count($new_sensors), '@names' => implode(', ', array_keys($new_sensors))));
     }
 
@@ -148,7 +148,7 @@ class SensorDisappearedSensors extends SensorConfigurable {
         unset($available_sensors[$sensor_to_remove]);
       }
       \Drupal::state()->set('monitoring.available_sensors', $available_sensors);
-      watchdog('monitoring', '@count new sensor/s removed: @names',
+      \Drupal::logger('monitoring')->notice('@count new sensor/s removed: @names',
         array('@count' => count($sensors_to_remove), '@names' => implode(', ', $sensors_to_remove)));
     }
   }

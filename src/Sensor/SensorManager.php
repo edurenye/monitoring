@@ -181,7 +181,7 @@ class SensorManager extends DefaultPluginManager {
       if (!isset($available_sensors[$sensor_name])) {
         // Use the watchdog message as the disappeared sensor does when new
         // sensors are detected.
-        watchdog('monitoring', '@count new sensor/s added: @names',
+        \Drupal::logger('monitoring')->notice('@count new sensor/s added: @names',
           array('@count' => 1, '@names' => $sensor_name));
       }
 
