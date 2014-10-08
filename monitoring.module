@@ -13,6 +13,8 @@ use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\node\NodeTypeInterface;
+use Drupal\search_api\Entity\Index;
+use Drupal\search_api\Index\IndexInterface;
 
 /**
  * Returns an instance of the sensor manager.
@@ -623,17 +625,17 @@ function monitoring_node_type_update(NodeTypeInterface $type) {
  *
  * Inserts new search api index  sensor config entities on creation of new search api index.
  */
-function monitoring_search_api_index_insert($info) {
+function monitoring_search_api_index_insert(IndexInterface $index) {
   $sensor = SensorInfo::create(array(
-    'id' => 'search_api_' . $info->machine_name,
-    'label' => String::format('Search index queue size of @index', array('@index' => $info->name)),
+    'id' => 'search_api_' . $index->id(),
+    'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
     'sensor_id' => 'search_api_unindexed',
     'value_label' => 'Unindexed items',
     'category' => 'Search API',
     'caching_time' => 900,
     'status' => TRUE,
     'settings' => array(
-      'index_id' => $info->id(),
+      'index_id' => $index->id(),
     ),
   ));
   $sensor->save();
@@ -644,8 +646,8 @@ function monitoring_search_api_index_insert($info) {
  *
  * Deletes search api index sensor config entities on deletion of search api index.
  */
-function monitoring_search_api_index_delete($info) {
-  $config_id = 'search_api_' . $info->machine_name;
+function monitoring_search_api_index_delete(IndexInterface $index) {
+  $config_id = 'search_api_' . $index->id();
   $sensor = SensorInfo::load($config_id);
   $sensor->delete();
 }
@@ -655,10 +657,10 @@ function monitoring_search_api_index_delete($info) {
  *
  * Updates search api index sensor config entities on updation of search api index.
  */
-function monitoring_search_api_index_update($info) {
-  $config_id = 'search_api_' . $info->machine_name;
+function monitoring_search_api_index_update(IndexInterface $index) {
+  $config_id = 'search_api_' . $index->id();
   $sensor = SensorInfo::load($config_id);
-  $sensor->id = 'search_api_' . $info->machine_name;
-  $sensor->label = String::format('Search index queue size of @index', array('@index' => $info->name));
+  $sensor->id = 'search_api_' . $index->id();
+  $sensor->label = String::format('Search index queue size of @index', array('@index' => $index->id()));
   $sensor->save();
 }
