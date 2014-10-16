@@ -70,15 +70,15 @@ function monitoring_demo_install() {
   // Generate watchdog entries.
   // Watchdog sensors are enabled by default, no need to enable them here.
   for($i = 0; $i < 20; $i++) {
-    watchdog('sensor_demo', $random->name(), array(), WATCHDOG_ERROR);
-    watchdog('sensor_demo', $random->name(), array(), WATCHDOG_NOTICE);
+    \Drupal::logger('sensor_demo')->error($random->name());
+    \Drupal::logger('sensor_demo')->notice($random->name());
   }
   for($i = 0; $i < 10; $i++) {
-    watchdog('sensor_demo', $random->name(), array(), WATCHDOG_INFO);
-    watchdog('sensor_demo', $random->name(), array(), WATCHDOG_WARNING);
+    \Drupal::logger('sensor_demo')->info($random->name());
+    \Drupal::logger('sensor_demo')->warning($random->name());
   }
   for($i = 0; $i < 50; $i++) {
-    watchdog('page not found', 'not/found');
+    \Drupal::logger('page not found')->notice('not/found');
   }
 
   // Enable Enabled modules and Disappeared sensors for the "interactive" demo.

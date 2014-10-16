@@ -5,6 +5,7 @@
  */
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\node\Entity\NodeType;
 use Drupal\search_api\Entity\Index;
@@ -68,13 +69,13 @@ function monitoring_install() {
 
   // Declares Watchdog events sensors.
   $severities = monitoring_event_severities();
-  foreach (watchdog_severity_levels() as $level => $name) {
-    if ($level <= WATCHDOG_ERROR) {
+  foreach (RfcLogLevel::getLevels() as $level => $name) {
+    if ($level <= RfcLogLevel::ERROR) {
       $caching_time = 300;
       $critical_threshold = 5;
       $warning_threshold = 1;
     }
-    elseif (!in_array($level, array(WATCHDOG_NOTICE, WATCHDOG_INFO))) {
+    elseif (!in_array($level, array(RfcLogLevel::NOTICE, RfcLogLevel::INFO))) {
       $caching_time = 900;
       $critical_threshold = 50;
       $warning_threshold = 20;
@@ -180,17 +181,17 @@ function monitoring_install() {
  * Maps severities to their machine names.
  *
  * @return array
- *   Severity names array keyed by WATCHDOG_* constants.
+ *   Severity names array keyed by RfcLogLevel constants.
  */
 function monitoring_event_severities() {
   return array(
-    WATCHDOG_DEBUG => 'debug',
-    WATCHDOG_INFO => 'info',
-    WATCHDOG_NOTICE => 'notice',
-    WATCHDOG_WARNING => 'warning',
-    WATCHDOG_ERROR => 'error',
-    WATCHDOG_EMERGENCY => 'emergency',
-    WATCHDOG_ALERT => 'alert',
-    WATCHDOG_CRITICAL => 'critical',
+    RfcLogLevel::DEBUG => 'debug',
+    RfcLogLevel::INFO => 'info',
+    RfcLogLevel::NOTICE => 'notice',
+    RfcLogLevel::WARNING => 'warning',
+    RfcLogLevel::ERROR => 'error',
+    RfcLogLevel::EMERGENCY => 'emergency',
+    RfcLogLevel::ALERT => 'alert',
+    RfcLogLevel::CRITICAL => 'critical',
   );
 }

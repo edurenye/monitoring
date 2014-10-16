@@ -6,6 +6,7 @@
 namespace Drupal\monitoring\Tests;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\monitoring\Entity\SensorInfo;
 
@@ -219,7 +220,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Run sensor and test the output.
     $severities = monitoring_event_severities();
-    $result = $this->runSensor('dblog_event_severity_' . $severities[WATCHDOG_ALERT]);
+    $result = $this->runSensor('dblog_event_severity_' . $severities[RfcLogLevel::ALERT]);
     $this->assertEqual($result->getValue(), 1);
 
     // ======= SensorUserFailedLogins tests ======= //
@@ -524,9 +525,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
       array('field' => 'type', 'value' => 'test_type'),
     );
     $sensor_info->save();
-    watchdog('test_type', $this->randomMachineName());
-    watchdog('test_type', $this->randomMachineName());
-    watchdog('other_test_type', $this->randomMachineName());
+    \Drupal::logger('test_type')->notice($this->randomMachineName());
+    \Drupal::logger('test_type')->notice($this->randomMachineName());
+    \Drupal::logger('other_test_type')->notice($this->randomMachineName());
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertEqual($result->getValue(), 2);
 
@@ -535,21 +536,21 @@ class MonitoringCoreTest extends MonitoringTestBase {
       array('field' => 'message', 'value' => 'test_message'),
     );
     $sensor_info->save();
-    watchdog($this->randomMachineName(), 'test_message');
-    watchdog($this->randomMachineName(), 'another_test_message');
-    watchdog($this->randomMachineName(), 'another_test_message');
+    \Drupal::logger($this->randomMachineName())->notice('test_message');
+    \Drupal::logger($this->randomMachineName())->notice('another_test_message');
+    \Drupal::logger($this->randomMachineName())->notice('another_test_message');
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertEqual($result->getValue(), 1);
 
     // Aggregate by watchdog severity.
     $sensor_info->settings['conditions'] = array(
-      array('field' => 'severity', 'value' => WATCHDOG_CRITICAL),
+      array('field' => 'severity', 'value' => RfcLogLevel::CRITICAL),
     );
     $sensor_info->save();
-    watchdog($this->randomMachineName(), $this->randomMachineName(), array(), WATCHDOG_CRITICAL);
-    watchdog($this->randomMachineName(), $this->randomMachineName(), array(), WATCHDOG_CRITICAL);
-    watchdog($this->randomMachineName(), $this->randomMachineName(), array(), WATCHDOG_CRITICAL);
-    watchdog($this->randomMachineName(), $this->randomMachineName(), array(), WATCHDOG_CRITICAL);
+    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertEqual($result->getValue(), 4);
 
@@ -590,13 +591,13 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getValue(), 0);
 
-    watchdog('test_watchdog_aggregate_sensor', 'testing');
-    watchdog('test_watchdog_aggregate_sensor', 'testing');
+    \Drupal::logger('test_watchdog_aggregate_sensor')->notice('testing');
+    \Drupal::logger('test_watchdog_aggregate_sensor')->notice('testing');
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertTrue($result->isWarning());
     $this->assertEqual($result->getValue(), 2);
 
-    watchdog('test_watchdog_aggregate_sensor', 'testing');
+    \Drupal::logger('test_watchdog_aggregate_sensor')->notice('testing');
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getValue(), 3);
