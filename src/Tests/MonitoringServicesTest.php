@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\rest\Tests\RESTTestBase;
 
@@ -85,7 +86,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['caching_time'], $sensor_info->getCachingTime());
       $this->assertEqual($response_data[$sensor_name]['time_interval'], $sensor_info->getTimeIntervalValue());
       $this->assertEqual($response_data[$sensor_name]['enabled'], $sensor_info->isEnabled());
-      $this->assertEqual($response_data[$sensor_name]['uri'], url('monitoring-sensor-info/' . $sensor_info->getName(), array('absolute' => TRUE)));
+      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_info->getName(), array('absolute' => TRUE))->toString());
 
       if ($sensor_info->isDefiningThresholds()) {
         $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_info->getSetting('thresholds'));
@@ -109,7 +110,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['caching_time'], $sensor_info->getCachingTime());
     $this->assertEqual($response_data['time_interval'], $sensor_info->getTimeIntervalValue());
     $this->assertEqual($response_data['enabled'], $sensor_info->isEnabled());
-    $this->assertEqual($response_data['uri'], url('monitoring-sensor-info/' . $sensor_info->getName(), array('absolute' => TRUE)));
+    $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_info->getName(), array('absolute' => TRUE))->toString());
 
     if ($sensor_info->isDefiningThresholds()) {
       $this->assertEqual($response_data['thresholds'], $sensor_info->getSetting('thresholds'));
@@ -177,7 +178,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_result['sensor_name'], $sensor_info->getName());
     // Test the uri - the hardcoded endpoint is defined in the
     // monitoring_test.default_services.inc.
-    $this->assertEqual($response_result['uri'], url('/monitoring-sensor-result/' . $sensor_info->getName(), array('absolute' => TRUE)));
+    $this->assertEqual($response_result['uri'], Url::fromUri('base://monitoring-sensor-result/' . $sensor_info->getName(), array('absolute' => TRUE))->toString());
 
     // If the result is cached test also for the result values. In case of
     // result which is not cached we might not get the same values.
@@ -210,7 +211,7 @@ class MonitoringServicesTest extends RESTTestBase {
    *   Decoded json object.
    */
   protected function doRequest($action, $query = array()) {
-    $url = url($action, array('absolute' => TRUE, 'query' => $query));
+    $url = Url::fromUri("base://$action", array('absolute' => TRUE, 'query' => $query))->toString();
     $result = $this->httpRequest($url, 'GET', NULL, $this->defaultMimeType);
     return Json::decode($result);
   }

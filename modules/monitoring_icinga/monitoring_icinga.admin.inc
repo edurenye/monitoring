@@ -13,7 +13,7 @@ function monitoring_icinga_config_passive_page() {
   $output[] = array(
     '#type' => 'markup',
     '#markup' => '<div class="messages warning">' . t('Passive result checing is not recommended as in case of the monitored system failure the Icinga server will not get notified of this fact. Due to this the <a href="@url">passive checks with freshness checking</a> is recommended.',
-      array('@url' => url('admin/config/system/monitoring/icinga/passive-with-freshness'))) . '</div>',
+      array('@url' => \Drupal::url('monitoring_icinga_config_passive_with_freshness'))) . '</div>',
   );
 
   $output[] = array(

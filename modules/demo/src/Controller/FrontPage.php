@@ -50,8 +50,8 @@ class FrontPage extends ControllerBase {
           '#theme' => 'item_list',
           '#items' => array(
             t('<a href="@url">Uninstall</a> the Database logging module what will make all the watchdog related sensors disappear.',
-              array('@url' => url('admin/modules/uninstall'))),
-            t('Visit the <a href="@url">sensors overview page</a> to see the sensor reporting disappeared sensors.', array('@url' => url('admin/reports/monitoring'))),
+              array('@url' => \Drupal::url('system.modules_uninstall'))),
+            t('Visit the <a href="@url">sensors overview page</a> to see the sensor reporting disappeared sensors.', array('@url' => \Drupal::url('monitoring.sensor_list'))),
           )
         ),
       ),
