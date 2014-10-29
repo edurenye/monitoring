@@ -80,8 +80,5 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
   public function runSensor(SensorResultInterface $result) {
     $result->setValue($this->getActualValue());
     $result->setExpectedValue($this->getExpectedValue());
-
-    $result->addStatusMessage(String::format('Expected value @expected actual @actual',
-      array('@expected' => $result->getFormattedValue($this->getExpectedValue()), '@actual' => $result->getFormattedValue($this->getActualValue()))));
   }
 }

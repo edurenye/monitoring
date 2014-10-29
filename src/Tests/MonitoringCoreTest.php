@@ -63,6 +63,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     \Drupal::config('system.cron')->set('threshold.autorun', 3600)->save();
     $result = $this->runSensor('core_cron_safe_threshold');
     $this->assertTrue($result->isCritical());
+    $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');
 
     // ======= Maintenance mode tests ======= //
 
@@ -74,6 +75,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Switch back to being online as being in maintenance mode would break
     // tests dealing with UI.
     \Drupal::state()->set('system.maintenance_mode', FALSE);
+    $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');
 
     // ======= SensorQueue tests ======= //
 
@@ -308,6 +310,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     \Drupal::config('system.theme')->set('default', 'bartik')->save();
     $result = $this->runSensor('core_theme_default');
     $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), 'Value bartik');
 
     \Drupal::config('system.theme')->set('default', 'garland')->save();
     $result = $this->runSensor('core_theme_default');
