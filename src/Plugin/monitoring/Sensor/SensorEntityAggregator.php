@@ -223,15 +223,13 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase {
       $form['conditions'][$no] = array(
         'field' => array(
           '#type' => 'textfield',
-	  '#title' => t('Condition\'s Field'),
+          '#title' => t('Condition\'s Field'),
           '#default_value' => $condition['field'],
-          '#required' => TRUE,
         ),
         'value' => array(
           '#type' => 'textfield',
-	  '#title' => t('Condition\'s Value'),
+          '#title' => t('Condition\'s Value'),
           '#default_value' => $condition['value'],
-          '#required' => TRUE,
         )
       );
     }
