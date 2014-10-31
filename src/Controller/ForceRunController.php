@@ -3,6 +3,7 @@
 namespace Drupal\monitoring\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
 use Drupal\monitoring\SensorRunner;
@@ -52,15 +53,16 @@ class ForceRunController extends ControllerBase {
     return $this->redirect('monitoring.sensor_list');
   }
 
-  public function forceRunSensor($sensor_name) {
-    try {
-      $sensor_info = $this->sensorManager->getSensorInfoByName($sensor_name);
-      $this->sensorRunner->resetCache(array($sensor_name));
-      drupal_set_message($this->t('Force run of the sensor @name executed.', array('@name' => $sensor_info->getLabel())));
-    }
-    catch (NonExistingSensorException $e) {
-      drupal_set_message($e->getMessage(), 'error');
-    }
+  /**
+   * Force runs a single sensor.
+   *
+   * @param string $monitoring_sensor
+   * @return RedirectResponse
+   */
+  public function forceRunSensor(SensorInfo $monitoring_sensor) {
+
+    $this->sensorRunner->resetCache(array($monitoring_sensor->getName()));
+    drupal_set_message($this->t('Force run of the sensor @name executed.', array('@name' => $monitoring_sensor->getLabel())));
     return $this->redirect('monitoring.sensor_list');
   }
 }

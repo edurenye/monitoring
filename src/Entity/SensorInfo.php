@@ -34,7 +34,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   },
  *   links = {
  *     "delete-form" = "monitoring.sensor_delete",
- *     "edit-form" = "monitoring.sensor_edit"
+ *     "edit-form" = "monitoring.sensor_edit",
+ *     "details-form" = "monitoring.detail_form",
+ *     "force-run-form" = "monitoring.force_run_sensor"
  *   }
  * )
  */

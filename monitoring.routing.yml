@@ -30,7 +30,7 @@ monitoring.force_run_all:
     _permission: 'monitoring force run'
 
 monitoring.force_run_sensor:
-  path: 'monitoring/sensors/force/{sensor_name}'
+  path: 'monitoring/sensors/force/{monitoring_sensor}'
   defaults:
     _controller: '\Drupal\monitoring\Controller\ForceRunController::forceRunSensor'
   requirements:

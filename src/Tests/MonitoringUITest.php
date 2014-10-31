@@ -168,9 +168,14 @@ class MonitoringUITest extends MonitoringTestBase {
     );
 
     $this->drupalGet('admin/reports/monitoring');
+
     // Test if the Test sensor is listed as the oldest cached. We do not test
     // for the cached time as such test contains a risk of random fail.
     $this->assertRaw(String::format('Sensor %sensor (%category) cached before', array('%sensor' => 'Test sensor', '%category' => 'Test')));
+
+    // Test the action buttons are clickable.
+    $this->assertLink(t('Details'));
+    $this->assertLink(t('Edit'));
 
     // Test the overview table.
     $tbody = $this->xpath('//table[@id="monitoring-sensors-overview"]/tbody');

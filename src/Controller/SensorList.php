@@ -107,16 +107,23 @@ class SensorList extends ControllerBase {
         $row['class'] = array('monitoring-' . strtolower($sensor_result->getStatus()));
 
         $links = array();
-        $links['details'] = array('title' => t('Details'), 'href' => 'admin/reports/monitoring/sensors/' . $sensor_name);
-        if ($this->currentUser()->hasPermission('monitoring verbose')) {
-          $links['log'] = array('title' => t('Log'), 'href' => 'admin/reports/monitoring/sensors/' . $sensor_name . '/log');
-        }
+        $links['details'] = array(
+          'title' => t('Details'),
+          'url' => $sensor_info->urlInfo('details-form')
+        );
+
         // Display a force execution link for any sensor that can be cached.
         if ($sensor_info->getCachingTime() && $this->currentUser()->hasPermission('monitoring force run')) {
-          $links['force_execution'] = array('title' => t('Force execution'), 'href' => 'monitoring/sensors/force/' . $sensor_name);
+          $links['force_execution'] = array(
+            'title' => t('Force execution'),
+            'url' => $sensor_info->urlInfo('force-run-form')
+          );
         }
-	$links['edit'] = array('title' => t('Edit'), 'href' => 'admin/config/system/monitoring/sensors/' . $sensor_name,
-          'query' => array('destination' => 'admin/reports/monitoring'));
+        $links['edit'] = array(
+          'title' => t('Edit'),
+          'url' => $sensor_info->urlInfo('edit-form'),
+          'query' => array('destination' => 'admin/reports/monitoring')
+        );
 
         \Drupal::moduleHandler()->alter('monitoring_sensor_links', $links, $sensor_info);
 
