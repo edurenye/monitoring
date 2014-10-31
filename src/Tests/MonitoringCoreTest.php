@@ -12,7 +12,7 @@ use Drupal\monitoring\Entity\SensorInfo;
 
 
 /**
- * Tests for cron sensor.
+ * Tests for the core pieces of monitoring.
  */
 class MonitoringCoreTest extends MonitoringTestBase {
 
@@ -132,7 +132,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $sensorInfo->settings = $settings;
     $sensorInfo->save();
 
-    // We still should have OK status but with different message
+    // We still should have OK status but with different message.
     $result = $this->runSensor('core_requirements_monitoring_test');
     // We expect OK status as REQUIREMENT_ERROR is set by excluded requirement.
     $this->assertTrue($result->isOk());
@@ -260,7 +260,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Two lines of cmd output.
     $this->assertEqual($result->getValue(), 2);
 
-    // Now echo empty string
+    // Now echo empty string.
     $sensorInfo->settings['cmd'] = 'echo ""';
     $sensorInfo->save();
 
@@ -404,8 +404,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
     monitoring_sensor_manager()->enableSensor('comment_new');
     // Now disable the comment module to have the comment_new sensor disappear.
     $module_handler->uninstall(array('comment'));
-    // Run the monitoring_disappeared_sensors sensor to get the status message that should
-    // be found in the settings form.
+    // Run the monitoring_disappeared_sensors sensor to get the status message
+    // that should be found in the settings form.
     $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
     $this->assertText('Missing sensor comment_new');
 
@@ -661,8 +661,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'field_name' => 'term_reference',
       'entity_type' => 'node',
       'bundle' => $type2->type,
-      'settings' => array(
-      ),
+      'settings' => array(),
       'required' => FALSE,
       'widget' => array(
         'type' => 'options_select',
@@ -695,8 +694,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'field_name' => 'term_reference2',
       'entity_type' => 'node',
       'bundle' => $type2->type,
-      'settings' => array(
-      ),
+      'settings' => array(),
       'required' => FALSE,
       'widget' => array(
         'type' => 'options_select',
@@ -754,7 +752,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'test' => array('field' => 'term_reference.target_id', 'value' => $term1->id()),
       'test2' => array(
         'field' => 'term_reference2.target_id',
-        'value' => $term2->id()
+        'value' => $term2->id(),
       ),
     );
     $sensor_info->save();
