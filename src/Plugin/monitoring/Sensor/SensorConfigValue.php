@@ -43,6 +43,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
    *   Config name.
    *
    * @return \Drupal\Core\Config\Config
+   *   The config.
    */
   protected function getConfig($name) {
     return $this->getService('config.factory')->get($name);
@@ -56,7 +57,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
     $settings = $this->info->getSettings();
     $form['config'] = array(
       '#type' => 'textfield',
-      '#default_value' => $this->info->getSetting('config')? $this->info->getSetting('config') : '',
+      '#default_value' => $this->info->getSetting('config') ? $this->info->getSetting('config') : '',
       '#autocomplete_route_name' => 'monitoring.config_autocomplete',
       '#maxlength' => 255,
       '#title' => t('Config Object'),
@@ -64,7 +65,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
     );
     $form['key'] = array(
       '#type' => 'textfield',
-      '#default_value' => $this->info->getSetting('key')? $this->info->getSetting('key') : '',
+      '#default_value' => $this->info->getSetting('key') ? $this->info->getSetting('key') : '',
       '#maxlength' => 255,
       '#title' => t('Key'),
       '#required' => TRUE,
