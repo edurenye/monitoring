@@ -7,5 +7,5 @@ numeric: FALSE
 category: 'Other'
 status: TRUE
 settings:
-  state: 'system.maintenance_mode'
+  key: 'system.maintenance_mode'
   value: FALSE
