@@ -2,6 +2,7 @@
 
 namespace Drupal\monitoring\Controller;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -102,7 +103,7 @@ class SensorList extends ControllerBase {
           'data' => $sensor_result->getExecutionTime() . 'ms',
           'class' => array('execution-time'),
         );
-        $row['data']['sensor_status_message'] = truncate_utf8(strip_tags($sensor_result->getMessage()), 200, TRUE, TRUE);
+        $row['data']['sensor_status_message'] = Unicode::truncate(strip_tags($sensor_result->getMessage()), 200, TRUE, TRUE);
 
         $row['class'] = array('monitoring-' . strtolower($sensor_result->getStatus()));
 

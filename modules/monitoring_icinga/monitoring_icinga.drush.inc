@@ -4,7 +4,7 @@
  * @file
  * Drush integration for monitoring_icinga.module.
  */
-
+use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
@@ -47,7 +47,7 @@ function monitoring_icinga_drush_callback($sensor_name = NULL) {
   $output = '';
 
   foreach ($results as $result) {
-    $message = iconv('utf-8', 'ASCII', truncate_utf8(strip_tags($result->getMessage()), 124, TRUE, TRUE));
+    $message = iconv('utf-8', 'ASCII', Unicode::truncate(strip_tags($result->getMessage()), 124, TRUE, TRUE));
     $service_description = monitoring_icinga_service_description($result->getSensorInfo());
 
     // Map INFO status to OK.

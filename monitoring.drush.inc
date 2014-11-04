@@ -6,6 +6,7 @@
 
 use Drupal\Component\Utility\Json;
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
@@ -322,9 +323,9 @@ function monitoring_drush_result_output_table_multiple(array $results, $show_exe
 
   foreach ($results as $result) {
     $rows[$result->getSensorName()] = array(
-      String::format("@label\n(@name)", array('@label' => truncate_utf8($result->getSensorInfo()->getLabel(), 40, TRUE, TRUE), '@name' => $result->getSensorName())),
+      String::format("@label\n(@name)", array('@label' => Unicode::truncate($result->getSensorInfo()->getLabel(), 40, TRUE, TRUE), '@name' => $result->getSensorName())),
       $result->getStatusLabel(),
-      truncate_utf8($result->getMessage(), 40, TRUE, TRUE),
+      Unicode::truncate($result->getMessage(), 40, TRUE, TRUE),
       \Drupal::service('date.formatter')->formatInterval(time() - $result->getTimestamp()),
     );
 
