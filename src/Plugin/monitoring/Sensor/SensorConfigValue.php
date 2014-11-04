@@ -10,7 +10,7 @@ use Drupal\monitoring\Sensor\Sensor;
 use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
 
 /**
- * Generic sensor that checks for the config value.
+ * Generic sensor that checks for a configuration value.
  *
  * @Sensor(
  *   id = "config_value",
@@ -18,7 +18,6 @@ use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
  *   description = @Translation("Checks for a specific configuration value."),
  *   addable = TRUE
  * )
- *
  */
 class SensorConfigValue extends SensorValueComparisonBase {
 

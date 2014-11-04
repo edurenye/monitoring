@@ -11,15 +11,14 @@ use Drupal;
 use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
 
 /**
- * Generic sensor that checks for the variable value.
+ * Generic sensor that checks for a state value.
  *
  * @Sensor(
  *   id = "state_value",
  *   label = @Translation("State Value"),
- *   description = @Translation("Monitors and checks for the variable value."),
+ *   description = @Translation("Checks for a specific state value."),
  *   addable = FALSE
  * )
- *
  */
 class SensorStateValue extends SensorValueComparisonBase {
 
@@ -39,9 +38,10 @@ class SensorStateValue extends SensorValueComparisonBase {
   }
 
   /**
-   * Gets config.
+   * Gets state.
    *
-   * @return \Drupal\Core\KeyValueStore\State
+   * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   *   The state.
    */
   protected function getState() {
     return $this->getService('state');
