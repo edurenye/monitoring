@@ -3,7 +3,7 @@
  * @file
  * Monitoring Munin module bootstrap file.
  */
-
+use Drupal\Component\Utility\Html;
 use Drupal\monitoring\SensorRunner;
 
 /**
@@ -275,5 +275,5 @@ function monitoring_munin_sensor_identifier($sensor_name) {
  *   The identifier.
  */
 function monitoring_munin_multigraph_identifier($category) {
-  return str_replace('-', '_', monitoring_host_key() . '__' . drupal_clean_css_identifier($category));
+  return str_replace('-', '_', monitoring_host_key() . '__' . Html::cleanCssIdentifier($category));
 }

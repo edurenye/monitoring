@@ -5,6 +5,7 @@
  */
 namespace Drupal\monitoring\Tests;
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\FileUsage\FileUsageInterface;
@@ -770,7 +771,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
   function createVocabulary() {
     // Create a vocabulary.
     $vocabulary = entity_create('taxonomy_vocabulary');
-    $vocabulary->vid = drupal_strtolower($this->randomMachineName());
+    $vocabulary->vid = Unicode::strtolower($this->randomMachineName());
     $vocabulary->name = $this->randomMachineName();
     $vocabulary->description = $this->randomMachineName();
     $vocabulary->save();

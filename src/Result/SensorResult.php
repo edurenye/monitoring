@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Result;
 
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Sensor\SensorCompilationException;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\monitoring\Sensor\Thresholds;
@@ -318,7 +319,7 @@ class SensorResult implements SensorResultInterface {
     if ($label = $this->getSensorInfo()->getValueLabel()) {
       // @todo This assumption will no longer work when non-english messages
       // supported.
-      $label = drupal_strtolower($label);
+      $label = Unicode::strtolower($label);
       return String::format('!value !label', array('!value' => $value, '!label' => $label));
     }
 

@@ -4,6 +4,7 @@
  * Set up dependencies for demo and tests.
  */
 use Drupal\Component\Utility\Random;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Language\Language;
 
 /**
@@ -39,7 +40,7 @@ function monitoring_setup_search_api() {
   $name = 'Monitoring test index';
   $values = array(
     'name' => $name,
-    'machine_name' => preg_replace('/[^a-z0-9]+/', '_', drupal_strtolower($name)),
+    'machine_name' => preg_replace('/[^a-z0-9]+/', '_', Unicode::strtolower($name)),
     'description' => 'An automatically created search index for indexing node data. Might be configured to specific needs.',
     'server' => $server->machine_name,
     'enabled' => TRUE,
