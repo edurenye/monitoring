@@ -31,8 +31,8 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds implements 
    *
    * @return array
    *   List of conditions where each condition is an associative array:
-   *   - field: Name of the field to filter on. Configurable fields are supported
-   *     using the field_name.column_name syntax.
+   *   - field: Name of the field to filter on. Configurable fields are
+   *     supported using the field_name.column_name syntax.
    *   - value: The value to limit by, either an array or a scalar value.
    *   - operator: Any of the supported operators.
    */
@@ -59,6 +59,7 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds implements 
    */
   public function settingsForm($form, &$form_state) {
     $form = parent::settingsForm($form, $form_state);
+
     $form['time_interval_value'] = array(
       '#type' => 'select',
       '#title' => t('Aggregate time interval'),
@@ -93,7 +94,7 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds implements 
       259200,
       604800,
       1209600,
-      2419200
+      2419200,
     );
     $date_formatter = \Drupal::service('date.formatter');
     return array_map(array($date_formatter, 'formatInterval'), array_combine($time_intervals, $time_intervals)) + array(0 => t('No restriction'));

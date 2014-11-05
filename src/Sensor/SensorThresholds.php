@@ -20,7 +20,6 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
    * {@inheritdoc}
    */
   public function settingsForm($form, &$form_state) {
-
     $form = parent::settingsForm($form, $form_state);
 
     $form['thresholds'] = array(
@@ -68,6 +67,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
           '#default_value' => $this->info->getThresholdValue('critical'),
         );
         break;
+
       case 'falls':
         $form['thresholds']['#description'] = t('The sensor will be set to the corresponding status if the value falls below the limits.');
         $form['thresholds']['warning'] = array(
@@ -81,6 +81,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
           '#default_value' => $this->info->getThresholdValue('critical'),
         );
         break;
+
       case 'inner_interval':
         $form['thresholds']['#description'] = t('The sensor will be set to the corresponding status if the value is within the limits.');
         $form['thresholds']['warning_low'] = array(
@@ -104,6 +105,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
           '#default_value' => $this->info->getThresholdValue('critical_high'),
         );
         break;
+
       case 'outer_interval':
         $form['thresholds']['#description'] = t('The sensor will be set to the corresponding status if the value is outside of the limits.');
         $form['thresholds']['warning_low'] = array(
@@ -159,11 +161,13 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
           $this->setFormError('warning', $form_state, t('Warning must be lower than critical or empty.'));
         }
         break;
+
       case 'falls':
         if (!empty($values['warning']) && !empty($values['critical']) && $values['warning'] <= $values['critical']) {
           $this->setFormError('warning', $form_state, t('Warning must be higher than critical or empty.'));
         }
         break;
+
       case 'inner_interval':
         if (empty($values['warning_low']) && !empty($values['warning_high']) || !empty($values['warning_low']) && empty($values['warning_high'])) {
           $this->setFormError('warning_low', $form_state, t('Either both warning values must be provided or none.'));
@@ -184,6 +188,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
           $this->setFormError('warning_high', $form_state, t('Warning high must be higher than critical high or empty.'));
         }
         break;
+
       case 'outer_interval':
         if (empty($values['warning_low']) && !empty($values['warning_high']) || !empty($values['warning_low']) && empty($values['warning_high'])) {
           $this->setFormError('warning_low', $form_state, t('Either both warning values must be provided or none.'));

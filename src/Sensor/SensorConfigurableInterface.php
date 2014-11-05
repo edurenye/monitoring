@@ -19,7 +19,7 @@ interface SensorConfigurableInterface {
   /**
    * Gets settings form for a specific sensor.
    *
-   * @param $form
+   * @param array $form
    *   Drupal $form structure.
    * @param array $form_state
    *   Drupal $form_state object. Carrying the string sensor_name.
@@ -32,7 +32,7 @@ interface SensorConfigurableInterface {
   /**
    * Form validator for a sensor settings form.
    *
-   * @param $form
+   * @param array $form
    *   Drupal $form structure.
    * @param array $form_state
    *   Drupal $form_state object. Carrying the string sensor_name.
