@@ -81,7 +81,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'sensor_id' => 'entity_aggregator',
     ), t('Select sensor'));
 
-    $this->assertText('Sensor Settings');
+    $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
       'settings[time_interval_value]' => 86400,
       'settings[entity_type]' => 'field_storage_config',

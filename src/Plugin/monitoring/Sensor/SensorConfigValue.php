@@ -25,7 +25,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
    * {@inheritdoc}
    */
   protected function getValueDescription() {
-    return t('Expected value of config %config', array('%config' => $this->info->getSetting('config') . '->' . $this->info->getSetting('key')));
+    return t('The expected value of config %key', array('%key' => $this->info->getSetting('config') . ':' . $this->info->getSetting('key')));
   }
 
   /**
@@ -54,7 +54,8 @@ class SensorConfigValue extends SensorValueComparisonBase {
    */
   public function settingsForm($form, &$form_state) {
     $form = parent::settingsForm($form, $form_state);
-    $settings = $this->info->getSettings();
+
+    // Add weight to display config key before expected value.
     $form['config'] = array(
       '#type' => 'textfield',
       '#default_value' => $this->info->getSetting('config') ? $this->info->getSetting('config') : '',
@@ -62,6 +63,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
       '#maxlength' => 255,
       '#title' => t('Config Object'),
       '#required' => TRUE,
+      '#weight' => -1,
     );
     $form['key'] = array(
       '#type' => 'textfield',
@@ -69,6 +71,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
       '#maxlength' => 255,
       '#title' => t('Key'),
       '#required' => TRUE,
+      '#weight' => -1,
     );
     return $form;
   }

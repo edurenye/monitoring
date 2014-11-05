@@ -24,6 +24,8 @@ class SensorForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $form['#tree'] = TRUE;
+
+    /* @var SensorInfo $sensor_info */
     $sensor_info = $this->entity;
 
     $form['category'] = array(
@@ -66,7 +68,7 @@ class SensorForm extends EntityForm {
       '#title' => t('Value Label'),
       '#maxlength' => 255,
       '#default_value' => $sensor_info->getValueLabel(),
-      '#description' => t("Value Label of the Sensor"),
+      '#description' => t("The value label represents the units of the sensor value."),
     );
 
     $form['caching_time'] = array(
@@ -74,7 +76,7 @@ class SensorForm extends EntityForm {
       '#title' => t('Cache Time'),
       '#maxlength' => 10,
       '#default_value' => $sensor_info->getCachingTime(),
-      '#description' => t("Caching time for the sensor"),
+      '#description' => t("The caching time for the sensor in seconds. Empty to disable caching."),
     );
 
     if ($sensor_info->isNew()) {
@@ -111,8 +113,8 @@ class SensorForm extends EntityForm {
     }
     else {
       $form_state->set('sensor_object', $sensor_info->getPlugin());
-      // Set the sensor object into $form_state to make it available for validate
-      // and submit callbacks.
+      // Set the sensor object into $form_state to make it available for
+      // validate and submit callbacks.
       $form['old_sensor_id'] = array(
         '#type' => 'textfield',
         '#title' => t('Sensor Plugin'),
@@ -131,12 +133,11 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_info->status(),
     );
 
-    if (isset($this->entity->sensor_id)) {
+    if (isset($sensor_info->sensor_id)) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
-        '#title' => t('Sensor Settings'),
-        '#description' => t("Here you change settings of the sensor."),
+        '#title' => t('Sensor plugin settings'),
         '#prefix' => '<div id="monitoring-sensor-plugin">',
         '#suffix' => '</div>',
       );

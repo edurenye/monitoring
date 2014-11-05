@@ -7,7 +7,6 @@
 
 namespace Drupal\monitoring\Sensor\Sensors;
 
-use Drupal\Component\Utility\String;
 use Drupal\monitoring\Sensor\SensorConfigurable;
 use Drupal\monitoring\Result\SensorResultInterface;
 
@@ -57,7 +56,8 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
     }
 
     $form['value'] = array(
-      '#title' => $this->getValueDescription(),
+      '#title' => 'Expected value',
+      '#description' => $this->getValueDescription(),
       '#default_value' => $this->getActualValue(),
     );
 
