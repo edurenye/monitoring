@@ -6,8 +6,6 @@
 
 namespace Drupal\monitoring\Sensor\Sensors;
 
-use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 use Drupal\monitoring\Sensor\SensorThresholds;
 
 /**
@@ -24,7 +22,7 @@ use Drupal\monitoring\Sensor\SensorThresholds;
  *
  * Adds time interval to sensor settings form.
  */
-abstract class SensorDatabaseAggregatorBase extends SensorThresholds implements SensorExtendedInfoInterface {
+abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
 
   /**
    * Gets conditions to be used in the select query.

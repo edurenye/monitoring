@@ -9,6 +9,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
+use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 use Drupal\monitoring\Sensor\Sensors\SensorDatabaseAggregatorBase;
 use Drupal\Core\Entity\DependencyTrait;
 
@@ -23,7 +24,7 @@ use Drupal\Core\Entity\DependencyTrait;
  * )
  *
  */
-class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase {
+class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements SensorExtendedInfoInterface {
   
   use DependencyTrait;
 

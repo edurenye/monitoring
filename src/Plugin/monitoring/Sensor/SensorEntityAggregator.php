@@ -10,6 +10,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
+use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 use Drupal\monitoring\Sensor\Sensors\SensorDatabaseAggregatorBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
@@ -30,7 +31,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   addable = TRUE
  * )
  */
-class SensorEntityAggregator extends SensorDatabaseAggregatorBase {
+class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements SensorExtendedInfoInterface {
 
   use DependencySerializationTrait;
   use DependencyTrait;
