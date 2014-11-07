@@ -60,7 +60,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase {
   /**
    * Builds the entity aggregate query.
    *
-   * @return Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
    */
   protected function getEntityQueryAggregate() {
@@ -223,12 +223,12 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase {
       $form['conditions'][$no] = array(
         'field' => array(
           '#type' => 'textfield',
-          '#title' => t('Condition\'s Field'),
+          '#title' => t("Condition's Field"),
           '#default_value' => $condition['field'],
         ),
         'value' => array(
           '#type' => 'textfield',
-          '#title' => t('Condition\'s Value'),
+          '#title' => t("Condition's Value"),
           '#default_value' => $condition['value'],
         )
       );
@@ -237,7 +237,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase {
   }
 
   /**
-   * Returns the rebuild form;
+   * Returns the rebuild form.
    */
   public function addConditions(array $form, FormStateInterface $form_state) {
     return $form['settings']['conditions'];
