@@ -64,7 +64,7 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase {
    *   The select query object.
    */
   protected function getAggregateQuery() {
-    /** @var \Drupal\Core\Database\Connection $database */
+    /* @var \Drupal\Core\Database\Connection $database */
     $database = $this->getService('database');
     $query = $database->select($this->info->getSetting('table'));
     $this->addAggregateExpression($query);
@@ -82,6 +82,9 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase {
 
   /**
    * Adds the aggregate expression to the select query.
+   *
+   * @param SelectInterface $select
+   *   The database select query.
    */
   protected function addAggregateExpression(SelectInterface $select) {
     $select->addExpression('COUNT(*)', 'records_count');
@@ -145,13 +148,13 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase {
 
     $form['conditions'][0]['field'] = array(
       '#type' => 'textfield',
-      '#title' => t('Condition\'s Field'),
+      '#title' => t("Condition's Field"),
       '#maxlength' => 255,
       '#default_value' => $field,
     );
     $form['conditions'][0]['value'] = array(
       '#type' => 'textfield',
-      '#title' => t('Condition\'s Value'),
+      '#title' => t("Condition's Value"),
       '#maxlength' => 255,
       '#default_value' => $field_value,
     );
