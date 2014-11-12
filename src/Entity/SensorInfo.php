@@ -172,7 +172,7 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
-   * Returns the sensor plugin.
+   * Gets the sensor plugin.
    *
    * @return \Drupal\monitoring\Sensor\SensorInterface
    *   Instantiated sensor.
@@ -259,7 +259,9 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
-   * Gets threshold type.
+   * Gets configured threshold type.
+   *
+   * Defaults to none.
    *
    * @return string|null
    *   Threshold type.
@@ -269,18 +271,17 @@ class SensorInfo extends ConfigEntityBase {
       return $this->settings['thresholds']['type'];
     }
 
-    // We assume the default threshold type.
-    return 'exceeds';
+    return 'none';
   }
 
   /**
-   * Returns a given threshold if one is configured.
+   * Gets the configured threshold value.
    *
-   * @param $key
+   * @param string $key
    *   Name of the threshold, for example warning or critical.
    *
    * @return int|null
-   *   The threshold value or NULL if not-configured.
+   *   The threshold value or NULL if not configured.
    */
   public function getThresholdValue($key) {
     if (isset($this->settings['thresholds'][$key]) && $this->settings['thresholds'][$key] !== '') {
@@ -289,7 +290,7 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
-   * Returns all settings.
+   * Gets all settings.
    *
    * @return array
    *   Settings as an array.
@@ -299,7 +300,7 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
-   * Gets time interval value.
+   * Gets the time interval value.
    *
    * @return int
    *   Number of seconds of the time interval.
@@ -310,7 +311,7 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
-   * Gets setting.
+   * Gets the setting of a key.
    *
    * @param string $key
    *   Setting key.

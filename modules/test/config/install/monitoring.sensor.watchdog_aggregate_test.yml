@@ -6,6 +6,7 @@ sensor_id: database_aggregator
 settings:
   result_logging: FALSE
   thresholds:
+    type: 'exceeds'
     warning: 1
     critical: 2
   table: 'watchdog'

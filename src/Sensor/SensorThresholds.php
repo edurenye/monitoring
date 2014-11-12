@@ -30,10 +30,9 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
       '#suffix' => '</div>',
     );
 
-    if ($form_state->hasValue(array($this->getSensorName(), 'thresholds', 'type'))) {
-      $type = $form_state->gasValue(array($this->getSensorName(), 'thresholds', 'type'));
-    }
-    else {
+    $type = $form_state->getValue(array('settings', 'thresholds', 'type'));
+
+    if (empty($type)) {
       $type = $this->info->getThresholdsType();
     }
 
@@ -41,6 +40,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
       '#type' => 'select',
       '#title' => t('Threshold type'),
       '#options' => array(
+        'none' => t('- None -'),
         'exceeds' => t('Exceeds'),
         'falls' => t('Falls'),
         'inner_interval' => t('Inner interval'),

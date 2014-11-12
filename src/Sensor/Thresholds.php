@@ -62,7 +62,7 @@ class Thresholds {
       return SensorResultInterface::STATUS_OK;
     }
     else {
-      $this->message = String::format('Unknown threshold type @type', array('@type' => $this->$this->sensorInfo->getThresholdsType()));
+      $this->message = String::format('Unknown threshold type @type', array('@type' => $this->sensorInfo->getThresholdsType()));
       return SensorResultInterface::STATUS_CRITICAL;
     }
   }
@@ -165,4 +165,13 @@ class Thresholds {
     }
   }
 
+  /**
+   * Returns the sensor status ok for the default threshold type None.
+   *
+   * @return string
+   *   The sensor status.
+   */
+  protected function none() {
+    return SensorResultInterface::STATUS_OK;
+  }
 }
