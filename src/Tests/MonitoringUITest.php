@@ -59,6 +59,12 @@ class MonitoringUITest extends MonitoringTestBase {
     // sensor results in a page not found response.
     $this->drupalGet('admin/config/system/monitoring/sensors/non_existing_sensor');
     $this->assertResponse(404);
+
+    // Tests the fields 'Sensor Plugin' & 'Entity Type' appear.
+    $this->drupalGet('admin/config/system/monitoring/sensors/user_new');
+    $this->assertOptionSelected('edit-settings-old-entity-type', 'user');
+    $this->assertText('Sensor Plugin');
+    $this->assertText('Entity Aggregator');
   }
 
   /**

@@ -156,11 +156,11 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
 
     if (isset($this->info->settings['entity_type'])) {
       $form['old_entity_type'] = array(
-        '#type' => 'textfield',
-        '#default_value' => $this->entityManager->getDefinition($this->getEntityType())->getClass(),
-	'#maxlength' => 255,
+        '#type' => 'select',
+        '#default_value' => $this->getEntityType(),
+        '#maxlength' => 255,
+        '#options' => $this->entityManager->getEntityTypeLabels(),
         '#title' => t('Entity Type'),
-        '#attributes' => array('readonly' => 'readonly'),
       );
       if (isset($settings['conditions'])) {
         $conditions = $settings['conditions'];
@@ -169,6 +169,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
     else {
       $form['entity_type'] = array(
         '#type' => 'select',
+        '#default_value' => $this->getEntityType(),
         '#options' => $this->entityManager->getEntityTypeLabels(),
         '#title' => t('Entity Type'),
         '#required' => TRUE,

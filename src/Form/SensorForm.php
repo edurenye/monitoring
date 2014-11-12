@@ -116,11 +116,10 @@ class SensorForm extends EntityForm {
       // Set the sensor object into $form_state to make it available for
       // validate and submit callbacks.
       $form['old_sensor_id'] = array(
-        '#type' => 'textfield',
+        '#type' => 'item',
         '#title' => t('Sensor Plugin'),
         '#maxlength' => 255,
-        '#attributes' => array('readonly' => 'readonly'),
-        '#default_value' => monitoring_sensor_manager()->getDefinition($sensor_info->sensor_id)['label']->render(),
+        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_info->sensor_id)['label']->render(),
       );
     }
 
