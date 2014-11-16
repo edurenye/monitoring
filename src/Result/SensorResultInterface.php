@@ -144,7 +144,7 @@ interface SensorResultInterface {
    * @return mixed
    *   Whatever value the sensor is supposed to return.
    */
-  function getFormattedValue($value);
+  public function getFormattedValue($value);
 
   /**
    * Sets sensor value.

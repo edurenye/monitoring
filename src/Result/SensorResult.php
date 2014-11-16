@@ -468,14 +468,14 @@ class SensorResult implements SensorResultInterface {
   /**
    * {@inheritdoc}
    */
-  function getSensorName() {
+  public function getSensorName() {
     return $this->sensorInfo->getName();
   }
 
   /**
    * {@inheritdoc}
    */
-  function getSensorInfo() {
+  public function getSensorInfo() {
     return $this->sensorInfo;
   }
 

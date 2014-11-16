@@ -28,7 +28,7 @@ abstract class MonitoringTestBase extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  function setUp() {
+  protected function setUp() {
     parent::setUp();
     if (!\Drupal::moduleHandler()->moduleExists('monitoring')) {
       throw new \Exception("Failed to install modules, aborting test");

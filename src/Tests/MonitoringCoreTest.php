@@ -35,7 +35,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
   /**
    * Tests individual sensors.
    */
-  function testSensors() {
+  public function testSensors() {
 
     // ======= SensorCronLastRunAge tests ======= //
 
@@ -324,7 +324,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * We provide a separate test method for the SensorDisappearedSensors as we
    * need to enable and disable additional modules.
    */
-  function testSensorDisappearedSensors() {
+  public function testSensorDisappearedSensors() {
 
     $module_handler = \Drupal::moduleHandler();
 
@@ -421,7 +421,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
   /**
    * Tests the UI/settings of the enabled modules sensor.
    */
-  function testSensorInstalledModulesUI() {
+  public function testSensorInstalledModulesUI() {
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
 
@@ -486,7 +486,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    *
    * We use separate test method as we need to enable/disable modules.
    */
-  function testSensorInstalledModulesAPI() {
+  public function testSensorInstalledModulesAPI() {
     // The initial run of the sensor will acknowledge all installed modules as
     // expected and so the status should be OK.
     $result = $this->runSensor('monitoring_enabled_modules');
@@ -521,7 +521,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
   /**
    * Tests the watchdog entries aggregator.
    */
-  function testGenericDBAggregate() {
+  public function testGenericDBAggregate() {
 
     // Aggregate by watchdog type.
     $sensor_info = SensorInfo::load('watchdog_aggregate_test');
@@ -768,7 +768,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * @return \Drupal\taxonomy\VocabularyInterface;
    *   Vocabulary object.
    */
-  function createVocabulary() {
+  protected function createVocabulary() {
     // Create a vocabulary.
     $vocabulary = entity_create('taxonomy_vocabulary');
     $vocabulary->vid = Unicode::strtolower($this->randomMachineName());
@@ -787,7 +787,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * @return \Drupal\taxonomy\TermInterface;
    *   Term object.
    */
-  function createTerm($vocabulary) {
+  protected function createTerm($vocabulary) {
     $term = entity_create('taxonomy_term', array('vid' => $vocabulary->id()));
     $term->name = $this->randomMachineName();
     $term->description = $this->randomMachineName();
@@ -804,7 +804,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * @return array
    *   List of dblog entries.
    */
-  function loadWatchdog($type = 'monitoring') {
+  protected function loadWatchdog($type = 'monitoring') {
     return db_query("SELECT * FROM {watchdog} WHERE type = :type", array(':type' => $type))
       ->fetchAll();
   }

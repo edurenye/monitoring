@@ -35,7 +35,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * {@inheritdoc}
    */
-  function setUp() {
+  protected function setUp() {
     parent::setUp();
     // Create the content type page in the setup as it is used by several tests.
     $this->drupalCreateContentType(array('type' => 'page'));
@@ -44,7 +44,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Test the sensor settings UI.
    */
-  function testSensorSettingsUI() {
+  public function testSensorSettingsUI() {
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
 
@@ -70,7 +70,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests creation of sensor through UI.
    */
-  function testSensorCreation() {
+  public function testSensorCreation() {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
@@ -109,7 +109,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests the time interval settings UI of the database aggregator sensor.
    */
-  function testAggregateSensorTimeIntervalConfig() {
+  public function testAggregateSensorTimeIntervalConfig() {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
@@ -156,7 +156,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Sensor over page tests coverage.
    */
-  function testSensorOverviewPage() {
+  public function testSensorOverviewPage() {
     $account = $this->drupalCreateUser(array('monitoring reports'));
     $this->drupalLogin($account);
 
@@ -204,7 +204,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests the sensor detail page.
    */
-  function testSensorDetailPage() {
+  public function testSensorDetailPage() {
     $account = $this->drupalCreateUser(array('monitoring reports', 'monitoring verbose', 'monitoring force run'));
     $this->drupalLogin($account);
 
@@ -281,7 +281,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests the force execute all and sensor specific force execute links.
    */
-  function testForceExecute() {
+  public function testForceExecute() {
     $account = $this->drupalCreateUser(array('monitoring force run', 'monitoring reports'));
     $this->drupalLogin($account);
 

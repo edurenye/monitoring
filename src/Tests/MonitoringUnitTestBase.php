@@ -23,7 +23,7 @@ abstract class MonitoringUnitTestBase extends DrupalUnitTestBase {
   /**
    * {@inheritdoc}
    */
-  function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     $this->installEntitySchema('monitoring_sensor_result');

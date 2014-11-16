@@ -43,7 +43,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
   /**
    * Test the base class if info is set and passed correctly.
    */
-  function testAPI() {
+  public function testAPI() {
 
     // == Test sensor info. == //
     // @todo - complete the sensor info tests in followup.
@@ -332,7 +332,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
   /**
    * Test logging with different settings.
    */
-  function testLogging() {
+  public function testLogging() {
 
     // First perform tests with the logging strategy in default mode - that is
     // "Log only on request or on status change".

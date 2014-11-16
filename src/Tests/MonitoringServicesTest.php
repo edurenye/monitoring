@@ -70,7 +70,7 @@ class MonitoringServicesTest extends RESTTestBase {
   /**
    * Test sensor info API calls.
    */
-  function testSensorInfo() {
+  public function testSensorInfo() {
     $this->drupalLogin($this->servicesAccount);
 
     $response_data = $this->doRequest('monitoring-sensor-info');
@@ -120,7 +120,7 @@ class MonitoringServicesTest extends RESTTestBase {
   /**
    * Test sensor result API calls.
    */
-  function testSensorResult() {
+  public function testSensorResult() {
     $this->drupalLogin($this->servicesAccount);
 
     // Test request for sensor results with expanded sensor info.

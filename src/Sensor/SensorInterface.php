@@ -24,7 +24,7 @@ interface SensorInterface extends PluginInspectionInterface {
    * @param mixed $service
    *   The service to be used in the run method.
    */
-  function addService($id, $service);
+  public function addService($id, $service);
 
   /**
    * Gets service.
@@ -34,7 +34,7 @@ interface SensorInterface extends PluginInspectionInterface {
    *
    * @return mixed
    */
-  function getService($id);
+  public function getService($id);
 
   /**
    * Gets sensor name (not the label).
@@ -42,7 +42,7 @@ interface SensorInterface extends PluginInspectionInterface {
    * @return string
    *   Sensor name.
    */
-  function getSensorName();
+  public function getSensorName();
 
   /**
    * Runs the sensor, updating $sensor_result.
@@ -109,7 +109,7 @@ interface SensorInterface extends PluginInspectionInterface {
    * @see \Drupal\monitoring\Result\SensorResultInterface::setMessage()
    * @see \Drupal\monitoring\Result\SensorResultInterface::addStatusMessage()
    */
-  function runSensor(SensorResultInterface $sensor_result);
+  public function runSensor(SensorResultInterface $sensor_result);
 
   /**
    * Determines if sensor is enabled.
@@ -117,7 +117,7 @@ interface SensorInterface extends PluginInspectionInterface {
    * @return boolean
    *   Enabled flag.
    */
-  function isEnabled();
+  public function isEnabled();
 
   /**
    * Calculates dependencies for the configured plugin.
