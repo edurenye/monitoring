@@ -5,8 +5,8 @@
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\Sensor;
 
 /**
  * Monitors commerce order turnover stats.
@@ -79,7 +79,7 @@ class SensorCommerceTurnover extends SensorEntityAggregator {
   /**
    * Adds the order statuses select element to the sensor settings form.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $conditions = $this->info->getSetting('conditions');
 

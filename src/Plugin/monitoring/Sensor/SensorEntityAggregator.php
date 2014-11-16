@@ -149,7 +149,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   /**
    * Adds UI for variables entity_type and conditions.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $conditions = array(array('field' => '', 'value' => ''));
     $settings = $this->info->getSettings();

@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorConfigurable;
 
@@ -39,7 +40,7 @@ class SensorDisappearedSensors extends SensorConfigurable {
   /**
    * Adds UI to clear the missing sensor status.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     try {
       $result = monitoring_sensor_run($this->info->getName());
     } catch (\Exception $e) {

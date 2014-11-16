@@ -5,6 +5,7 @@
  */
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Extension\Extension;
@@ -384,7 +385,7 @@ function monitoring_host_key() {
  *
  * @see \Drupal\monitoring\Sensor\Sensors\SensorDisappearedSensors::settingsForm()
  */
-function monitoring_clear_missing_sensor_submit($form, &$form_state) {
+function monitoring_clear_missing_sensor_submit($form, FormStateInterface $form_state) {
   $available_sensors = array();
   foreach (monitoring_sensor_info() as $key => $info) {
     $available_sensors[$key] = array(
@@ -550,7 +551,7 @@ function monitoring_value_label_callback_commerce_currency(SensorResultInterface
 /**
  * Ajax callback for threshold sensors settings form.
  */
-function monitoring_sensor_thresholds_ajax($form, &$form_state) {
+function monitoring_sensor_thresholds_ajax($form, FormStateInterface $form_state) {
   return $form['settings']['thresholds'];
 }
 

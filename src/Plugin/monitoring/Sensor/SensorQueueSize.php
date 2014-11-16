@@ -9,6 +9,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorThresholds;
 use Drupal;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Monitors number of items for a given core queue.
@@ -30,7 +31,7 @@ class SensorQueueSize extends SensorThresholds {
   /**
    * Adds UI to select Queue for the sensor.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $queues = array_keys(Drupal::moduleHandler()->invokeAll('queue_info'));
     $form['queue'] = array(

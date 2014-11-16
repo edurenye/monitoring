@@ -8,6 +8,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 use Drupal\monitoring\Sensor\Sensors\SensorDatabaseAggregatorBase;
@@ -130,7 +131,7 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements S
   /**
    * Adds UI for variables table and conditions.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $field = '';
     $field_value = '';

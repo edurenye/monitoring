@@ -6,6 +6,8 @@
 
 namespace Drupal\monitoring\Sensor;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Interface for a configurable sensor.
  *
@@ -21,22 +23,22 @@ interface SensorConfigurableInterface {
    *
    * @param array $form
    *   Drupal $form structure.
-   * @param array $form_state
+   * @param FormStateInterface $form_state
    *   Drupal $form_state object. Carrying the string sensor_name.
    *
    * @return array
    *   Drupal form structure.
    */
-  function settingsForm($form, &$form_state);
+  public function settingsForm($form, FormStateInterface $form_state);
 
   /**
    * Form validator for a sensor settings form.
    *
    * @param array $form
    *   Drupal $form structure.
-   * @param array $form_state
+   * @param FormStateInterface $form_state
    *   Drupal $form_state object. Carrying the string sensor_name.
    */
-  function settingsFormValidate($form, &$form_state);
+  public function settingsFormValidate($form, FormStateInterface $form_state);
 
 }

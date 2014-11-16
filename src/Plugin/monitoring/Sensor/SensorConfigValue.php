@@ -6,7 +6,8 @@
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
-use Drupal\monitoring\Sensor\Sensor;
+
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
 
 /**
@@ -52,7 +53,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
   /**
    * Adds UI for variables config object and key.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
     // Add weight to display config key before expected value.

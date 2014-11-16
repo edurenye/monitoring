@@ -19,7 +19,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
     $form['thresholds'] = array(
@@ -139,7 +139,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
    *
    * @param string $threshold_key
    *   Key of the threshold value form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   Drupal form state object.
    * @param string $message
    *   The validation message.
@@ -151,7 +151,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
   /**
    * {@inheritdoc}
    */
-  public function settingsFormValidate($form, &$form_state) {
+  public function settingsFormValidate($form, FormStateInterface $form_state) {
     $values = $form_state->getValue(array('settings', 'thresholds'));
     $type = $values['type'];
 

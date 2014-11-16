@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring\Sensor\Sensors;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Sensor\SensorConfigurable;
 use Drupal\monitoring\Result\SensorResultInterface;
 
@@ -48,7 +49,7 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
   /**
    * Adds expected value setting field into the sensor settings form.
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
     if (is_array($this->getActualValue())) {

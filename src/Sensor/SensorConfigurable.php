@@ -6,6 +6,8 @@
 
 namespace Drupal\monitoring\Sensor;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Abstract configurable sensor class.
  *
@@ -19,7 +21,7 @@ abstract class SensorConfigurable extends Sensor implements SensorConfigurableIn
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
 
     return $form;
   }
@@ -27,7 +29,7 @@ abstract class SensorConfigurable extends Sensor implements SensorConfigurableIn
   /**
    * {@inheritdoc}
    */
-  public function settingsFormValidate($form, &$form_state) {
+  public function settingsFormValidate($form, FormStateInterface $form_state) {
     // Do nothing.
   }
 }

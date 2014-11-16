@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Sensor\Sensors;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Sensor\SensorThresholds;
 
 /**
@@ -55,7 +56,7 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
     $form['time_interval_value'] = array(

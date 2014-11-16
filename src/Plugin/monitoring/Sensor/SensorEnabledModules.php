@@ -10,6 +10,7 @@ use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorConfigurable;
 use Drupal;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Monitors installed modules.
@@ -28,7 +29,7 @@ class SensorEnabledModules extends SensorConfigurable {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, &$form_state) {
+  public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
     module_load_include('inc', 'system', 'system.admin');

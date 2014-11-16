@@ -4,6 +4,7 @@ namespace Drupal\monitoring_munin\Form;
 
 
 use Drupal\Core\Form\FormInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 class MuninGraphSettingsForm implements FormInterface {
 
@@ -18,7 +19,7 @@ class MuninGraphSettingsForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $sensor_name = '') {
+  public function buildForm(array $form, FormStateInterface $form_state, $sensor_name = '') {
     $form['multigraphs'] = array(
       '#type' => 'fieldset',
       '#title' => t('Munin multigraph definitions'),
@@ -104,14 +105,14 @@ class MuninGraphSettingsForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     foreach (monitoring_sensor_info() as $sensor_name => $sensor_info) {
       if ($sensor_info->isEnabled() && !empty($form_state['values'][$sensor_name])) {
         $settings = monitoring_sensor_settings_get($sensor_name);
@@ -121,13 +122,13 @@ class MuninGraphSettingsForm implements FormInterface {
     }
   }
 
-  public function multigraphAddSubmit(array &$form, array &$form_state) {
+  public function multigraphAddSubmit(array &$form, FormStateInterface $form_state) {
     if (!empty($form_state['values']['title'])) {
       monitoring_munin_multigraph_save($form_state['values']['title'], $form_state['values']['vlabel']);
     }
   }
 
-  public function multigraphDeleteSubmit(array &$form, array &$form_state) {
+  public function multigraphDeleteSubmit(array &$form, FormStateInterface $form_state) {
     foreach ($form_state['values']['delete_multigraphs'] as $title) {
       monitoring_munin_multigraph_delete($title);
     }
