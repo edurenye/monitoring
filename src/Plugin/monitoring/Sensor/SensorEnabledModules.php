@@ -41,12 +41,26 @@ class SensorEnabledModules extends SensorConfigurable {
       '#default_value' => $this->info->getSetting('allow_additional'),
     );
 
-    // Get current list of modules.
+    // Get current list of available modules.
     // @todo find a faster solution? If that happens we can drop caching the
-    //    result for 1 hour.
+    //   result for 1 hour.
     $modules = system_rebuild_module_data();
+
+    uasort($modules, 'system_sort_modules_by_info_name');
+
+    $default_value = array_filter($this->info->getSetting('modules', NULL));
+    // array_filter is needed to get rid off default empty setting.
+    // See monitoring.sensor.monitoring_enabled_modules.yml
+    if (empty($default_value)) {
+      $enabled_modules = Drupal::moduleHandler()->getModuleList();
+      // Reduce to the module name only.
+      $default_value = array_combine(array_keys($enabled_modules), array_keys($enabled_modules));
+    }
+
     $visible_modules = array();
+    $visible_default_value = array();
     $hidden_modules = array();
+    $hidden_default_value = array();
 
     foreach ($modules as $module => $module_data) {
       // Skip profiles.
@@ -59,37 +73,60 @@ class SensorEnabledModules extends SensorConfigurable {
         $module_data->info['name'] = '- No name -';
       }
       if (!empty($module_data->info['hidden'])) {
-        $module_data->info['name'] .= ' [' . t('Hidden module') .']';
-        $hidden_modules[$module] = $module_data;
+        $hidden_modules[$module] = $module_data->info['name'] . ' (' . $module . ')';
+        if (!empty($default_value[$module])) {
+          $hidden_default_value[$module] = $default_value[$module];
+        }
       }
       else {
-        $visible_modules[$module] = $module_data;
+        $visible_modules[$module] = $module_data->info['name'] . ' (' . $module . ')';
+        if (!empty($default_value[$module])) {
+          $visible_default_value[$module] = $default_value[$module];
+        }
       }
-    }
-
-    uasort($visible_modules, 'system_sort_modules_by_info_name');
-    uasort($hidden_modules, 'system_sort_modules_by_info_name');
-
-    $default_value = $this->info->getSetting('modules');
-
-    if (empty($default_value)) {
-      $default_value = module_list();
-    }
-
-    $options = array();
-    foreach (array_merge($visible_modules, $hidden_modules) as $module => $module_data) {
-      $options[$module] = $module_data->info['name'] . ' (' . $module . ')';
     }
 
     $form['modules'] = array(
       '#type' => 'checkboxes',
-      '#options' => $options,
+      '#options' => $visible_modules,
       '#title' => t('Modules expected to be enabled'),
       '#description' => t('Check all modules that are supposed to be enabled.'),
-      '#default_value' => $default_value,
+      '#default_value' => $visible_default_value,
+    );
+
+    $form['extended'] = array(
+      '#type' => 'details',
+      '#title' => 'Extended',
+      '#open' => count($hidden_default_value) ? TRUE : FALSE,
+    );
+
+    $form['extended']['modules_hidden'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $hidden_modules,
+      '#title' => t('Hidden modules expected to be enabled'),
+      '#default_value' => $hidden_default_value,
+      '#description' => t('Check all modules that are supposed to be enabled.'),
     );
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsFormSubmit($form, FormStateInterface $form_state) {
+    $sensor_info = $form_state->getFormObject()->getEntity();
+
+    parent::settingsFormSubmit($form, $form_state);
+
+    $modules = $form_state->getValue(array('settings', 'modules'));
+    $hidden_modules = $form_state->getValue(array(
+      'settings', 'extended', 'modules_hidden'));
+    $modules = array_merge(array_filter($modules), array_filter($hidden_modules));
+    unset($sensor_info->settings['extended']);
+    $sensor_info->settings['modules'] = $modules;
+
+    return $form_state;
   }
 
   /**
@@ -147,7 +184,7 @@ class SensorEnabledModules extends SensorConfigurable {
     if (!$this->info->getSetting('allow_additional') && !empty($unexpected_modules)) {
       $delta += count($unexpected_modules);
       $unexpected_modules_info = array();
-      foreach($unexpected_modules as $unexpected_module) {
+      foreach ($unexpected_modules as $unexpected_module) {
         $unexpected_modules_info[] = $names[$unexpected_module] . ' (' . $unexpected_module . ')';
       }
       $result->addStatusMessage('Following modules are NOT expected to be installed: @modules', array('@modules' => implode(', ', $unexpected_modules_info)));
@@ -155,4 +192,5 @@ class SensorEnabledModules extends SensorConfigurable {
 
     $result->setValue($delta);
   }
+
 }

@@ -7,11 +7,11 @@
 namespace Drupal\monitoring\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\monitoring\Sensor\Sensor;
 use Drupal\monitoring\Entity\SensorInfo;
 use Drupal\monitoring\Sensor\SensorConfigurableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\monitoring\Sensor\SensorInterface;
 
 /**
  * Sensor settings form controller.
@@ -112,9 +112,10 @@ class SensorForm extends EntityForm {
 
     }
     else {
-      $form_state->set('sensor_object', $sensor_info->getPlugin());
       // Set the sensor object into $form_state to make it available for
       // validate and submit callbacks.
+      $form_state->set('sensor_object', $sensor_info->getPlugin());
+
       $form['old_sensor_id'] = array(
         '#type' => 'item',
         '#title' => t('Sensor Plugin'),
@@ -186,7 +187,8 @@ class SensorForm extends EntityForm {
    */
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
-    /** @var SensorConfigurableInterface $sensor */
+
+    /* @var SensorConfigurableInterface $sensor */
     if ($this->entity->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
       $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
@@ -194,20 +196,32 @@ class SensorForm extends EntityForm {
     else {
       $sensor = $form_state->get('sensor_object');
     }
+
     $sensor->settingsFormValidate($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
-    /** @var Sensor $sensor */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    /* @var SensorInfo $sensor_info */
     $sensor_info = $this->entity;
-    /*    if (isset($sensor_info->settings['conditions']) && isset($sensor_info->settings['conditions']['table'])) {
-      $this->entity->settings['conditions'] = $this->entity->settings['conditions']['table'];
-      unset($this->entity->settings['conditions']['table']);
-      }*/
-    $sensor_info->save();
+    /* @var SensorInterface */
+    $sensor = $sensor_info->getPlugin();
+
+    if ($sensor instanceof SensorConfigurableInterface) {
+      $sensor->settingsFormSubmit($form, $form_state);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
+
     $form_state->setRedirectUrl(new Url('monitoring.sensors_overview_settings'));
     drupal_set_message($this->t('Sensor settings saved.'));
   }

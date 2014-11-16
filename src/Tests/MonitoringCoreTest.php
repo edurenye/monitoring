@@ -442,6 +442,10 @@ class MonitoringCoreTest extends MonitoringTestBase {
     ), t('Save'));
     // Reset the sensor info so that it reflects changes done via POST.
     monitoring_sensor_manager()->resetCache();
+    // Make sure the extended / hidden_modules form submit cleanup worked and
+    // they are not stored as a duplicate in settings.
+    $info = monitoring_sensor_manager()->getSensorInfoByName('monitoring_enabled_modules');
+    $this->assertTrue(!array_key_exists('extended', $info->settings), 'Do not persist extended module hidden selections separately.');
     // The sensor should escalate to CRITICAL.
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());

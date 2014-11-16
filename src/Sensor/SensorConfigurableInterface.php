@@ -41,4 +41,14 @@ interface SensorConfigurableInterface {
    */
   public function settingsFormValidate($form, FormStateInterface $form_state);
 
+  /**
+   * Form Submitter for a sensor settings form.
+   *
+   * @param array $form
+   *   Drupal $form structure.
+   * @param FormStateInterface $form_state
+   *   Drupal $form_state object. Carrying the string sensor_name.
+   */
+  public function settingsFormSubmit($form, FormStateInterface $form_state);
+
 }

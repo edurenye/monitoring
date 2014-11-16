@@ -32,4 +32,11 @@ abstract class SensorConfigurable extends Sensor implements SensorConfigurableIn
   public function settingsFormValidate($form, FormStateInterface $form_state) {
     // Do nothing.
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsFormSubmit($form, FormStateInterface $form_state) {
+    // Do nothing.
+  }
 }
