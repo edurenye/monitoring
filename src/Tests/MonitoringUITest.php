@@ -104,6 +104,15 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('This action cannot be undone.');
     $this->drupalPostForm(NULL, array(), t('Delete'));
     $this->assertText('Sensor UI created Sensor has been deleted.');
+
+    $this->drupalGet('admin/config/system/monitoring/sensors/add');
+
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
+      'sensor_id' => 'config_value',
+    ), t('Select sensor'));
+
+    $this->assertText('Expected value');
+    $this->assertFieldByName('settings[value]');
   }
 
   /**

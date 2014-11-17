@@ -52,10 +52,6 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
   public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
-    if (is_array($this->getActualValue())) {
-      return $form;
-    }
-
     $form['value'] = array(
       '#title' => 'Expected value',
       '#description' => $this->getValueDescription(),
@@ -63,9 +59,9 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
     );
 
     if ($this->info->isNumeric()) {
-      $form['value']['#type'] = 'numeric';
+      $form['value']['#type'] = 'number';
     }
-    elseif ($this->info->getValueType() == 'bool') {
+    elseif ($this->info->isBool()) {
       $form['value']['#type'] = 'checkbox';
     }
     else {
