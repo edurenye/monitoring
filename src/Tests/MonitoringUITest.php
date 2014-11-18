@@ -303,6 +303,10 @@ class MonitoringUITest extends MonitoringTestBase {
     // and make sure the expected and actual values are displayed.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_maintenance_mode');
     $this->assertText('The expected value of state system.maintenance_mode, actual value: FALSE');
+
+    // Visit the edit page of a sensor which has plugin that does not extend
+    // SensorConfigurableInterface to make sure the page works as intended.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_node');
   }
 
   /**

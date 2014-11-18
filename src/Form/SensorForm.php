@@ -7,11 +7,10 @@
 namespace Drupal\monitoring\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\monitoring\Entity\SensorInfo;
-use Drupal\monitoring\Sensor\SensorConfigurableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\monitoring\Sensor\SensorInterface;
+use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Sensor\SensorConfigurableInterface;
 
 /**
  * Sensor settings form controller.
@@ -133,7 +132,7 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_info->status(),
     );
 
-    if (isset($sensor_info->sensor_id)) {
+    if (isset($sensor_info->sensor_id) && $sensor_info->getPlugin() instanceof SensorConfigurableInterface) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
