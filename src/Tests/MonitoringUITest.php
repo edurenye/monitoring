@@ -307,6 +307,15 @@ class MonitoringUITest extends MonitoringTestBase {
     // Visit the edit page of a sensor which has plugin that does not extend
     // SensorConfigurableInterface to make sure the page works as intended.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_node');
+
+    // Test the checkbox in edit sensor settings for the bool sensor
+    // Cron safe threshold enabled/disabled.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_cron_safe_threshold');
+    $this->assertNoFieldChecked('edit-settings-value');
+    $this->drupalPostForm(NULL, array('settings[value]' => 'Checked'), t('Save'));
+
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_cron_safe_threshold');
+    $this->assertFieldChecked('edit-settings-value');
   }
 
   /**

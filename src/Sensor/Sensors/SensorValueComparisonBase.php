@@ -72,7 +72,7 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
     $form['value'] = array(
       '#title' => 'Expected value',
       '#description' => $this->getValueDescription(),
-      '#default_value' => $this->getActualValue(),
+      '#default_value' => $this->info->getSetting('value'),
     );
 
     if ($this->info->isNumeric()) {

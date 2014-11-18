@@ -26,7 +26,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "details" = "Drupal\monitoring\Form\SensorDetailForm"
  *     }
  *   },
- *   admin_permission = "administer sensors",
+ *   admin_permission = "administer monitoring",
  *   config_prefix = "sensor",
  *   entity_keys = {
  *     "id" = "id",
