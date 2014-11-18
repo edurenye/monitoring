@@ -26,7 +26,11 @@ class SensorConfigValue extends SensorValueComparisonBase {
    * {@inheritdoc}
    */
   protected function getValueDescription() {
-    return t('The expected value of config %key', array('%key' => $this->info->getSetting('config') . ':' . $this->info->getSetting('key')));
+    return (t('The expected value of config %key, actual value: %actVal',
+      array(
+        '%key' => $this->info->getSetting('config') . ':' . $this->info->getSetting('key'),
+        '%actVal' => $this->getActualValueText(),
+      )));
   }
 
   /**
@@ -34,7 +38,11 @@ class SensorConfigValue extends SensorValueComparisonBase {
    */
   protected function getActualValue() {
     $config = $this->getConfig($this->info->getSetting('config'));;
-    return $config->get($this->info->getSetting('key'));
+    $key = $this->info->getSetting('key');
+    if (empty($key)) {
+      return NULL;
+    }
+    return $config->get($key);
   }
 
   /**
@@ -47,6 +55,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
    *   The config.
    */
   protected function getConfig($name) {
+    // @todo fix condition $name==''
     return $this->getService('config.factory')->get($name);
   }
 

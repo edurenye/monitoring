@@ -286,6 +286,24 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/non_existing_sensor');
     $this->assertResponse(404);
   }
+  /**
+   * Tests the sensor detail page for actual and expected values.
+   */
+  public function testSensorEditPage() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    // Visit the edit page of "core theme default" (config value sensor)
+    // and make sure the expected and actual values are displayed.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_theme_default');
+    $this->assertText('The expected value of config system.theme:default, actual value: stark');
+
+
+    // Visit the edit page of "core maintainance mode" (state value sensor)
+    // and make sure the expected and actual values are displayed.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_maintenance_mode');
+    $this->assertText('The expected value of state system.maintenance_mode, actual value: FALSE');
+  }
 
   /**
    * Tests the force execute all and sensor specific force execute links.

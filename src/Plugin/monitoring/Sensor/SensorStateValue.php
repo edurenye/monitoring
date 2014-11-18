@@ -26,7 +26,11 @@ class SensorStateValue extends SensorValueComparisonBase {
    * {@inheritdoc}
    */
   protected function getValueDescription() {
-    return t('The expected value of state %key', array('%key' => $this->info->getSetting('key')));
+    return (t('The expected value of state %key, actual value: %actVal',
+      array(
+        '%key' => $this->info->getSetting('key'),
+        '%actVal' => $this->getActualValueText(),
+      )));
   }
 
   /**
@@ -34,7 +38,11 @@ class SensorStateValue extends SensorValueComparisonBase {
    */
   protected function getActualValue() {
     $state = $this->getState();
-    return $state->get($this->info->getSetting('key'));
+    $key = $this->info->getSetting('key');
+    if (empty($key)) {
+      return NULL;
+    }
+    return $state->get($key);
   }
 
   /**

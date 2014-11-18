@@ -37,6 +37,23 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
   abstract protected function getActualValue();
 
   /**
+   * Gets the actual value as text.
+   *
+   * @return string
+   *   The expected value.
+   */
+  protected function getActualValueText() {
+    if ($this->info->isBool()) {
+      $actual_value = $this->getActualValue() ? 'TRUE' : 'FALSE';
+    }
+    else {
+      $actual_value = $this->getActualValue();
+    }
+
+    return $actual_value;
+  }
+
+  /**
    * Gets the expected value.
    *
    * @return mixed
