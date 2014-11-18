@@ -45,7 +45,7 @@ class SensorManager extends DefaultPluginManager {
   protected $config;
 
   /**
-   * Constructes a sensor manager.
+   * Constructs a sensor manager.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -153,7 +153,7 @@ class SensorManager extends DefaultPluginManager {
   }
 
   /**
-   * Reset the static cache
+   * Reset the static cache.
    */
   public function resetCache() {
     $this->info = array();
@@ -218,13 +218,13 @@ class SensorManager extends DefaultPluginManager {
   /**
    * Returns if an array is flat.
    *
-   * @param $array
+   * @param array $array
    *   The array to check.
    *
    * @return bool
    *   TRUE if the array has no values that are arrays again.
    */
-  protected function isFlatArray($array) {
+  protected function isFlatArray(array $array) {
     foreach ($array as $value) {
       if (is_array($value)) {
         return FALSE;
