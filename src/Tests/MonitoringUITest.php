@@ -89,7 +89,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
-      'settings[time_interval_value]' => 86400,
+      'settings[aggregation][time_interval_value]' => 86400,
       'settings[entity_type]' => 'field_storage_config',
       'settings[conditions][0][field]' => 'type',
       'settings[conditions][0][value]' => 'message',
@@ -129,38 +129,49 @@ class MonitoringUITest extends MonitoringTestBase {
     $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
     $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
     // Test for the default value.
-    $this->assertFieldByName('settings[time_interval_value]', $sensor_info->getTimeIntervalValue());
+    $this->assertFieldByName('settings[aggregation][time_interval_field]', 'created');
+    $this->assertFieldByName('settings[aggregation][time_interval_value]', 86400);
 
-    // Update the time interval and test for the updated value.
-    $time_interval = 10800;
+    // Update the time interval and field to test for the updated value.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
-      'settings[time_interval_value]' => $time_interval,
+      'settings[aggregation][time_interval_field]' => 'timestamp-invalid',
+      'settings[aggregation][time_interval_value]' => 10800,
     ), t('Save'));
 
     $this->sensorManager->resetCache();
     $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
-    $this->assertEqual($sensor_info->getTimeIntervalValue(), $time_interval);
+    // Assert the change of time field and value.
+    $this->assertEqual($sensor_info->getTimeIntervalField(), 'timestamp-invalid');
+    $this->assertEqual($sensor_info->getTimeIntervalValue(), 10800);
+    // Set the time interval field back to 'created'
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+      'settings[aggregation][time_interval_field]' => 'created',
+    ), t('Save'));
 
     // Check the sensor overview to verify that the sensor result is
     // recalculated and the new sensor message is displayed.
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons in 3 hours');
 
-    // Update the time interval and set it to no restriction.
-    $time_interval = 0;
+    // Update the time interval and set value to no restriction.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
-      'settings[time_interval_value]' => $time_interval,
+      'settings[aggregation][time_interval_field]' => 'created',
+      'settings[aggregation][time_interval_value]' => 0,
     ), t('Save'));
-
-    $this->sensorManager->resetCache();
-    $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
-    $this->assertEqual($sensor_info->getTimeIntervalValue(), $time_interval);
-
     // Visit the overview and make sure that no time interval is displayed.
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons');
     $this->assertNoText('0 druplicons in');
-  }
+
+    // Update the time interval and empty interval field.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+      'settings[aggregation][time_interval_field]' => '',
+      'settings[aggregation][time_interval_value]' => 86400,
+    ), t('Save'));
+    // Visit the overview and make sure that no time interval is displayed.
+    $this->drupalGet('admin/reports/monitoring');
+    $this->assertText('0 druplicons');
+    $this->assertNoText('0 druplicons in');  }
 
   /**
    * Sensor over page tests coverage.

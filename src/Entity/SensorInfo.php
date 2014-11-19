@@ -300,6 +300,17 @@ class SensorInfo extends ConfigEntityBase {
   }
 
   /**
+   * Gets the time interval field.
+   *
+   * @return string
+   *   The time interval field.
+   *   NULL in case the sensor does not define the time interval field.
+   */
+  public function getTimeIntervalField() {
+    return $this->getSetting('time_interval_field', NULL);
+  }
+
+  /**
    * Gets the time interval value.
    *
    * @return int
