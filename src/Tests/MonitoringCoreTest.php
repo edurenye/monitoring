@@ -326,7 +326,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    */
   public function testSensorDisappearedSensors() {
 
-    $module_handler = \Drupal::moduleHandler();
+    $module_handler = \Drupal::service('module_installer');
 
     // Install the comment module and the comment_new sensor.
     $module_handler->install(array('comment'));
@@ -461,7 +461,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     ), t('Save'));
     // Reset the sensor info so that it reflects changes done via POST.
     monitoring_sensor_manager()->resetCache();
-    \Drupal::moduleHandler()->install(array('help'));
+    \Drupal::service('module_installer')->install(array('help'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Help (help)');
@@ -498,7 +498,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Install additional module. As the setting "allow_additional" is not
     // enabled by default this should result in sensor escalation to critical.
-    \Drupal::moduleHandler()->install(array('contact'));
+    \Drupal::service('module_installer')->install(array('contact'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Contact (contact)');
@@ -515,7 +515,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // should escalate to critical.
     $sensor_info->settings['modules']['contact'] = 'contact';
     $sensor_info->save();
-    \Drupal::moduleHandler()->uninstall(array('contact'));
+    \Drupal::service('module_installer')->uninstall(array('contact'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are expected to be installed: Contact (contact)');
