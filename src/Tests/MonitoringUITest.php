@@ -62,7 +62,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // Tests the fields 'Sensor Plugin' & 'Entity Type' appear.
     $this->drupalGet('admin/config/system/monitoring/sensors/user_new');
-    $this->assertOptionSelected('edit-settings-old-entity-type', 'user');
+    $this->assertOptionSelected('edit-settings-entity-type', 'user');
     $this->assertText('Sensor Plugin');
     $this->assertText('Entity Aggregator');
   }
@@ -90,7 +90,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
       'settings[aggregation][time_interval_value]' => 86400,
-      'settings[entity_type]' => 'field_storage_config',
+      'settings[entity_type]' => 'node',
       'settings[conditions][0][field]' => 'type',
       'settings[conditions][0][value]' => 'message',
     ), t('Save'));
@@ -122,26 +122,35 @@ class MonitoringUITest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
-    // Visit the overview and make sure the sensor is displayed.
+    // Visit the monitoring report overview.
     $this->drupalGet('admin/reports/monitoring');
+
+    // -----
+    // Test SensorDatabaseAggregator through db_aggregate_test.
+    // Make sure the sensor db_aggregate_test is displayed.
     $this->assertText('0 druplicons in 1 day');
 
-    $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
-    $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
     // Test for the default value.
+    $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
     $this->assertFieldByName('settings[aggregation][time_interval_field]', 'created');
     $this->assertFieldByName('settings[aggregation][time_interval_value]', 86400);
 
-    // Update the time interval and field to test for the updated value.
+    // Update the time interval field to an invalid value.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
-      'settings[aggregation][time_interval_field]' => 'timestamp-invalid',
+      'settings[aggregation][time_interval_field]' => 'field-invalid',
+    ), t('Save'));
+    $this->assertText('The specified time interval field field-invalid does not exist or has wrong type.');
+
+    // Update the time interval field and value with valid values.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+      'settings[aggregation][time_interval_field]' => 'changed',
       'settings[aggregation][time_interval_value]' => 10800,
     ), t('Save'));
 
     $this->sensorManager->resetCache();
     $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
     // Assert the change of time field and value.
-    $this->assertEqual($sensor_info->getTimeIntervalField(), 'timestamp-invalid');
+    $this->assertEqual($sensor_info->getTimeIntervalField(), 'changed');
     $this->assertEqual($sensor_info->getTimeIntervalValue(), 10800);
     // Set the time interval field back to 'created'
     $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
@@ -168,10 +177,28 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[aggregation][time_interval_field]' => '',
       'settings[aggregation][time_interval_value]' => 86400,
     ), t('Save'));
+    $this->assertText('Sensor settings saved.');
     // Visit the overview and make sure that no time interval is displayed.
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons');
-    $this->assertNoText('0 druplicons in');  }
+    $this->assertNoText('0 druplicons in');
+
+    // -----
+    // Test SensorEntityAggregator through user_new.
+    // Verify field name validation.
+    $this->drupalGet('admin/config/system/monitoring/sensors/user_new');
+    // Try to input an invalid time field.
+    $this->drupalPostForm(NULL, array(
+      'settings[aggregation][time_interval_field]' => 'field-invalid',
+    ), t('Save'));
+    // Assert the error message due to the invalid time field.
+    $this->assertText('The specified time interval field field-invalid does not exist or has wrong type.');
+    // Set the time field to timestamp.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_new', array(
+      'settings[aggregation][time_interval_field]' => 'created',
+    ), t('Save'));
+    $this->assertText('Sensor settings saved.');
+  }
 
   /**
    * Sensor over page tests coverage.

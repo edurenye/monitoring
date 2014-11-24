@@ -162,4 +162,24 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements S
     );
     return $form;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsFormValidate($form, FormStateInterface $form_state) {
+    parent::settingsFormValidate($form, $form_state);
+
+    /** @var \Drupal\Core\Database\Connection $database */
+    $database = $this->getService('database');
+    $field_name = $form_state->getValue(array(
+      'settings', 'aggregation', 'time_interval_field'));
+    if (!empty($field_name)) {
+      // @todo instead of validate, switch to a form select.
+      $table = $form_state->getValue(array('settings', 'table'));
+      if (!$database->schema()->fieldExists($table, $field_name)) {
+        $form_state->setErrorByName('settings][aggregation][time_interval_field',
+          t('The specified time interval field %name does not exist.', array('%name' => $field_name)));
+      }
+    }
+  }
 }
