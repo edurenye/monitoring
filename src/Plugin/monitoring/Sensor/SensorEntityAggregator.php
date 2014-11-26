@@ -151,22 +151,29 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
    */
   public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
-
-    $settings = $this->info->getSettings();
     $conditions = array(array('field' => '', 'value' => ''));
-    if (isset($settings['conditions'])) {
-      $conditions = $settings['conditions'];
-    }
+    $settings = $this->info->getSettings();
 
-    $form['entity_type'] = array(
-      '#type' => 'select',
-      '#default_value' => $this->getEntityType(),
-      '#maxlength' => 255,
-      '#options' => $this->entityManager->getEntityTypeLabels(TRUE)['Content'],
-      '#title' => t('Entity Type'),
-    );
-    if (!isset($settings['entity_type'])) {
-      $form['entity_type']['#required'] = TRUE;
+    if (isset($this->info->settings['entity_type'])) {
+      $form['old_entity_type'] = array(
+        '#type' => 'select',
+        '#default_value' => $this->getEntityType(),
+        '#maxlength' => 255,
+        '#options' => $this->entityManager->getEntityTypeLabels(),
+        '#title' => t('Entity Type'),
+      );
+      if (isset($settings['conditions'])) {
+        $conditions = $settings['conditions'];
+      }
+    }
+    else {
+      $form['entity_type'] = array(
+        '#type' => 'select',
+        '#default_value' => $this->getEntityType(),
+        '#options' => $this->entityManager->getEntityTypeLabels(),
+        '#title' => t('Entity Type'),
+        '#required' => TRUE,
+      );
     }
 
     /*    if (isset($form_state['values']['settings']['conditions']['table'])) {
@@ -248,26 +255,4 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsFormValidate($form, FormStateInterface $form_state) {
-    parent::settingsFormValidate($form, $form_state);
-
-    $field_name = $form_state->getValue(array(
-      'settings', 'aggregation', 'time_interval_field'));
-    if (!empty($field_name)) {
-      // @todo instead of validate, switch to a form select.
-      $entity_type = $form_state->getValue(array('settings', 'entity_type'));
-      $entity_info = $this->entityManager->getFieldStorageDefinitions($entity_type);
-      $data_type = NULL;
-      if (!empty($entity_info[$field_name])) {
-        $data_type = $entity_info[$field_name]->getItemDefinition()->getPropertyDefinition('value')->getDataType();
-      }
-      if ($data_type != 'timestamp') {
-        $form_state->setErrorByName('settings][aggregation][time_interval_field',
-          t('The specified time interval field %name does not exist or has wrong type.', array('%name' => $field_name)));
-      }
-    }
-  }
 }
