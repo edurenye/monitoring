@@ -218,9 +218,9 @@ class SensorResult implements SensorResultInterface {
       // Add the sensor value if provided.
       if ($this->getValue() !== NULL) {
 
-        // If the sensor defines time interval field & value we append
-        // the info to the message.
-        if ($this->getSensorInfo()->getTimeIntervalField() && $this->getSensorInfo()->getTimeIntervalValue()) {
+        // If the sensor defines time interval we append the info to the
+        // message.
+        if ($this->getSensorInfo()->getTimeIntervalValue()) {
           $messages[] = String::format('!formatted_value in !time_interval', $default_variables);
         }
         else {
