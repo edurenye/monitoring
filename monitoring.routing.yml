@@ -9,7 +9,7 @@ monitoring.sensors_overview_settings:
 monitoring.sensor_list:
   path: '/admin/reports/monitoring'
   defaults:
-    _content: '\Drupal\monitoring\Controller\SensorList::content'
+    _controller: '\Drupal\monitoring\Controller\SensorList::content'
     _title: Monitoring
   requirements:
     _permission: 'monitoring reports'

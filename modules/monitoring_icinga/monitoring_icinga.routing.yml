@@ -1,20 +1,20 @@
 monitoring_icinga_config_active:
   path: '/admin/config/system/monitoring/icinga'
   defaults:
-    _content: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configActive'
+    _controller: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configActive'
   requirements:
     _permission: 'administer monitoring'
 
 monitoring_icinga_config_passive:
   path: '/admin/config/system/monitoring/icinga/passive'
   defaults:
-    _content: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configPassive'
+    _controller: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configPassive'
   requirements:
     _permission: 'administer monitoring'
 
 monitoring_icinga_config_passive_with_freshness:
   path: '/admin/config/system/monitoring/icinga/passive-with-freshness'
   defaults:
-    _content: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configPassiveWithFreshness'
+    _controller: '\Drupal\monitoring_icinga\Pages\IcingaInfo::configPassiveWithFreshness'
   requirements:
     _permission: 'administer monitoring'

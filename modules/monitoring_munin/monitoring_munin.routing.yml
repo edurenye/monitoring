@@ -8,6 +8,6 @@ monitoring_munin_graph_settings:
 monitoring_munin_config:
   path: '/admin/config/system/monitoring/munin/config'
   defaults:
-    _content: '\Drupal\monitoring_munin\Pages\MuninConfig::content'
+    _controller: '\Drupal\monitoring_munin\Pages\MuninConfig::content'
   requirements:
     _permission: 'administer monitoring'
