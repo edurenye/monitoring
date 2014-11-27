@@ -10,7 +10,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\SensorRunner;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Tests for Monitoring API.
@@ -45,53 +45,53 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
    */
   public function testAPI() {
 
-    // == Test sensor info. == //
-    // @todo - complete the sensor info tests in followup.
-    $sensor_info_data = array(
-      'label' => 'Test sensor info',
-      'description' => 'To test correct sensor info hook implementation precedence.',
+    // == Test sensor config. == //
+    // @todo - complete the sensor config tests in followup.
+    $sensor_config_data = array(
+      'label' => 'Test sensor config',
+      'description' => 'To test correct sensor config hook implementation precedence.',
       'settings' => array(),
     );
     monitoring_sensor_manager()->resetCache();
-    $test_sensorInfo = SensorInfo::load('test_sensor_info');
-    $sensor_info = monitoring_sensor_manager()->getSensorInfoByName('test_sensor_info');
+    $test_sensor_config = SensorConfig::load('test_sensor_info');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
 
-    $this->assertEqual($sensor_info->getLabel(), $sensor_info_data['label']);
-    $this->assertEqual($sensor_info->getDescription(), $sensor_info_data['description']);
-    // @todo - add tests for compulsory sensor info attributes.
+    $this->assertEqual($sensor_config->getLabel(), $sensor_config_data['label']);
+    $this->assertEqual($sensor_config->getDescription(), $sensor_config_data['description']);
+    // @todo - add tests for compulsory sensor config attributes.
 
     // Test all defaults.
     // Flag numeric should default to TRUE.
-    $this->assertEqual($sensor_info->isNumeric(), TRUE);
+    $this->assertEqual($sensor_config->isNumeric(), TRUE);
     // @todo - add tests for default values of attributes.
 
     // @todo - override remaining attributes.
-    $sensor_info_data['numeric'] = FALSE;
-    $test_sensorInfo->numeric = FALSE;
+    $sensor_config_data['numeric'] = FALSE;
+    $test_sensor_config->numeric = FALSE;
     // Define custom value label and NO value type. In this setup the sensor
     // defined value label must be used.
-    $sensor_info_data['value_label'] = 'Test label';
-    $test_sensorInfo->value_label = 'Test label';
-    $test_sensorInfo->save();
+    $sensor_config_data['value_label'] = 'Test label';
+    $test_sensor_config->value_label = 'Test label';
+    $test_sensor_config->save();
     monitoring_sensor_manager()->resetCache();
-    $sensor_info = monitoring_sensor_manager()->getSensorInfoByName('test_sensor_info');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
     // Test all custom defined.
     // Flag numeric must be false.
-    $this->assertEqual($sensor_info->isNumeric(), FALSE);
-    $this->assertEqual($sensor_info->getValueLabel(), $sensor_info_data['value_label']);
+    $this->assertEqual($sensor_config->isNumeric(), FALSE);
+    $this->assertEqual($sensor_config->getValueLabel(), $sensor_config_data['value_label']);
     // @todo - add tests for overridden values of attributes.
 
     // Test value label provided by the monitoring_value_types().
     // Set the value type to one defined by the monitoring_value_types().
-    $sensor_info_data['value_type'] = 'time_interval';
-    $test_sensorInfo->value_type = 'time_interval';
-    $test_sensorInfo->value_label = '';
-    $test_sensorInfo->save();
-    unset($sensor_info_data['value_label']);
+    $sensor_config_data['value_type'] = 'time_interval';
+    $test_sensor_config->value_type = 'time_interval';
+    $test_sensor_config->value_label = '';
+    $test_sensor_config->save();
+    unset($sensor_config_data['value_label']);
     monitoring_sensor_manager()->resetCache();
-    $sensor_info = monitoring_sensor_manager()->getSensorInfoByName('test_sensor_info');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
     $value_types = monitoring_value_types();
-    $this->assertEqual($sensor_info->getValueLabel(), $value_types['time_interval']['label']);
+    $this->assertEqual($sensor_config->getValueLabel(), $value_types['time_interval']['label']);
 
     // == Test basic sensor infrastructure - value, status and message. == //
 
@@ -128,7 +128,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     // Trying to fetch information for a non-existing sensor or trying to
     // execute such a sensor must throw an exception.
     try {
-      monitoring_sensor_manager()->getSensorInfoByName('non_existing_sensor');
+      monitoring_sensor_manager()->getSensorConfigByName('non_existing_sensor');
       $this->fail('Expected exception for non-existing sensor not thrown.');
     } catch (NonExistingSensorException $e) {
       $this->pass('Expected exception for non-existing sensor thrown.');
@@ -343,7 +343,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
       'sensor_status' => SensorResultInterface::STATUS_OK,
     );
     \Drupal::state()->set('monitoring_test.sensor_result_data', $test_sensor_result_data);
-    $sensor = SensorInfo::load('test_sensor');
+    $sensor = SensorConfig::load('test_sensor');
     $sensor->settings['result_logging'] = TRUE;
     $sensor->save();
     $this->runSensor('test_sensor');
@@ -362,7 +362,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     debug(\Drupal::config('monitoring.settings')->get('test_sensor'));
     /** @var SensorRunner $runner */
     $runner = \Drupal::service('monitoring.sensor_runner');
-    $runner->runSensors(array(monitoring_sensor_manager()->getSensorInfoByName('test_sensor')));
+    $runner->runSensors(array(monitoring_sensor_manager()->getSensorConfigByName('test_sensor')));
     //$this->runSensor('test_sensor');
     $logs = $this->loadSensorLog('test_sensor');
     $this->assertEqual(count($logs), 1);

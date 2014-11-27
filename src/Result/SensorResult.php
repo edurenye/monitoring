@@ -9,7 +9,7 @@ namespace Drupal\monitoring\Result;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Sensor\SensorCompilationException;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Sensor\Thresholds;
 
 /**
@@ -17,17 +17,17 @@ use Drupal\monitoring\Sensor\Thresholds;
  *
  * @todo more
  *
- * @see \Drupal\monitoring\Entity\SensorInfo
+ * @see \Drupal\monitoring\Entity\SensorConfig
  * @see \Drupal\monitoring\SensorRunner
  */
 class SensorResult implements SensorResultInterface {
 
   /**
-   * The sensor info instance.
+   * The sensor config instance.
    *
-   * @var \Drupal\monitoring\Entity\SensorInfo
+   * @var \Drupal\monitoring\Entity\SensorConfig
    */
-  protected $sensorInfo;
+  protected $sensorConfig;
 
   /**
    * If the current result was constructed from a cache.
@@ -69,13 +69,13 @@ class SensorResult implements SensorResultInterface {
    *
    * By default, the sensor status is STATUS_UNKNOWN with empty message.
    *
-   * @param SensorInfo $sensor_info
-   *   Sensor info object.
+   * @param SensorConfig $sensor_config
+   *   Sensor config object.
    * @param array $cached_data
    *   Result data obtained from a cache.
    */
-  function __construct(SensorInfo $sensor_info, array $cached_data = array()) {
-    $this->sensorInfo = $sensor_info;
+  function __construct(SensorConfig $sensor_config, array $cached_data = array()) {
+    $this->sensorConfig = $sensor_config;
     if ($cached_data) {
       $this->data = $cached_data;
       $this->isCached = TRUE;
@@ -175,7 +175,7 @@ class SensorResult implements SensorResultInterface {
     // configurable thresholds.
     $threshold_message = NULL;
     if ($this->isUnknown()) {
-      if ($this->getSensorInfo()->isDefiningThresholds()) {
+      if ($this->getSensorConfig()->isDefiningThresholds()) {
         $threshold_message = $this->assessThresholds();
       }
       // If there are no thresholds, look for an expected value and compare it.
@@ -187,7 +187,7 @@ class SensorResult implements SensorResultInterface {
       }
     }
 
-    if ($this->getSensorInfo()->getValueType() == 'bool') {
+    if ($this->getSensorConfig()->getValueType() == 'bool') {
       $msg_expected = $this->getExpectedValue() ? 'TRUE' : 'FALSE';
     }
     else {
@@ -209,7 +209,7 @@ class SensorResult implements SensorResultInterface {
         '!formatted_value' => $this->getFormattedValue($this->getValue()),
         '@time' => $this->getTimestamp(),
         '!expected' => $msg_expected,
-        '!time_interval' => \Drupal::service('date.formatter')->formatInterval($this->getSensorInfo()->getTimeIntervalValue()),
+        '!time_interval' => \Drupal::service('date.formatter')->formatInterval($this->getSensorConfig()->getTimeIntervalValue()),
       );
 
       // Build an array of message parts.
@@ -220,7 +220,7 @@ class SensorResult implements SensorResultInterface {
 
         // If the sensor defines time interval we append the info to the
         // message.
-        if ($this->getSensorInfo()->getTimeIntervalValue()) {
+        if ($this->getSensorConfig()->getTimeIntervalValue()) {
           $messages[] = String::format('!formatted_value in !time_interval', $default_variables);
         }
         else {
@@ -275,7 +275,7 @@ class SensorResult implements SensorResultInterface {
    * @see \Drupal\monitoring\Sensor\Thresholds
    */
   protected function assessThresholds() {
-    $thresholds = new Thresholds($this->sensorInfo);
+    $thresholds = new Thresholds($this->sensorConfig);
     $matched_threshold = $thresholds->getMatchedThreshold($this->getValue());
 
     // Set sensor status based on matched threshold.
@@ -298,7 +298,7 @@ class SensorResult implements SensorResultInterface {
   public function getFormattedValue($value) {
     // If the value type is defined we have the formatter that will format the
     // value to be ready for display.
-    if ($value_type = $this->getSensorInfo()->getValueType()) {
+    if ($value_type = $this->getSensorConfig()->getValueType()) {
       $value_types = monitoring_value_types();
       if (!isset($value_types[$value_type])) {
         throw new SensorCompilationException(String::format('Invalid value type @type', array('@type' => $value_type)));
@@ -316,7 +316,7 @@ class SensorResult implements SensorResultInterface {
     // If there is no value formatter we try to provide something human readable
     // by concatenating the value and label.
 
-    if ($label = $this->getSensorInfo()->getValueLabel()) {
+    if ($label = $this->getSensorConfig()->getValueLabel()) {
       // @todo This assumption will no longer work when non-english messages
       // supported.
       $label = Unicode::strtolower($label);
@@ -330,7 +330,7 @@ class SensorResult implements SensorResultInterface {
    * {@inheritdoc}
    */
   public function getValue() {
-    if ($this->getSensorInfo()->isBool()) {
+    if ($this->getSensorConfig()->isBool()) {
       return (bool) $this->getResultData('sensor_value');
     }
     return $this->getResultData('sensor_value');
@@ -340,7 +340,7 @@ class SensorResult implements SensorResultInterface {
    * {@inheritdoc}
    */
   public function getExpectedValue() {
-    if ($this->getSensorInfo()->isBool()) {
+    if ($this->getSensorConfig()->isBool()) {
       return (bool) $this->getResultData('sensor_expected_value');
     }
     return $this->getResultData('sensor_expected_value');
@@ -469,14 +469,14 @@ class SensorResult implements SensorResultInterface {
    * {@inheritdoc}
    */
   public function getSensorName() {
-    return $this->sensorInfo->getName();
+    return $this->sensorConfig->getName();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSensorInfo() {
-    return $this->sensorInfo;
+  public function getSensorConfig() {
+    return $this->sensorConfig;
   }
 
   /**

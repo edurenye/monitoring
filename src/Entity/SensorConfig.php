@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Entity\SensorInfo.
+ * Contains \Drupal\monitoring\Entity\SensorConfig.
  */
 
 namespace Drupal\monitoring\Entity;
@@ -11,11 +11,11 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Represents a sensor info entity class.
+ * Represents a sensor config entity class.
  *
  * @todo more
  * @ConfigEntityType(
- *   id = "monitoring_sensor",
+ *   id = "monitoring_sensor_config",
  *   label = @Translation("Monitoring Sensor"),
  *   handlers = {
  *     "list_builder" = "Drupal\monitoring\SensorListBuilder",
@@ -40,7 +40,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   }
  * )
  */
-class SensorInfo extends ConfigEntityBase {
+class SensorConfig extends ConfigEntityBase {
 
   /**
    * The config id.
@@ -365,7 +365,7 @@ class SensorInfo extends ConfigEntityBase {
    * Compiles sensor values to an associative array.
    *
    * @return array
-   *   Sensor info associative array.
+   *   Sensor config associative array.
    */
   public function getDefinition() {
     $info_array = array(

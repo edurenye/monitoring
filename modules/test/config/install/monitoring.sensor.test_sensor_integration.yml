@@ -1,6 +1,6 @@
 id: test_sensor_integration
 label: 'Test from integration hook'
-description: 'To test correct sensor info hook implementation precedence.'
+description: 'To test correct sensor config hook implementation precedence.'
 category: 'Test'
 sensor_id: test_sensor
 settings:

@@ -126,10 +126,10 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons in 1 day');
 
-    $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
+    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
     $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
     // Test for the default value.
-    $this->assertFieldByName('settings[time_interval_value]', $sensor_info->getTimeIntervalValue());
+    $this->assertFieldByName('settings[time_interval_value]', $sensor_config->getTimeIntervalValue());
 
     // Update the time interval and test for the updated value.
     $time_interval = 10800;
@@ -138,8 +138,8 @@ class MonitoringUITest extends MonitoringTestBase {
     ), t('Save'));
 
     $this->sensorManager->resetCache();
-    $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
-    $this->assertEqual($sensor_info->getTimeIntervalValue(), $time_interval);
+    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
+    $this->assertEqual($sensor_config->getTimeIntervalValue(), $time_interval);
 
     // Check the sensor overview to verify that the sensor result is
     // recalculated and the new sensor message is displayed.
@@ -153,8 +153,8 @@ class MonitoringUITest extends MonitoringTestBase {
     ), t('Save'));
 
     $this->sensorManager->resetCache();
-    $sensor_info = $this->sensorManager->getSensorInfoByName('db_aggregate_test');
-    $this->assertEqual($sensor_info->getTimeIntervalValue(), $time_interval);
+    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
+    $this->assertEqual($sensor_config->getTimeIntervalValue(), $time_interval);
 
     // Visit the overview and make sure that no time interval is displayed.
     $this->drupalGet('admin/reports/monitoring');
@@ -196,13 +196,13 @@ class MonitoringUITest extends MonitoringTestBase {
     $tbody = $this->xpath('//table[@id="monitoring-sensors-overview"]/tbody');
     $rows = $tbody[0];
     $i = 0;
-    foreach (monitoring_sensor_info_by_categories() as $category => $category_sensor_info) {
+    foreach (monitoring_sensor_config_by_categories() as $category => $category_sensor_info) {
       $tr = $rows->tr[$i];
       $this->assertEqual($category, $tr->td->h3);
-      foreach ($category_sensor_info as $sensor_info) {
+      foreach ($category_sensor_info as $sensor_config) {
         $i++;
         $tr = $rows->tr[$i];
-        $this->assertEqual($tr->td[0]->span, $sensor_info->getLabel());
+        $this->assertEqual($tr->td[0]->span, $sensor_config->getLabel());
       }
 
       $i++;
@@ -219,16 +219,16 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalCreateNode(array('promote' => NODE_PROMOTED));
 
-    $sensor_info = monitoring_sensor_manager()->getSensorInfoByName('db_aggregate_test');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('db_aggregate_test');
     $this->drupalGet('admin/reports/monitoring/sensors/db_aggregate_test');
-    $this->assertTitle(t('@label (@category) | Drupal', array('@label' => $sensor_info->getLabel(), '@category' => $sensor_info->getCategory())));
+    $this->assertTitle(t('@label (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
 
     // Make sure that all relevant information is displayed.
     // @todo: Assert position/order.
     // Cannot use $this->runSensor() as the cache needs to remain.
     $result = monitoring_sensor_run('db_aggregate_test');
     $this->assertText(t('Description'));
-    $this->assertText($sensor_info->getDescription());
+    $this->assertText($sensor_config->getDescription());
     $this->assertText(t('Status'));
     $this->assertText('Warning');
     $this->assertText(t('Message'));
@@ -373,12 +373,12 @@ class MonitoringUITest extends MonitoringTestBase {
    */
   protected function submitThresholdSettings($sensor_name, array $thresholds) {
     $data = array();
-    $sensor_info = $this->sensorManager->getSensorInfoByName($sensor_name);
+    $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
     foreach ($thresholds as $key => $value) {
       $form_field_name = 'settings' . '[thresholds][' . $key . ']';
       $data[$form_field_name] = $value;
     }
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/' . $sensor_info->getName(), $data, t('Save'));
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/' . $sensor_config->getName(), $data, t('Save'));
   }
 
   /**
@@ -392,9 +392,9 @@ class MonitoringUITest extends MonitoringTestBase {
    *   values.
    */
   protected function assertThresholdSettingsUIDefaults($sensor_name, $thresholds) {
-    $sensor_info = $this->sensorManager->getSensorInfoByName($sensor_name);
+    $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
     $this->drupalGet('admin/config/system/monitoring/sensors/' . $sensor_name);
-    $this->assertTitle(t('@label settings (@category) | Drupal', array('@label' => $sensor_info->getLabel(), '@category' => $sensor_info->getCategory())));
+    $this->assertTitle(t('@label settings (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
     foreach ($thresholds as $key => $value) {
       $form_field_name = 'settings' . '[thresholds][' . $key . ']';
       $this->assertFieldByName($form_field_name, $value);

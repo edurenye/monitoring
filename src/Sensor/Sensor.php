@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Sensor;
 
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,9 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class Sensor implements SensorInterface {
 
   /**
-   * Current sensor info object.
+   * Current sensor config object.
    *
-   * @var SensorInfo
+   * @var SensorConfig
    */
   protected $info;
   protected $services = array();
@@ -42,14 +42,14 @@ abstract class Sensor implements SensorInterface {
   /**
    * Instantiates a sensor object.
    *
-   * @param SensorInfo $info
-   *   Sensor info object.
+   * @param SensorConfig $info
+   *   Sensor config object.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  function __construct(SensorInfo $info, $plugin_id, $plugin_definition) {
+  function __construct(SensorConfig $info, $plugin_id, $plugin_definition) {
     $this->pluginId = $plugin_id;
     $this->pluginDefinition = $plugin_definition;
     $this->info = $info;
@@ -109,7 +109,7 @@ abstract class Sensor implements SensorInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, SensorInfo $info, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, SensorConfig $info, $plugin_id, $plugin_definition) {
     return new static(
       $info,
       $plugin_id,

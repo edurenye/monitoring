@@ -21,8 +21,8 @@ use Drupal\monitoring\Sensor\SensorConfigurable;
  * )
  *
  * It stores the list of available sensors and their enabled/disabled status
- * and compares it to the current sensor info retrieved via
- * monitoring_sensor_info() callback.
+ * and compares it to the current sensor config retrieved via
+ * monitoring_sensor_config() callback.
  */
 class SensorDisappearedSensors extends SensorConfigurable {
 
@@ -31,10 +31,10 @@ class SensorDisappearedSensors extends SensorConfigurable {
    */
   public function runSensor(SensorResultInterface $result) {
     $available_sensors = \Drupal::state()->get('monitoring.available_sensors', array());
-    $sensor_info = monitoring_sensor_info();
+    $sensor_config = monitoring_sensor_manager()->getSensorConfig();
 
-    $available_sensors = $this->updateAvailableSensorsList($available_sensors, $sensor_info);
-    $this->checkForMissingSensors($result, $available_sensors, $sensor_info);
+    $available_sensors = $this->updateAvailableSensorsList($available_sensors, $sensor_config);
+    $this->checkForMissingSensors($result, $available_sensors, $sensor_config);
   }
 
   /**
@@ -77,16 +77,16 @@ class SensorDisappearedSensors extends SensorConfigurable {
    *
    * @param array $available_sensors
    *   The available sensors list.
-   * @param \Drupal\monitoring\Entity\SensorInfo[] $sensor_info
-   *   The current sensor info.
+   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensor_config
+   *   The current sensor config.
    *
    * @return array
    *   Updated available sensors list.
    */
-  protected function updateAvailableSensorsList($available_sensors, $sensor_info) {
+  protected function updateAvailableSensorsList($available_sensors, $sensor_config) {
     $new_sensors = array();
 
-    foreach ($sensor_info as $key => $info) {
+    foreach ($sensor_config as $key => $info) {
       // Check for newly added sensors. This is needed as some sensors get
       // enabled by default and not via monitoring_sensor_enable() callback that
       // takes care of updating the available sensors list.
@@ -120,16 +120,16 @@ class SensorDisappearedSensors extends SensorConfigurable {
    *   The current sensor result object.
    * @param array $available_sensors
    *   The available sensors list.
-   * @param \Drupal\monitoring\Entity\SensorInfo[] $sensor_info
-   *   The current sensor info.
+   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensor_config
+   *   The current sensor config.
    */
-  protected function checkForMissingSensors(SensorResultInterface $result, $available_sensors, $sensor_info) {
+  protected function checkForMissingSensors(SensorResultInterface $result, $available_sensors, $sensor_config) {
     $result->setStatus(SensorResultInterface::STATUS_OK);
 
     $sensors_to_remove = array();
     // Check for missing sensors.
     foreach ($available_sensors as $available_sensor) {
-      if (!in_array($available_sensor['name'], array_keys($sensor_info))) {
+      if (!in_array($available_sensor['name'], array_keys($sensor_config))) {
         // If sensor is missing and was not disabled prior to go missing do
         // escalate to critical status.
         if (!empty($available_sensor['enabled'])) {

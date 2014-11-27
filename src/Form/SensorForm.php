@@ -9,7 +9,7 @@ namespace Drupal\monitoring\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Sensor\SensorConfigurableInterface;
 
 /**
@@ -24,21 +24,21 @@ class SensorForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $form['#tree'] = TRUE;
 
-    /* @var SensorInfo $sensor_info */
-    $sensor_info = $this->entity;
+    /* @var SensorConfig $sensor_config */
+    $sensor_config = $this->entity;
 
     $form['category'] = array(
       '#type' => 'textfield',
       '#title' => t('Category'),
       '#maxlength' => 255,
-      '#default_value' => $sensor_info->getCategory(),
+      '#default_value' => $sensor_config->getCategory(),
     );
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $sensor_info->getLabel(),
+      '#default_value' => $sensor_config->getLabel(),
       '#required' => TRUE,
     );
 
@@ -46,12 +46,12 @@ class SensorForm extends EntityForm {
       '#type' => 'machine_name',
       '#title' => t('ID'),
       '#maxlength' => 255,
-      '#default_value' => $sensor_info->id(),
+      '#default_value' => $sensor_config->id(),
       '#description' => t("ID of the sensor"),
       '#required' => TRUE,
-      '#disabled' => !$sensor_info->isNew(),
+      '#disabled' => !$sensor_config->isNew(),
       '#machine_name' => array(
-        'exists' => 'Drupal\monitoring\Entity\SensorInfo::load',
+        'exists' => 'Drupal\monitoring\Entity\SensorConfig::load',
       ),
     );
 
@@ -59,14 +59,14 @@ class SensorForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => t('Description'),
       '#maxlength' => 255,
-      '#default_value' => $sensor_info->getDescription(),
+      '#default_value' => $sensor_config->getDescription(),
     );
 
     $form['value_label'] = array(
       '#type' => 'textfield',
       '#title' => t('Value Label'),
       '#maxlength' => 255,
-      '#default_value' => $sensor_info->getValueLabel(),
+      '#default_value' => $sensor_config->getValueLabel(),
       '#description' => t("The value label represents the units of the sensor value."),
     );
 
@@ -74,11 +74,11 @@ class SensorForm extends EntityForm {
       '#type' => 'number',
       '#title' => t('Cache Time'),
       '#maxlength' => 10,
-      '#default_value' => $sensor_info->getCachingTime(),
+      '#default_value' => $sensor_config->getCachingTime(),
       '#description' => t("The caching time for the sensor in seconds. Empty to disable caching."),
     );
 
-    if ($sensor_info->isNew()) {
+    if ($sensor_config->isNew()) {
       $plugin_types = array();
       foreach (monitoring_sensor_manager()->getDefinitions() as $plugin_id => $definition) {
         if ($definition['addable'] == TRUE) {
@@ -113,13 +113,13 @@ class SensorForm extends EntityForm {
     else {
       // Set the sensor object into $form_state to make it available for
       // validate and submit callbacks.
-      $form_state->set('sensor_object', $sensor_info->getPlugin());
+      $form_state->set('sensor_object', $sensor_config->getPlugin());
 
       $form['old_sensor_id'] = array(
         '#type' => 'item',
         '#title' => t('Sensor Plugin'),
         '#maxlength' => 255,
-        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_info->sensor_id)['label']->render(),
+        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_config->sensor_id)['label']->render(),
       );
     }
 
@@ -129,10 +129,10 @@ class SensorForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => t('Enabled'),
       '#description' => t('Check to have the sensor trigger.'),
-      '#default_value' => $sensor_info->status(),
+      '#default_value' => $sensor_config->status(),
     );
 
-    if (isset($sensor_info->sensor_id) && $sensor_info->getPlugin() instanceof SensorConfigurableInterface) {
+    if (isset($sensor_config->sensor_id) && $sensor_config->getPlugin() instanceof SensorConfigurableInterface) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
@@ -140,7 +140,7 @@ class SensorForm extends EntityForm {
         '#prefix' => '<div id="monitoring-sensor-plugin">',
         '#suffix' => '</div>',
       );
-      $form['settings'] += (array) $sensor_info->getPlugin()->settingsForm($form['settings'], $form_state);
+      $form['settings'] += (array) $sensor_config->getPlugin()->settingsForm($form['settings'], $form_state);
     }
     else {
       $form['settings'] = array(
@@ -149,7 +149,7 @@ class SensorForm extends EntityForm {
         '#suffix' => '</div>',
       );
     }
-    $settings = $sensor_info->getSettings();
+    $settings = $sensor_config->getSettings();
     foreach ($settings as $key => $value) {
       if (!isset($form['settings'][$key])) {
         $form['settings'][$key] = array(
@@ -205,10 +205,10 @@ class SensorForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /* @var SensorInfo $sensor_info */
-    $sensor_info = $this->entity;
+    /* @var SensorConfig $sensor_config */
+    $sensor_config = $this->entity;
     /* @var SensorInterface */
-    $sensor = $sensor_info->getPlugin();
+    $sensor = $sensor_config->getPlugin();
 
     if ($sensor instanceof SensorConfigurableInterface) {
       $sensor->settingsFormSubmit($form, $form_state);
@@ -227,11 +227,13 @@ class SensorForm extends EntityForm {
 
   /**
    * Settings form page title callback.
+   *
+   * @param SensorConfig $monitoring_sensor_config
+   *   The Sensor config.
+   *
+   * @return string
    */
-  public function formTitle($monitoring_sensor) {
-    if ($sensor_info = SensorInfo::load($monitoring_sensor)) {
-      return $this->t('@label settings (@category)', array('@category' => $sensor_info->getCategory(), '@label' => $sensor_info->getLabel()));
-    }
-    return '';
+  public function formTitle(SensorConfig $monitoring_sensor_config) {
+    return $this->t('@label settings (@category)', array('@category' => $monitoring_sensor_config->getCategory(), '@label' => $monitoring_sensor_config->getLabel()));
   }
 }

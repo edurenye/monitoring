@@ -62,8 +62,8 @@ class MuninGraphSettingsForm implements FormInterface {
       $options[$multigraph['title']] = $multigraph['title'];
     }
 
-    foreach (monitoring_sensor_manager()->getEnabledSensorInfo() as $sensor_name => $sensor_info) {
-      $munin_settings = $sensor_info->getSetting('munin', array(
+    foreach (monitoring_sensor_manager()->getEnabledSensorConfig() as $sensor_name => $sensor_config) {
+      $munin_settings = $sensor_config->getSetting('munin', array(
         'multigraphs' => array(),
         'munin_enabled' => FALSE,
         'graph_args' => '',
@@ -71,8 +71,8 @@ class MuninGraphSettingsForm implements FormInterface {
 
       $form[$sensor_name] = array(
         '#type' => 'fieldset',
-        '#title' => $sensor_info->getLabel(),
-        '#description' => $sensor_info->getDescription(),
+        '#title' => $sensor_config->getLabel(),
+        '#description' => $sensor_config->getDescription(),
         '#tree' => TRUE,
       );
       $form[$sensor_name]['munin_enabled'] = array(
@@ -113,8 +113,8 @@ class MuninGraphSettingsForm implements FormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach (monitoring_sensor_info() as $sensor_name => $sensor_info) {
-      if ($sensor_info->isEnabled() && !empty($form_state['values'][$sensor_name])) {
+    foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
+      if ($sensor_config->isEnabled() && !empty($form_state['values'][$sensor_name])) {
         $settings = monitoring_sensor_settings_get($sensor_name);
         $settings['munin'] = $form_state['values'][$sensor_name];
         monitoring_sensor_settings_save($sensor_name, $settings);

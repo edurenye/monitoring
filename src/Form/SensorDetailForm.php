@@ -8,7 +8,7 @@ namespace Drupal\monitoring\Form;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -65,9 +65,9 @@ class SensorDetailForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $sensor_info = $this->entity;
+    $sensor_config = $this->entity;
     try {
-      $results = $this->sensorRunner->runSensors(array($sensor_info), FALSE, TRUE);
+      $results = $this->sensorRunner->runSensors(array($sensor_config), FALSE, TRUE);
       $result = array_shift($results);
     }
     catch (DisabledSensorException $e) {
@@ -77,19 +77,19 @@ class SensorDetailForm extends EntityForm {
       throw new NotFoundHttpException();
     }
 
-    if ($sensor_info->getDescription()) {
+    if ($sensor_config->getDescription()) {
       $form['sensor_info']['description'] = array(
         '#type' => 'item',
         '#title' => $this->t('Description'),
-        '#markup' => $sensor_info->getDescription(),
+        '#markup' => $sensor_config->getDescription(),
       );
     }
 
-    if ($sensor_info->getCategory()) {
+    if ($sensor_config->getCategory()) {
       $form['sensor_info']['category'] = array(
         '#type' => 'item',
         '#title' => $this->t('Category'),
-        '#markup' => $sensor_info->getCategory(),
+        '#markup' => $sensor_config->getCategory(),
       );
     }
 
@@ -121,7 +121,7 @@ class SensorDetailForm extends EntityForm {
       $form['sensor_result']['cached'] = array(
         '#type' => 'item',
         '#title' => $this->t('Cache information'),
-        '#markup' => $this->t('Executed @interval ago, valid for @valid', array('@interval' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $result->getTimestamp()), '@valid' => \Drupal::service('date.formatter')->formatInterval($sensor_info->getCachingTime()))),
+        '#markup' => $this->t('Executed @interval ago, valid for @valid', array('@interval' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $result->getTimestamp()), '@valid' => \Drupal::service('date.formatter')->formatInterval($sensor_config->getCachingTime()))),
       );
 
       $form['sensor_result']['force_run'] = array(
@@ -130,11 +130,11 @@ class SensorDetailForm extends EntityForm {
 	'#access' => \Drupal::currentUser()->hasPermission('monitoring force run'),
       );
     }
-    elseif ($sensor_info->getCachingTime()) {
+    elseif ($sensor_config->getCachingTime()) {
       $form['sensor_result']['cached'] = array(
         '#type' => 'item',
         '#title' => $this->t('Cache information'),
-        '#markup' => $this->t('Executed now, valid for @valid', array('@valid' => \Drupal::service('date.formatter')->formatInterval($sensor_info->getCachingTime()))),
+        '#markup' => $this->t('Executed now, valid for @valid', array('@valid' => \Drupal::service('date.formatter')->formatInterval($sensor_config->getCachingTime()))),
       );
 
       $form['sensor_result']['force_run'] = array(
@@ -151,7 +151,7 @@ class SensorDetailForm extends EntityForm {
       );
     }
 
-    if ($sensor_info->isExtendedInfo()) {
+    if ($sensor_config->isExtendedInfo()) {
       $form['sensor_result']['verbose'] = array(
         '#type' => 'fieldset',
         '#title' => $this->t('Verbose'),
@@ -180,14 +180,14 @@ class SensorDetailForm extends EntityForm {
     $form['settings'] = array(
       '#type' => 'details',
       '#title' => $this->t('Settings'),
-      '#description' => SafeMarkup::set('<pre>' . var_export($sensor_info->getSettings(), TRUE) . '</pre>'),
+      '#description' => SafeMarkup::set('<pre>' . var_export($sensor_config->getSettings(), TRUE) . '</pre>'),
       '#open' => FALSE,
     );
 
     $view = Views::getView('monitoring_sensor_results');
     if (!empty($view)) {
       $view->initDisplay();
-      $output = $view->preview('detail_page_log', array($sensor_info->getName()));
+      $output = $view->preview('detail_page_log', array($sensor_config->getName()));
       if (!empty($view->result)) {
         $form['sensor_log'] = array(
           '#type' => 'details',
@@ -216,9 +216,14 @@ class SensorDetailForm extends EntityForm {
   }
 
   /**
-   * Settings form page title callback.
+   * Detail page title callback.
+   *
+   * @param SensorConfig $monitoring_sensor_config
+   *   The Sensor config.
+   *
+   * @return string
    */
-  public function formTitle(SensorInfo $monitoring_sensor) {
-    return $this->t('@label (@category)', array('@category' => $monitoring_sensor->getCategory(), '@label' => $monitoring_sensor->getLabel()));
+  public function formTitle(SensorConfig $monitoring_sensor_config) {
+    return $this->t('@label (@category)', array('@category' => $monitoring_sensor_config->getCategory(), '@label' => $monitoring_sensor_config->getLabel()));
   }
 }

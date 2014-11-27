@@ -115,7 +115,7 @@ class SensorEnabledModules extends SensorConfigurable {
    * {@inheritdoc}
    */
   public function settingsFormSubmit($form, FormStateInterface $form_state) {
-    $sensor_info = $form_state->getFormObject()->getEntity();
+    $sensor_config = $form_state->getFormObject()->getEntity();
 
     parent::settingsFormSubmit($form, $form_state);
 
@@ -123,8 +123,8 @@ class SensorEnabledModules extends SensorConfigurable {
     $hidden_modules = $form_state->getValue(array(
       'settings', 'extended', 'modules_hidden'));
     $modules = array_merge(array_filter($modules), array_filter($hidden_modules));
-    unset($sensor_info->settings['extended']);
-    $sensor_info->settings['modules'] = $modules;
+    unset($sensor_config->settings['extended']);
+    $sensor_config->settings['modules'] = $modules;
 
     return $form_state;
   }

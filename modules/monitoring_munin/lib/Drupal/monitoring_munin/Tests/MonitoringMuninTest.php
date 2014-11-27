@@ -44,7 +44,7 @@ class MonitoringMuninTest extends MonitoringTestBase {
     // Deleting the multigraph must remove it form sensors settings as well.
     monitoring_munin_multigraph_delete('test multigraph');
     monitoring_sensor_manager()->resetCache();
-    $info = $this->sensorManager->getSensorInfoByName('dblog_404');
+    $info = $this->sensorManager->getSensorConfigByName('dblog_404');
     $munin_settings = $info->getSetting('munin');
     $this->assertTrue(!in_array('test multigraph', $munin_settings['multigraphs']));
   }
@@ -69,11 +69,11 @@ class MonitoringMuninTest extends MonitoringTestBase {
       ),
     ));
 
-    foreach (monitoring_sensor_info_by_categories() as $category => $sensors) {
+    foreach (monitoring_sensor_config_by_categories() as $category => $sensors) {
       if (!isset($multigraphs[$category])) {
         continue;
       }
-      /** @var \Drupal\monitoring\Sensor\SensorInfo $sensor */
+      /** @var \Drupal\monitoring\Sensor\SensorConfig $sensor */
       foreach ($sensors as $sensor) {
         $munin_settings = $sensor->getSetting('munin');
         $this->assertTrue($munin_settings['munin_enabled']);

@@ -11,11 +11,9 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\node\NodeTypeInterface;
-use Drupal\search_api\Entity\Index;
-use Drupal\search_api\Index\IndexInterface;
 
 /**
  * Returns an instance of the sensor manager.
@@ -28,31 +26,31 @@ function monitoring_sensor_manager() {
 }
 
 /**
- * Returns monitoring sensor info.
+ * Returns monitoring sensor config.
  *
- * @return \Drupal\monitoring\Entity\SensorInfo[]
- *   List of SensorInfo instances.
+ * @return \Drupal\monitoring\Entity\SensorConfig[]
+ *   List of SensorConfig instances.
  *
  * @throws \Drupal\monitoring\Sensor\NonExistingSensorException
  *   In case a sensor name is provided, which does not exists.
  *
  * @see \Drupal\monitoring\Sensor\SensorManager
  */
-function monitoring_sensor_info() {
-  return monitoring_sensor_manager()->getSensorInfo();
+function monitoring_sensor_config() {
+  return monitoring_sensor_manager()->getSensorConfig();
 }
 
 /**
- * Gets sensor info grouped by categories.
+ * Gets sensor config grouped by categories.
  *
  * @param bool $enabled
  *   Sensor isEnabled flag.
  *
- * @return \Drupal\monitoring\Entity\SensorInfo[]
- *   Sensor info.
+ * @return \Drupal\monitoring\Entity\SensorConfig[]
+ *   Sensor config.
  */
-function monitoring_sensor_info_by_categories($enabled = TRUE) {
-  return monitoring_sensor_manager()->getSensorInfoByCategories($enabled);
+function monitoring_sensor_config_by_categories($enabled = TRUE) {
+  return monitoring_sensor_manager()->getSensorConfigByCategories($enabled);
 }
 
 /**
@@ -103,21 +101,21 @@ function monitoring_sensor_run($sensor_name, $force_run = FALSE, $verbose = FALS
  * @see \Drupal\monitoring\SensorRunner
  */
 function monitoring_sensor_run_multiple($sensor_names = array(), $force_run = FALSE, $verbose = FALSE) {
-  $sensors_info = array();
+  $sensors_config = array();
   if (empty($sensor_names)) {
-    foreach (monitoring_sensor_manager()->getEnabledSensorInfo() as $sensor_name => $sensor_info) {
-      $sensors_info[$sensor_name] = $sensor_info;
+    foreach (monitoring_sensor_manager()->getEnabledSensorConfig() as $sensor_name => $sensor_config) {
+      $sensors_config[$sensor_name] = $sensor_config;
     }
   }
   else {
     foreach ($sensor_names as $sensor_name) {
-      $sensors_info[$sensor_name] = monitoring_sensor_manager()->getSensorInfoByName($sensor_name);
+      $sensors_config[$sensor_name] = monitoring_sensor_manager()->getSensorConfigByName($sensor_name);
     }
   }
 
   /** @var \Drupal\Monitoring\SensorRunner $runner */
   $runner = \Drupal::service('monitoring.sensor_runner');
-  $results = $runner->runSensors($sensors_info, $force_run, $verbose);
+  $results = $runner->runSensors($sensors_config, $force_run, $verbose);
   return $results;
 }
 
@@ -154,14 +152,14 @@ function monitoring_preprocess_views_view_table(&$vars) {
  *
  * @param string $action
  *   View/page action.
- * @param \Drupal\monitoring\Entity\SensorInfo $sensor_info
- *   Sensor info.
+ * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
+ *   Sensor config.
  *
  * @return string
  *   Title.
  */
-function monitoring_sensor_action_title($action, SensorInfo $sensor_info) {
-  $placeholders = array('@category' => $sensor_info->getCategory(), '@label' => $sensor_info->getLabel());
+function monitoring_sensor_action_title($action, SensorConfig $sensor_config) {
+  $placeholders = array('@category' => $sensor_config->getCategory(), '@label' => $sensor_config->getLabel());
   switch ($action) {
     case 'log':
       return t('@label (@category)', $placeholders);
@@ -387,7 +385,7 @@ function monitoring_host_key() {
  */
 function monitoring_clear_missing_sensor_submit($form, FormStateInterface $form_state) {
   $available_sensors = array();
-  foreach (monitoring_sensor_info() as $key => $info) {
+  foreach (monitoring_sensor_manager()->getSensorConfig() as $key => $info) {
     $available_sensors[$key] = array(
       'name' => $key,
       'label' => $info->getLabel(),
@@ -536,7 +534,7 @@ function monitoring_value_label_callback_bool(SensorResultInterface $result) {
  */
 function monitoring_value_label_callback_commerce_currency(SensorResultInterface $result) {
   if (\Drupal::moduleHandler()->moduleExists('commerce')) {
-    $currency = $result->getSensorInfo()->getSetting('currency_code');
+    $currency = $result->getSensorConfig()->getSetting('currency_code');
     if (empty($currency)) {
       $currency = commerce_default_currency();
     }
@@ -561,7 +559,7 @@ function monitoring_sensor_thresholds_ajax($form, FormStateInterface $form_state
  * Inserts new node sensor config entities on creation of new node types.
  */
 function monitoring_node_type_insert(NodeTypeInterface $type) {
-  $sensor = SensorInfo::create(array(
+  $sensor = SensorConfig::create(array(
     'id' => 'node_new_' . $type->id(),
     'label' => String::format('New @type nodes', array('@type' => $type->label())),
     'description' => String::format('New nodes of type @type', array('@type' => $type->label())),
@@ -592,7 +590,7 @@ function monitoring_node_type_insert(NodeTypeInterface $type) {
  */
 function monitoring_node_type_delete(NodeTypeInterface $info) {
   $config_id = 'node_new_' . $info->id();
-  $sensor = SensorInfo::load($config_id);
+  $sensor = SensorConfig::load($config_id);
   $sensor->delete();
 }
 
@@ -603,7 +601,7 @@ function monitoring_node_type_delete(NodeTypeInterface $info) {
  */
 function monitoring_node_type_update(NodeTypeInterface $type) {
   $config_id = 'node_new_' . $type->id();
-  $sensor = SensorInfo::load($config_id);
+  $sensor = SensorConfig::load($config_id);
   if ($sensor) {
     $sensor->id = 'node_new_' . $type->id();
     $sensor->label = String::format(
@@ -629,7 +627,7 @@ function monitoring_node_type_update(NodeTypeInterface $type) {
  * Inserts new search api index  sensor config entities on creation of new search api index.
  */
 function monitoring_search_api_index_insert(IndexInterface $index) {
-  $sensor = SensorInfo::create(array(
+  $sensor = SensorConfig::create(array(
     'id' => 'search_api_' . $index->id(),
     'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
     'sensor_id' => 'search_api_unindexed',
@@ -651,7 +649,7 @@ function monitoring_search_api_index_insert(IndexInterface $index) {
  */
 function monitoring_search_api_index_delete(IndexInterface $index) {
   $config_id = 'search_api_' . $index->id();
-  $sensor = SensorInfo::load($config_id);
+  $sensor = SensorConfig::load($config_id);
   $sensor->delete();
 }
 
@@ -662,7 +660,7 @@ function monitoring_search_api_index_delete(IndexInterface $index) {
  */
 function monitoring_search_api_index_update(IndexInterface $index) {
   $config_id = 'search_api_' . $index->id();
-  $sensor = SensorInfo::load($config_id);
+  $sensor = SensorConfig::load($config_id);
   $sensor->id = 'search_api_' . $index->id();
   $sensor->label = String::format('Search index queue size of @index', array('@index' => $index->id()));
   $sensor->save();

@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Result;
 
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Interface for a sensor result.
@@ -231,11 +231,11 @@ interface SensorResultInterface {
   public function getSensorName();
 
   /**
-   * Gets sensor info.
+   * Gets sensor config.
    *
-   * @return SensorInfo
+   * @return SensorConfig
    */
-  public function getSensorInfo();
+  public function getSensorConfig();
 
   /**
    * Checks if sensor is in UNKNOWN state.

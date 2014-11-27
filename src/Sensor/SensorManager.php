@@ -13,7 +13,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\monitoring\SensorRunner;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Manages sensor definitions and settings.
@@ -30,7 +30,7 @@ class SensorManager extends DefaultPluginManager {
   /**
    * List of sensor definitions.
    *
-   * @var \Drupal\monitoring\Entity\SensorInfo[]
+   * @var \Drupal\monitoring\Entity\SensorConfig[]
    */
   protected $info;
 
@@ -68,60 +68,59 @@ class SensorManager extends DefaultPluginManager {
   public function createInstance($plugin_id, array $configuration = array()) {
     // Configuration contains sensor_info object. Extracting
     // it to use for sensor object creation.
-    $sensor_info = $configuration['sensor_info'];
+    $sensor_config = $configuration['sensor_info'];
     $definition = $this->getDefinition($plugin_id);
     // Sensor class from the sensor definition.
     $class = $definition['class'];
     // Creating instance of the sensor. Refer Sensor.php for arguments.
-    return $class::create(\Drupal::getContainer(), $sensor_info, $plugin_id, $definition);
+    return $class::create(\Drupal::getContainer(), $sensor_config, $plugin_id, $definition);
   }
 
   /**
-   * Returns monitoring sensor info.
+   * Returns monitoring sensor config.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo[]
-   *   List of SensorInfo instances.
+   * @return \Drupal\monitoring\Entity\SensorConfig[]
+   *   List of SensorConfig instances.
    */
-  public function getSensorInfo() {
-    $sensors = SensorInfo::loadMultiple();
-    $this->moduleHandler->alter('monitoring_sensor_info', $sensors);
+  public function getSensorConfig() {
+    $sensors = SensorConfig::loadMultiple();
 
     // Sort the sensors by category and label.
-    uasort($sensors, "\Drupal\monitoring\Entity\SensorInfo::sort");
+    uasort($sensors, "\Drupal\monitoring\Entity\SensorConfig::sort");
 
     return $sensors;
   }
 
   /**
-   * Returns monitoring sensor info for enabled sensors.
+   * Returns monitoring sensor config for enabled sensors.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo[]
-   *   List of SensorInfo instances.
+   * @return \Drupal\monitoring\Entity\SensorConfig[]
+   *   List of SensorConfig instances.
    */
-  public function getEnabledSensorInfo() {
+  public function getEnabledSensorConfig() {
     $enabled_sensors = array();
-    foreach ($this->getSensorInfo() as $sensor_info) {
-      if ($sensor_info->isEnabled()) {
-        $enabled_sensors[$sensor_info->getName()] = $sensor_info;
+    foreach ($this->getSensorConfig() as $sensor_config) {
+      if ($sensor_config->isEnabled()) {
+        $enabled_sensors[$sensor_config->getName()] = $sensor_config;
       }
     }
     return $enabled_sensors;
   }
 
   /**
-   * Returns monitoring sensor info for a given sensor.
+   * Returns monitoring sensor config for a given sensor.
    *
    * @param string $sensor_name
    *   Sensor id.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo
-   *   A single SensorInfo instance.
+   * @return \Drupal\monitoring\Entity\SensorConfig
+   *   A single SensorConfig instance.
    *
    * @throws \Drupal\monitoring\Sensor\NonExistingSensorException
    *   Thrown if the requested sensor does not exist.
    */
-  public function getSensorInfoByName($sensor_name) {
-    $info = $this->getSensorInfo();
+  public function getSensorConfigByName($sensor_name) {
+    $info = $this->getSensorConfig();
     if (isset($info[$sensor_name])) {
       return $info[$sensor_name];
     }
@@ -129,24 +128,24 @@ class SensorManager extends DefaultPluginManager {
   }
 
   /**
-   * Gets sensor info grouped by categories.
+   * Gets sensor config grouped by categories.
    *
    * @todo: The enabled flag is strange, FALSE should return all?
    *
    * @param bool $enabled
    *   Sensor isEnabled flag.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo[]
-   *   Sensor info.
+   * @return \Drupal\monitoring\Entity\SensorConfig[]
+   *   Sensor config.
    */
-  public function getSensorInfoByCategories($enabled = TRUE) {
+  public function getSensorConfigByCategories($enabled = TRUE) {
     $info_by_categories = array();
-    foreach ($this->getSensorInfo() as $sensor_name => $sensor_info) {
-      if ($sensor_info->isEnabled() != $enabled) {
+    foreach ($this->getSensorConfig() as $sensor_name => $sensor_config) {
+      if ($sensor_config->isEnabled() != $enabled) {
         continue;
       }
 
-      $info_by_categories[$sensor_info->getCategory()][$sensor_name] = $sensor_info;
+      $info_by_categories[$sensor_config->getCategory()][$sensor_name] = $sensor_config;
     }
 
     return $info_by_categories;
@@ -171,10 +170,10 @@ class SensorManager extends DefaultPluginManager {
    *   Thrown if the requested sensor does not exist.
    */
   public function enableSensor($sensor_name) {
-    $sensor_info = $this->getSensorInfoByName($sensor_name);
-    if (!$sensor_info->isEnabled()) {
-      $sensor_info->status = TRUE;
-      $sensor_info->save();
+    $sensor_config = $this->getSensorConfigByName($sensor_name);
+    if (!$sensor_config->isEnabled()) {
+      $sensor_config->status = TRUE;
+      $sensor_config->save();
 
       $available_sensors = \Drupal::state()->get('monitoring.available_sensors', array());
 
@@ -204,10 +203,10 @@ class SensorManager extends DefaultPluginManager {
    *   Thrown if the requested sensor does not exist.
    */
   public function disableSensor($sensor_name) {
-    $sensor_info = $this->getSensorInfoByName($sensor_name);
-    if ($sensor_info->isEnabled()) {
-      $sensor_info->status = FALSE;
-      $sensor_info->save();
+    $sensor_config = $this->getSensorConfigByName($sensor_name);
+    if ($sensor_config->isEnabled()) {
+      $sensor_config->status = FALSE;
+      $sensor_config->save();
       $available_sensors = \Drupal::state()->get('monitoring.available_sensors', array());
       $available_sensors[$sensor_name]['enabled'] = FALSE;
       $available_sensors[$sensor_name]['name'] = $sensor_name;

@@ -43,12 +43,12 @@ function monitoring_drush_command() {
 
   $items['monitoring-info'] = array(
     'callback' => 'monitoring_drush_info',
-    'description' => 'Displays information about available sensors. If a sensor name provided as argument a detailed sensor info is provided.',
+    'description' => 'Displays information about available sensors. If a sensor name provided as argument a detailed sensor config is provided.',
     'arguments' => array(
       'sensor_name' => 'Specific sensor name for which we want to display info.'
     ),
     'examples' => array(
-      'drush monitoring-info' => 'Prints sensor info for all available sensors.',
+      'drush monitoring-info' => 'Prints sensor config for all available sensors.',
       'drush monitoring-info node_new' => 'Prints info of the node_new sensor.',
     ),
     'drupal dependencies' => array('monitoring'),
@@ -137,12 +137,12 @@ function monitoring_drush_info($sensor_name = NULL) {
  * Provides info about available sensors.
  */
 function monitoring_drush_info_all() {
-  $sensors_info = monitoring_sensor_manager()->getSensorInfo();
+  $sensors_config = monitoring_sensor_manager()->getSensorConfig();
 
   $rows[] = array(dt('Label'), dt('Name'), dt('Category'), dt('Enabled'));
   $rows[] = array('----', '----', '----');
-  /** @var \Drupal\monitoring\Sensor\SensorInfo $info */
-  foreach ($sensors_info as $name => $info) {
+  /** @var \Drupal\monitoring\Entity\SensorConfig $info */
+  foreach ($sensors_config as $name => $info) {
     $rows[] = array(
       $info->getLabel(),
       $name,
@@ -161,26 +161,26 @@ function monitoring_drush_info_all() {
  *   Sensor name for which to print info.
  */
 function monitoring_drush_info_single($sensor_name) {
-  $sensor_info = NULL;
+  $sensor_config = NULL;
   try {
-    $sensor_info = monitoring_sensor_manager()->getSensorInfoByName($sensor_name);
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName($sensor_name);
   }
   catch (NonExistingSensorException $e) {
     return drush_set_error('MONITORING_SENSOR_INVALID_NAME', dt('Sensor "@name" does not exist.', array('@name' => $sensor_name)));
   }
 
-  $rows[] = array(String::format("@label (@name)", array('@label' => $sensor_info->getLabel(), '@name' => $sensor_info->getName())), '====================');
-  $rows[] = array(dt('Category'), $sensor_info->getCategory());
-  $rows[] = array(dt('Description'), $sensor_info->getDescription());
+  $rows[] = array(String::format("@label (@name)", array('@label' => $sensor_config->getLabel(), '@name' => $sensor_config->getName())), '====================');
+  $rows[] = array(dt('Category'), $sensor_config->getCategory());
+  $rows[] = array(dt('Description'), $sensor_config->getDescription());
   $rows[] = array(dt('Value info'), String::format('type: @type, label: @label, numeric: @numeric', array(
-    '@type' => ($sensor_info->getValueType() ? $sensor_info->getValueType() : dt('N/A')),
-    '@label' => ($sensor_info->getValueLabel() ? $sensor_info->getValueLabel() : dt('N/A')),
-    '@numeric' => ($sensor_info->isNumeric() ? dt('Yes') : dt('No')),
+    '@type' => ($sensor_config->getValueType() ? $sensor_config->getValueType() : dt('N/A')),
+    '@label' => ($sensor_config->getValueLabel() ? $sensor_config->getValueLabel() : dt('N/A')),
+    '@numeric' => ($sensor_config->isNumeric() ? dt('Yes') : dt('No')),
   )));
-  $rows[] = array(dt('Caching time'), \Drupal::service('date.formatter')->formatInterval($sensor_info->getCachingTime()));
-  $rows[] = array(dt('Enabled'), $sensor_info->isEnabled() ? dt('Yes') : dt('No'));
-  $rows[] = array(dt('Has thresholds'), $sensor_info->isDefiningThresholds() ? dt('Yes') : dt('No'));
-  $rows[] = array(dt('Is configurable'), $sensor_info->isConfigurable() ? dt('Yes') : dt('No'));
+  $rows[] = array(dt('Caching time'), \Drupal::service('date.formatter')->formatInterval($sensor_config->getCachingTime()));
+  $rows[] = array(dt('Enabled'), $sensor_config->isEnabled() ? dt('Yes') : dt('No'));
+  $rows[] = array(dt('Has thresholds'), $sensor_config->isDefiningThresholds() ? dt('Yes') : dt('No'));
+  $rows[] = array(dt('Is configurable'), $sensor_config->isConfigurable() ? dt('Yes') : dt('No'));
 
   drush_print_table($rows);
 }
@@ -262,7 +262,7 @@ function monitoring_drush_result_output_json(array $results, $expand = NULL) {
   foreach ($results as $result) {
     $json_output[$result->getSensorName()] = $result->toArray();
     if ($expand == 'sensor_info') {
-      $json_output[$result->getSensorName()]['sensor_info'] = $result->getSensorInfo()->toArray();
+      $json_output[$result->getSensorName()]['sensor_info'] = $result->getSensorConfig()->toArray();
     }
   }
   drush_print(Json::encode($json_output));
@@ -292,8 +292,8 @@ function monitoring_drush_result_output_table(array $results, $show_exec_time = 
  *   Sensor result object.
  */
 function monitoring_drush_result_output_table_single(SensorResultInterface $result) {
-  $rows[] = array(dt('Name'), $result->getSensorInfo()->getName());
-  $rows[] = array(dt('Label'), $result->getSensorInfo()->getLabel());
+  $rows[] = array(dt('Name'), $result->getSensorConfig()->getName());
+  $rows[] = array(dt('Label'), $result->getSensorConfig()->getLabel());
   $rows[] = array(dt('Status'), $result->getStatusLabel());
   $rows[] = array(dt('Message'), $result->getMessage());
   $rows[] = array(dt('Execution time'), $result->getExecutionTime() . 'ms');
@@ -323,7 +323,7 @@ function monitoring_drush_result_output_table_multiple(array $results, $show_exe
 
   foreach ($results as $result) {
     $rows[$result->getSensorName()] = array(
-      String::format("@label\n(@name)", array('@label' => Unicode::truncate($result->getSensorInfo()->getLabel(), 40, TRUE, TRUE), '@name' => $result->getSensorName())),
+      String::format("@label\n(@name)", array('@label' => Unicode::truncate($result->getSensorConfig()->getLabel(), 40, TRUE, TRUE), '@name' => $result->getSensorName())),
       $result->getStatusLabel(),
       Unicode::truncate($result->getMessage(), 40, TRUE, TRUE),
       \Drupal::service('date.formatter')->formatInterval(time() - $result->getTimestamp()),
@@ -346,13 +346,13 @@ function monitoring_drush_result_output_table_multiple(array $results, $show_exe
 function monitoring_drush_enable($sensor_name) {
   $sensor_manager = monitoring_sensor_manager();
   try {
-    $sensor_info = $sensor_manager->getSensorInfoByName($sensor_name);
-    if (!$sensor_info->isEnabled()) {
+    $sensor_config = $sensor_manager->getSensorConfigByName($sensor_name);
+    if (!$sensor_config->isEnabled()) {
       $sensor_manager->enableSensor($sensor_name);
-      drush_log(dt('The sensor @name was enabled.', array('@name' => $sensor_info->getLabel())), 'ok');
+      drush_log(dt('The sensor @name was enabled.', array('@name' => $sensor_config->getLabel())), 'ok');
     }
     else {
-      drush_log(dt('The sensor @name is already enabled.', array('@name' => $sensor_info->getLabel())), 'warning');
+      drush_log(dt('The sensor @name is already enabled.', array('@name' => $sensor_config->getLabel())), 'warning');
     }
 
   }
@@ -370,13 +370,13 @@ function monitoring_drush_enable($sensor_name) {
 function monitoring_drush_disable($sensor_name) {
   $sensor_manager = monitoring_sensor_manager();
   try {
-    $sensor_info = $sensor_manager->getSensorInfoByName($sensor_name);
-    if (!$sensor_info->isEnabled()) {
+    $sensor_config = $sensor_manager->getSensorConfigByName($sensor_name);
+    if (!$sensor_config->isEnabled()) {
       $sensor_manager->enableSensor($sensor_name);
-      drush_log(dt('The sensor @name was disabled.', array('@name' => $sensor_info->getLabel())), 'ok');
+      drush_log(dt('The sensor @name was disabled.', array('@name' => $sensor_config->getLabel())), 'ok');
     }
     else {
-      drush_log(dt('The sensor @name is currently disabled.', array('@name' => $sensor_info->getLabel())), 'warning');
+      drush_log(dt('The sensor @name is currently disabled.', array('@name' => $sensor_config->getLabel())), 'warning');
     }
   }
   catch (NonExistingSensorException $e) {
@@ -393,7 +393,7 @@ function monitoring_drush_disable($sensor_name) {
 function monitoring_drush_purge_settings($sensor_name = NULL) {
   if (empty($sensor_name)) {
     if (drush_confirm(dt('Do you want to purge all sensor settings?'))) {
-      foreach (monitoring_sensor_manager()->getSensorInfo() as $sensor_name => $sensor_info) {
+      foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
         \Drupal::config('monitoring.settings')->set($sensor_name, array())->save();
       }
       drush_print(dt('Purged settings for all sensors'));

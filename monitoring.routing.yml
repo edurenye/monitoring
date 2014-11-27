@@ -1,7 +1,7 @@
 monitoring.sensors_overview_settings:
   path: '/admin/config/system/monitoring/sensors'
   defaults:
-    _entity_list: 'monitoring_sensor'
+    _entity_list: 'monitoring_sensor_config'
     _title: 'Sensor Overview'
   requirements:
     _permission: 'administer monitoring'
@@ -15,9 +15,9 @@ monitoring.sensor_list:
     _permission: 'monitoring reports'
 
 monitoring.detail_form:
-  path: '/admin/reports/monitoring/sensors/{monitoring_sensor}'
+  path: '/admin/reports/monitoring/sensors/{monitoring_sensor_config}'
   defaults:
-    _entity_form: 'monitoring_sensor.details'
+    _entity_form: 'monitoring_sensor_config.details'
     _title_callback: '\Drupal\monitoring\Form\SensorDetailForm::formTitle'
   requirements:
     _permission: 'monitoring reports'
@@ -30,24 +30,24 @@ monitoring.force_run_all:
     _permission: 'monitoring force run'
 
 monitoring.force_run_sensor:
-  path: 'monitoring/sensors/force/{monitoring_sensor}'
+  path: 'monitoring/sensors/force/{monitoring_sensor_config}'
   defaults:
     _controller: '\Drupal\monitoring\Controller\ForceRunController::forceRunSensor'
   requirements:
     _permission: 'monitoring force run'
 
 monitoring.sensor_delete:
-  path: '/admin/config/system/monitoring/sensors/{monitoring_sensor}/delete'
+  path: '/admin/config/system/monitoring/sensors/{monitoring_sensor_config}/delete'
   defaults:
-    _entity_form: 'monitoring_sensor.delete'
+    _entity_form: 'monitoring_sensor_config.delete'
     _title: 'Delete'
   requirements:
     _permission: 'administer monitoring'
 
 monitoring.sensor_edit:
-  path: '/admin/config/system/monitoring/sensors/{monitoring_sensor}'
+  path: '/admin/config/system/monitoring/sensors/{monitoring_sensor_config}'
   defaults:
-    _entity_form: 'monitoring_sensor.edit'
+    _entity_form: 'monitoring_sensor_config.edit'
     _title_callback: '\Drupal\monitoring\Form\SensorForm::formTitle'
   requirements:
     _permission: 'administer monitoring'
@@ -55,7 +55,7 @@ monitoring.sensor_edit:
 monitoring.sensor_add:
   path: '/admin/config/system/monitoring/sensors/add'
   defaults:
-    _entity_form: 'monitoring_sensor.add'
+    _entity_form: 'monitoring_sensor_config.add'
     _title: 'Add Sensor'
   requirements:
     _permission: 'administer monitoring'

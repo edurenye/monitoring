@@ -25,15 +25,15 @@ class MultigraphForm extends EntityForm {
     $multigraph = $this->entity;
 
     // Find sensors that can be included.
-    $sensor_ids = \Drupal::entityQuery('monitoring_sensor')
+    $sensor_ids = \Drupal::entityQuery('monitoring_sensor_config')
       ->condition('numeric', TRUE)
       ->condition('status', TRUE)
       ->execute();
     $sensor_ids = array_diff($sensor_ids, array_keys($multigraph->getSensorsRaw()));
     ksort($sensor_ids);
-    /** @var \Drupal\monitoring\Entity\SensorInfo[] $sensors */
+    /** @var \Drupal\monitoring\Entity\SensorConfig[] $sensors */
     $sensors = \Drupal::entityManager()
-      ->getStorage('monitoring_sensor')
+      ->getStorage('monitoring_sensor_config')
       ->loadMultiple($sensor_ids);
 
     $form['label'] = array(
@@ -217,7 +217,7 @@ class MultigraphForm extends EntityForm {
 
     // Add any selected sensor to entity.
     if ($sensor_name = $form_state->getValue(array('sensor_add', 'sensor_add_select'))) {
-      $sensor_label = \Drupal::entityManager()->getStorage('monitoring_sensor')->load($sensor_name)->getLabel();
+      $sensor_label = \Drupal::entityManager()->getStorage('monitoring_sensor_config')->load($sensor_name)->getLabel();
       $multigraph->addSensor($sensor_name);
       drupal_set_message($this->t('Sensor "@sensor_label" added. You have unsaved changes.', array('@sensor_label' => $sensor_label)), 'warning');
     }
@@ -240,7 +240,7 @@ class MultigraphForm extends EntityForm {
     // Remove sensor as indicated by triggering_element.
     $button_name = $form_state->getTriggeringElement()['#name'];
     $sensor_name = substr($button_name, strlen('remove_'));
-    $sensor_label = \Drupal::entityManager()->getStorage('monitoring_sensor')->load($sensor_name)->getLabel();
+    $sensor_label = \Drupal::entityManager()->getStorage('monitoring_sensor_config')->load($sensor_name)->getLabel();
     $multigraph->removeSensor($sensor_name);
     drupal_set_message($this->t('Sensor "@sensor_label" removed.  You have unsaved changes.', array('@sensor_label' => $sensor_label)), 'warning');
   }

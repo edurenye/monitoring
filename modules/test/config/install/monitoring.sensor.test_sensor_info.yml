@@ -1,6 +1,6 @@
 id: test_sensor_info
-label: 'Test sensor info'
-description: 'To test correct sensor info hook implementation precedence.'
+label: 'Test sensor config'
+description: 'To test correct sensor config hook implementation precedence.'
 sensor_id: test_sensor
 numeric: TRUE
 value_label: 'Test label'

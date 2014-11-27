@@ -170,22 +170,22 @@ function monitoring_icinga_objects_definitions_output($active_checks = TRUE, $ch
 
   $services_def = array();
   $servicegroups = array();
-  foreach (monitoring_sensor_manager()->getEnabledSensorInfo() as $sensor_name => $sensor_info) {
+  foreach (monitoring_sensor_manager()->getEnabledSensorConfig() as $sensor_name => $sensor_config) {
     $services_def[] = monitoring_config_code('monitoring_icinga', 'service', array(
       '@host' => $host,
-      '@service_description' => monitoring_icinga_service_description($sensor_info),
+      '@service_description' => monitoring_icinga_service_description($sensor_config),
       '@sensor_name' => $sensor_name,
       '@site_key' => monitoring_host_key(),
-      '@description' => $sensor_info->getDescription(),
+      '@description' => $sensor_config->getDescription(),
       '@active_checks' => (int) $active_checks,
       '@passive_checks' => (int) (!$active_checks),
       '@check_freshness' => (int) $check_freshness,
       '@check_command' => ($check_freshness ? 'service_is_stale' : 'check_drupal'),
     ));
 
-    $category = strtolower(str_replace(' ', '_', $sensor_info->getCategory()));
+    $category = strtolower(str_replace(' ', '_', $sensor_config->getCategory()));
     $servicegroups[$category]['alias'] = $category;
-    $servicegroups[$category]['members'][] = $host . ',' . monitoring_icinga_service_description($sensor_info);
+    $servicegroups[$category]['members'][] = $host . ',' . monitoring_icinga_service_description($sensor_config);
   }
   $services_def = implode("\n\n", $services_def);
 

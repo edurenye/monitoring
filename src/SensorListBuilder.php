@@ -11,13 +11,13 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\monitoring\Sensor\SensorManager;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines a class to build a listing of monitoring entities.
  *
- * @see \Drupal\monitoring\Entity\SensorInfo
+ * @see \Drupal\monitoring\Entity\SensorConfig
  */
 class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface {
 
@@ -96,7 +96,7 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     foreach ($form_state->getValue('sensors') as $sensor_id => $enabled) {
-      $sensor = SensorInfo::load($sensor_id);
+      $sensor = SensorConfig::load($sensor_id);
       if ($enabled) {
         $sensor->status = TRUE;
       }

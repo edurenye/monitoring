@@ -31,7 +31,7 @@ function monitoring_icinga_drush_command() {
 }
 
 /**
- * Drush callback to get the sensor info.
+ * Drush callback to get the sensor config.
  *
  * @param string $sensor_name
  *   Sensor name.
@@ -48,7 +48,7 @@ function monitoring_icinga_drush_callback($sensor_name = NULL) {
 
   foreach ($results as $result) {
     $message = iconv('utf-8', 'ASCII', Unicode::truncate(strip_tags($result->getMessage()), 124, TRUE, TRUE));
-    $service_description = monitoring_icinga_service_description($result->getSensorInfo());
+    $service_description = monitoring_icinga_service_description($result->getSensorConfig());
 
     // Map INFO status to OK.
     $status = $result->getStatus();

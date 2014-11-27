@@ -12,7 +12,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal;
 use Drupal\monitoring\Sensor\SensorManager;
 
@@ -40,9 +40,9 @@ class SensorRunner {
   /**
    * List of sensors info keyed by sensor name that are meant to run.
    *
-   * @var \Drupal\monitoring\Entity\SensorInfo[]
+   * @var \Drupal\monitoring\Entity\SensorConfig[]
    */
-  protected $sensorInfo = array();
+  protected $sensorConfig = array();
 
   /**
    * Flag to force sensor run.
@@ -84,15 +84,15 @@ class SensorRunner {
   /**
    * Loads available sensor results from cache.
    *
-   * @param \Drupal\monitoring\Entity\SensorInfo[] $sensors_info
-   *   List of sensor info object that we want to run.
+   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensors_config
+   *   List of sensor config object that we want to run.
    */
-  protected function loadCache(array $sensors_info) {
+  protected function loadCache(array $sensors_config) {
     $cids = array();
     // Only load sensor caches if they define caching.
-    foreach ($sensors_info as $sensor_info) {
-      if ($sensor_info->getCachingTime()) {
-        $cids[] = $this->getSensorCid($sensor_info->getName());
+    foreach ($sensors_config as $sensor_config) {
+      if ($sensor_config->getCachingTime()) {
+        $cids[] = $this->getSensorCid($sensor_config->getName());
       }
     }
     if ($cids) {
@@ -105,8 +105,8 @@ class SensorRunner {
   /**
    * Runs the defined sensableors.
    *
-   * @param \Drupal\monitoring\Entity\SensorInfo[] $sensors_info
-   *   List of sensor info object that we want to run.
+   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensors_config
+   *   List of sensor config object that we want to run.
    * @param bool $force
    *   Force sensor execution.
    * @param bool $verbose
@@ -120,18 +120,18 @@ class SensorRunner {
    *
    * @see \Drupal\monitoring\SensorRunner::runSensor()
    */
-  public function runSensors(array $sensors_info = array(), $force = FALSE, $verbose = FALSE) {
+  public function runSensors(array $sensors_config = array(), $force = FALSE, $verbose = FALSE) {
 
     $this->verbose = $verbose;
     $this->forceRun = $force;
 
-    if (empty($sensors_info)) {
-      $sensors_info = $this->sensorManager->getEnabledSensorInfo();
+    if (empty($sensors_config)) {
+      $sensors_config = $this->sensorManager->getEnabledSensorConfig();
     }
 
-    $this->loadCache($sensors_info);
+    $this->loadCache($sensors_config);
     $results = array();
-    foreach ($sensors_info as $name => $info) {
+    foreach ($sensors_config as $name => $info) {
       if ($result = $this->runSensor($info)) {
         $results[$name] = $result;
       }
@@ -144,8 +144,8 @@ class SensorRunner {
   /**
    * Run a single given sensor.
    *
-   * @param SensorInfo $sensor_info
-   *   Sensor info
+   * @param SensorConfig $sensor_config
+   *   Sensor config
    *
    * @return SensorResultInterface
    *   Sensor result.
@@ -155,18 +155,18 @@ class SensorRunner {
    *
    * @see \Drupal\monitoring\Sensor\SensorInterface::runSensor()
    */
-  protected function runSensor(SensorInfo $sensor_info) {
-    $sensor = $sensor_info->getPlugin();
+  protected function runSensor(SensorConfig $sensor_config) {
+    $sensor = $sensor_config->getPlugin();
     // Check if sensor is enabled.
     if (!$sensor->isEnabled()) {
-      throw new DisabledSensorException(String::format('Sensor @sensor_name is not enabled and must not be run.', array('@sensor_name' => $sensor_info->getName())));
+      throw new DisabledSensorException(String::format('Sensor @sensor_name is not enabled and must not be run.', array('@sensor_name' => $sensor_config->getName())));
     }
 
-    $result = $this->getResultObject($sensor_info);
+    $result = $this->getResultObject($sensor_config);
 
     // In case result is not yet cached run sensor.
     if (!$result->isCached()) {
-      Timer::start($sensor_info->getName());
+      Timer::start($sensor_config->getName());
       try {
         $sensor->runSensor($result);
       } catch (\Exception $e) {
@@ -180,11 +180,11 @@ class SensorRunner {
         //   backtrace as part of the sensor verbose output.
       }
 
-      $timer = Timer::stop($sensor_info->getName());
+      $timer = Timer::stop($sensor_config->getName());
       $result->setExecutionTime($timer['time']);
 
       // Capture verbose output if requested and if we are able to do so.
-      if ($this->verbose && $sensor_info->isExtendedInfo()) {
+      if ($this->verbose && $sensor_config->isExtendedInfo()) {
         $result->setVerboseOutput($sensor->resultVerbose($result));
       }
 
@@ -241,7 +241,7 @@ class SensorRunner {
    *   TRUE if the result should be logged, FALSE if not.
    */
   protected function needsLogging($result, $old_status = NULL, $new_status = NULL) {
-    $log_activity = $result->getSensorInfo()->getSetting('result_logging', FALSE);
+    $log_activity = $result->getSensorConfig()->getSetting('result_logging', FALSE);
 
 
     // We log if requested or on status change.
@@ -265,7 +265,7 @@ class SensorRunner {
   protected function cacheResults(array $results) {
     // @todo: Cache in a single array, with per item expiration?
     foreach ($results as $result) {
-      $definition = $result->getSensorInfo();
+      $definition = $result->getSensorConfig();
       if ($definition->getCachingTime() && !$result->isCached()) {
         $data = array(
           'name' => $result->getSensorName(),
@@ -289,20 +289,20 @@ class SensorRunner {
   /**
    * Instantiates sensor result object.
    *
-   * @param SensorInfo $sensor_info
-   *   Sensor info.
+   * @param SensorConfig $sensor_config
+   *   Sensor config.
    *
    * @return \Drupal\monitoring\Result\SensorResultInterface
    *   Instantiated sensor result object.
    */
-  protected function getResultObject(SensorInfo $sensor_info) {
+  protected function getResultObject(SensorConfig $sensor_config) {
     $result_class = '\Drupal\monitoring\Result\SensorResult';
 
-    if (!$this->forceRun && isset($this->sensorResultCache[$sensor_info->getName()])) {
-      $result = new $result_class($sensor_info, $this->sensorResultCache[$sensor_info->getName()]);
+    if (!$this->forceRun && isset($this->sensorResultCache[$sensor_config->getName()])) {
+      $result = new $result_class($sensor_config, $this->sensorResultCache[$sensor_config->getName()]);
     }
     else {
-      $result = new $result_class($sensor_info);
+      $result = new $result_class($sensor_config);
     }
     return $result;
   }

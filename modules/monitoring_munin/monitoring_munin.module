@@ -96,7 +96,7 @@ function monitoring_munin_multigraph_delete($title) {
   \Drupal::config('monitoring.munin')->set('multigraphs', $multigraphs)->save();
 
   // Remove from settings.
-  foreach (monitoring_sensor_info() as $info) {
+  foreach (monitoring_sensor_manager()->getSensorConfig() as $info) {
     $munin_settings = $info->getSetting('munin');
 
     // If the sensor has given multigraph remove it from the settings.
@@ -135,7 +135,7 @@ function monitoring_munin_multigraph_save($title, $vlabel) {
  */
 function _monitoring_munin_result() {
 
-  $sensor_info = monitoring_sensor_manager()->getEnabledSensorInfo();
+  $sensor_config = monitoring_sensor_manager()->getEnabledSensorConfig();
   $munin_enabled = array();
 
   // Select only those sensors that are enabled for munin.
@@ -148,12 +148,12 @@ function _monitoring_munin_result() {
       // Retrieve sensor name from the label.
       $label = str_replace('.label', '', $value);
       $parts = explode('__', $label);
-      // Check if such sensor info exists.
-      if (!isset($sensor_info[$parts[1]])) {
+      // Check if such sensor config exists.
+      if (!isset($sensor_config[$parts[1]])) {
         continue;
       }
 
-      $munin_enabled[$value] = $sensor_info[$parts[1]];
+      $munin_enabled[$value] = $sensor_config[$parts[1]];
     }
   }
 
@@ -165,7 +165,7 @@ function _monitoring_munin_result() {
   /** @var \Drupal\monitoring\Result\SensorResultInterface $result */
   foreach ($runner->runSensors() as $sensor_name => $result) {
 
-    $munin_settings = $result->getSensorInfo()->getSetting('munin');
+    $munin_settings = $result->getSensorConfig()->getSetting('munin');
     $sensor_name = monitoring_munin_sensor_identifier($sensor_name);
 
     // Compose multigraph results.
@@ -212,7 +212,7 @@ function monitoring_munin_config() {
     );
   }
 
-  foreach (monitoring_sensor_manager()->getEnabledSensorInfo() as $sensor_name => $info) {
+  foreach (monitoring_sensor_manager()->getEnabledSensorConfig() as $sensor_name => $info) {
     $munin_settings = $info->getSetting('munin');
 
     // Skip in case sensor is disabled by munin.

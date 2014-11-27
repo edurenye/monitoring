@@ -5,7 +5,6 @@
  */
 
 use Drupal\monitoring\Sensor\NonExistingSensorException;
-use Drupal\monitoring\Sensor\SensorInfo;
 
 /**
  * Implements hook_install()
@@ -14,7 +13,7 @@ use Drupal\monitoring\Sensor\SensorInfo;
  */
 function monitoring_munin_install() {
 
-  $sensor_info_by_categories = monitoring_sensor_info_by_categories();
+  $sensor_config_by_categories = monitoring_sensor_config_by_categories();
 
   foreach (\Drupal::moduleHandler()->getImplementations('munin_default_multigraphs') as $module) {
     foreach (\Drupal::moduleHandler()->invoke($module, 'munin_default_multigraphs') as $multigraph_title => $multigraph_info) {
@@ -26,14 +25,14 @@ function monitoring_munin_install() {
       // logic with test coverage.
       if (isset($multigraph_info['categories'])) {
         foreach ($multigraph_info['categories'] as $category) {
-          if (isset($sensor_info_by_categories[$category])) {
-            /** @var SensorInfo $sensor_info */
-            foreach ($sensor_info_by_categories[$category] as $sensor_info) {
-              if ($sensor_info->isNumeric()) {
-                $settings = monitoring_sensor_settings_get($sensor_info->getName());
+          if (isset($sensor_config_by_categories[$category])) {
+            /** @var SensorConfig $sensor_config */
+            foreach ($sensor_config_by_categories[$category] as $sensor_config) {
+              if ($sensor_config->isNumeric()) {
+                $settings = monitoring_sensor_settings_get($sensor_config->getName());
                 $settings['munin']['munin_enabled'] = TRUE;
                 $settings['munin']['multigraphs'][] = $multigraph_title;
-                monitoring_sensor_settings_save($sensor_info->getName(), $settings);
+                monitoring_sensor_settings_save($sensor_config->getName(), $settings);
 
                 $has_sensors = TRUE;
               }
@@ -46,19 +45,19 @@ function monitoring_munin_install() {
       if (isset($multigraph_info['sensors'])) {
         foreach ($multigraph_info['sensors'] as $sensor_name) {
           try {
-            $sensor_info = monitoring_sensor_manager()->getSensorInfoByName($sensor_name);
+            $sensor_config = monitoring_sensor_manager()->getSensorConfigByName($sensor_name);
           }
           catch (NonExistingSensorException $e) {
             drupal_set_message($e->getMessage(), 'error');
             watchdog_exception('monitoring_munin', $e);
           }
-          if (!$sensor_info->isEnabled()) {
+          if (!$sensor_config->isEnabled()) {
             continue;
           }
-          $settings = monitoring_sensor_settings_get($sensor_info->getName());
+          $settings = monitoring_sensor_settings_get($sensor_config->getName());
           $settings['munin']['munin_enabled'] = TRUE;
           $settings['munin']['multigraphs'][] = $multigraph_title;
-          monitoring_sensor_settings_save($sensor_info->getName(), $settings);
+          monitoring_sensor_settings_save($sensor_config->getName(), $settings);
 
           $has_sensors = TRUE;
         }

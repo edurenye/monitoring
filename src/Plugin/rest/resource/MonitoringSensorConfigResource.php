@@ -22,10 +22,10 @@ use Psr\Log\LoggerInterface;
  *
  * @RestResource(
  *   id = "monitoring-sensor-info",
- *   label = @Translation("Monitoring sensor info")
+ *   label = @Translation("Monitoring sensor config")
  * )
  */
-class MonitoringSensorInfoResource extends ResourceBase {
+class MonitoringSensorConfigResource extends ResourceBase {
 
   /**
    * The sensor manager.
@@ -88,14 +88,14 @@ class MonitoringSensorInfoResource extends ResourceBase {
    *   (optional) The sensor name, returns a list of all sensors when empty.
    *
    * @return \Drupal\rest\ResourceResponse
-   *   The response containing the sensor info.
+   *   The response containing the sensor config.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function get($sensor_name = NULL) {
     if ($sensor_name) {
       try {
-        $info = $this->sensorManager->getSensorInfoByName($sensor_name);
+        $info = $this->sensorManager->getSensorConfigByName($sensor_name);
       }
       catch (NonExistingSensorException $e) {
         throw new NotFoundHttpException($e->getMessage(), $e);
@@ -106,8 +106,8 @@ class MonitoringSensorInfoResource extends ResourceBase {
     }
 
     $list = array();
-    foreach ($this->sensorManager->getSensorInfo() as $sensor_name => $sensor_info) {
-      $list[$sensor_name] = $sensor_info->getDefinition();
+    foreach ($this->sensorManager->getSensorConfig() as $sensor_name => $sensor_config) {
+      $list[$sensor_name] = $sensor_config->getDefinition();
       $list[$sensor_name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor-info/' . $sensor_name);
     }
     return new ResourceResponse($list);

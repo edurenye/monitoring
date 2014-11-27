@@ -99,7 +99,7 @@ class MonitoringSensorResultResource extends ResourceBase {
    *   (optional) The sensor name, returns a list of all sensors when empty.
    *
    * @return \Drupal\rest\ResourceResponse
-   *   The response containing the sensor info.
+   *   The response containing the sensor config.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
@@ -108,12 +108,12 @@ class MonitoringSensorResultResource extends ResourceBase {
 
     if ($sensor_name) {
       try {
-        $sensor_info[$sensor_name] = $this->sensorManager->getSensorInfoByName($sensor_name);
-        $result = $this->sensorRunner->runSensors($sensor_info);
+        $sensor_config[$sensor_name] = $this->sensorManager->getSensorConfigByName($sensor_name);
+        $result = $this->sensorRunner->runSensors($sensor_config);
         $response = $result[$sensor_name]->toArray();
         $response['uri'] = $request->getUriForPath('/monitoring-sensor-result/' . $sensor_name);
         if ($request->get('expand') == 'sensor_info') {
-          $response['sensor_info'] = $result[$sensor_name]->getSensorInfo()->toArray();
+          $response['sensor_info'] = $result[$sensor_name]->getSensorConfig()->toArray();
         }
         return new ResourceResponse($response);
       }
@@ -130,7 +130,7 @@ class MonitoringSensorResultResource extends ResourceBase {
         $list[$sensor_name] = $result->toArray();
         $list[$sensor_name]['uri'] = $request->getUriForPath('/monitoring-sensor-result/' . $sensor_name);
         if ($request->get('expand') == 'sensor_info') {
-          $list[$sensor_name]['sensor_info'] = $result->getSensorInfo()->toArray();
+          $list[$sensor_name]['sensor_info'] = $result->getSensorConfig()->toArray();
         }
       }
       return new ResourceResponse($list);

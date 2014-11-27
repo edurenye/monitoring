@@ -16,7 +16,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -85,7 +85,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   /**
    * Constructs an SensorEntityAggregator object.
    */
-  public function __construct (SensorInfo $info, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $entity_query) {
+  public function __construct (SensorConfig $info, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $entity_query) {
     parent::__construct($info, $plugin_id, $plugin_definition);
     $this->entityManager = $entityManager;
     $this->entityQueryAggregate = $entity_query;
@@ -94,7 +94,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, SensorInfo $info, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, SensorConfig $info, $plugin_id, $plugin_definition) {
     return new static(
       $info,
       $plugin_id,

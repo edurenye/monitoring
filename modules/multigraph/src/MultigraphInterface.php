@@ -46,7 +46,7 @@ interface MultigraphInterface extends ConfigEntityInterface {
   /**
    * Gets the included sensors.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo[]
+   * @return \Drupal\monitoring\Entity\SensorConfig[]
    *   The included sensors as an indexed array sorted by weight where the
    *   values are sensors with custom labels.
    */

@@ -7,7 +7,7 @@
 namespace Drupal\monitoring_test\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorThresholds;
 
@@ -26,7 +26,7 @@ class TestSensor extends SensorThresholds implements SensorExtendedInfoInterface
 
   protected $testSensorResultData;
 
-  function __construct(SensorInfo $info, $sensor_id, $definition) {
+  function __construct(SensorConfig $info, $sensor_id, $definition) {
     parent::__construct($info, $sensor_id, $definition);
 
     // Load test sensor data which will be used in the runSensor() logic.

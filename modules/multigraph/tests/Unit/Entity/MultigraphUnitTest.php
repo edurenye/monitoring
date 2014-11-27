@@ -65,7 +65,7 @@ class MultigraphUnitTest extends UnitTestCase {
 
     $this->entityManager->expects($this->any())
       ->method('getStorage')
-      ->with('monitoring_sensor')
+      ->with('monitoring_sensor_config')
       ->willReturn($sensor_storage);
 
     // Assert dependencies are calculated correctly for the Multigraph.
@@ -74,16 +74,16 @@ class MultigraphUnitTest extends UnitTestCase {
   }
 
   /**
-   * Returns a mock SensorInfo entity.
+   * Returns a mock SensorConfig entity.
    *
    * @param array $id
    *   An ID to set on the sensor.
    *
-   * @return \Drupal\monitoring\Entity\SensorInfo|\PHPUnit_Framework_MockObject_MockObject
+   * @return \Drupal\monitoring\Entity\SensorConfig|\PHPUnit_Framework_MockObject_MockObject
    *   The mock sensor object.
    */
   protected function getMockSensor($id) {
-    $sensor1 = $this->getMock('\Drupal\monitoring\Entity\SensorInfo', array(), array(array(), 'monitoring_sensor'));
+    $sensor1 = $this->getMock('\Drupal\monitoring\Entity\SensorConfig', array(), array(array(), 'monitoring_sensor_config'));
     $sensor1->expects($this->any())
       ->method('getConfigDependencyName')
       ->willReturn("sensor.$id");

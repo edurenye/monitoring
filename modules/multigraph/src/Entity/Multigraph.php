@@ -10,7 +10,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring_multigraph\MultigraphInterface;
 
 /**
@@ -81,7 +81,7 @@ class Multigraph extends ConfigEntityBase implements MultigraphInterface {
    * The entities of the included sensors, sorted by weight and with labels
    * overridden.
    *
-   * @var \Drupal\monitoring\Entity\SensorInfo[]
+   * @var \Drupal\monitoring\Entity\SensorConfig[]
    */
   protected $sensorEntities = array();
 
@@ -174,7 +174,7 @@ class Multigraph extends ConfigEntityBase implements MultigraphInterface {
    *   (optional) Custom sensor label for this Multigraph.
    */
   protected function addSensorEntity($name, $label = NULL) {
-    $sensor = \Drupal::entityManager()->getStorage('monitoring_sensor')->load($name);
+    $sensor = \Drupal::entityManager()->getStorage('monitoring_sensor_config')->load($name);
     if (!empty($label)) {
       $sensor->label = $label;
     }
@@ -185,7 +185,7 @@ class Multigraph extends ConfigEntityBase implements MultigraphInterface {
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array('entity' => array_map(function(SensorInfo $sensor) {
+    return array('entity' => array_map(function(SensorConfig $sensor) {
       return $sensor->getConfigDependencyName();
     }, $this->getSensors()));
   }

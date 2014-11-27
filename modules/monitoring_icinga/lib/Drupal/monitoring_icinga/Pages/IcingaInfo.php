@@ -2,6 +2,8 @@
 
 namespace Drupal\monitoring_icinga\Pages;
 
+use Drupal\monitoring\Entity\SensorConfig;
+
 class IcingaInfo {
 
   function configActive() {
@@ -163,27 +165,27 @@ active check of the sensor.'),
 
     $services_def = array();
     $servicegroups = array();
-    /** @var \Drupal\monitoring\Sensor\SensorInfo $sensor_info */
-    foreach (monitoring_sensor_info() as $sensor_name => $sensor_info) {
+    /** @var SensorConfig $sensor_config */
+    foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
 
-      if (!$sensor_info->isEnabled()) {
+      if (!$sensor_config->isEnabled()) {
         continue;
       }
       $services_def[] = monitoring_config_code('monitoring_icinga', 'service', array(
         '@host' => $host,
-        '@service_description' => monitoring_icinga_service_description($sensor_info),
+        '@service_description' => monitoring_icinga_service_description($sensor_config),
         '@sensor_name' => $sensor_name,
         '@site_key' => monitoring_host_key(),
-        '@description' => $sensor_info->getDescription(),
+        '@description' => $sensor_config->getDescription(),
         '@active_checks' => (int) $active_checks,
         '@passive_checks' => (int) (!$active_checks),
         '@check_freshness' => (int) $check_freshness,
         '@check_command' => ($check_freshness ? 'service_is_stale' : 'check_drupal'),
       ));
 
-      $category = strtolower(str_replace(' ', '_', $sensor_info->getCategory()));
+      $category = strtolower(str_replace(' ', '_', $sensor_config->getCategory()));
       $servicegroups[$category]['alias'] = $category;
-      $servicegroups[$category]['members'][] = $host . ',' . monitoring_icinga_service_description($sensor_info);
+      $servicegroups[$category]['members'][] = $host . ',' . monitoring_icinga_service_description($sensor_config);
     }
     $services_def = implode("\n\n", $services_def);
 

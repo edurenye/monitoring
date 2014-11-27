@@ -23,22 +23,6 @@ function monitoring_test_queue_worker() {
 }
 
 /**
- * Implements monitoring_MODULE_monitoring_sensor_info().
- *
- * @see \MonitoringApiTest::testAPI()
- */
-function monitoring_monitoring_test_monitoring_sensor_info() {
-  // In case we have testing_sensor_info data we add it as a new sensor.
-  // @see \MonitoringApiTest::testAPI()
-  $testing_sensor_info = \Drupal::state()->get('monitoring_test.sensor_info');
-  if (!empty($testing_sensor_info)) {
-    $info['test_sensor_info'] = $testing_sensor_info;
-  }
-
-  return $info;
-}
-
-/**
  * Implements hook_commerce_currency_info_alter().
  */
 function monitoring_test_commerce_currency_info_alter(&$currencies, $langcode) {

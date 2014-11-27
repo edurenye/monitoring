@@ -29,13 +29,13 @@ class SensorName extends FieldPluginBase {
     $value = $this->getValue($values);
 
     try {
-      $sensor_info = monitoring_sensor_manager()->getSensorInfoByName($value);
-      $label = $sensor_info->getLabel();
+      $sensor_config = monitoring_sensor_manager()->getSensorConfigByName($value);
+      $label = $sensor_config->getLabel();
     }
     catch (NonExistingSensorException $e) {
       $label = t('Disappeared sensor @name', array('@name' => $value));
     }
 
-    return \Drupal::l($label, Url::fromRoute('monitoring.detail_form', array('monitoring_sensor' => $value)));
+    return \Drupal::l($label, Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => $value)));
   }
 }

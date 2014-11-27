@@ -63,10 +63,10 @@ class SensorList extends ControllerBase {
     $non_cached_execution_time = 0;
     // Oldest sensor age in seconds.
     $oldest_sensor_age = 0;
-    // Oldest sensor info.
+    // Oldest sensor config.
     $oldest_sensor_info = NULL;
 
-    foreach ($this->sensorManager->getSensorInfoByCategories() as $category => $category_sensor_info) {
+    foreach ($this->sensorManager->getSensorConfigByCategories() as $category => $category_sensor_info) {
 
       // Category grouping row.
       $rows[] = array(
@@ -79,7 +79,7 @@ class SensorList extends ControllerBase {
       );
       $ok_row_count = 0;
 
-      foreach ($category_sensor_info as $sensor_name => $sensor_info) {
+      foreach ($category_sensor_info as $sensor_name => $sensor_config) {
         if (!isset($results[$sensor_name])) {
           continue;
         }
@@ -87,11 +87,11 @@ class SensorList extends ControllerBase {
         $sensor_result = $results[$sensor_name];
         $called_before = REQUEST_TIME - $sensor_result->getTimestamp();
         if ($called_before > $oldest_sensor_age) {
-          $oldest_sensor_info = $sensor_info;
+          $oldest_sensor_info = $sensor_config;
           $oldest_sensor_age = $called_before;
         }
 
-        $row['data']['label'] = SafeMarkup::set('<span title="' . $sensor_info->getDescription() . '">' . $sensor_info->getLabel() . '</span>');
+        $row['data']['label'] = SafeMarkup::set('<span title="' . $sensor_config->getDescription() . '">' . $sensor_config->getLabel() . '</span>');
 
         $row['data']['sensor_status'] = array(
           'data' => $sensor_result->getStatus(),
@@ -110,23 +110,23 @@ class SensorList extends ControllerBase {
         $links = array();
         $links['details'] = array(
           'title' => t('Details'),
-          'url' => $sensor_info->urlInfo('details-form')
+          'url' => $sensor_config->urlInfo('details-form')
         );
 
         // Display a force execution link for any sensor that can be cached.
-        if ($sensor_info->getCachingTime() && $this->currentUser()->hasPermission('monitoring force run')) {
+        if ($sensor_config->getCachingTime() && $this->currentUser()->hasPermission('monitoring force run')) {
           $links['force_execution'] = array(
             'title' => t('Force execution'),
-            'url' => $sensor_info->urlInfo('force-run-form')
+            'url' => $sensor_config->urlInfo('force-run-form')
           );
         }
         $links['edit'] = array(
           'title' => t('Edit'),
-          'url' => $sensor_info->urlInfo('edit-form'),
+          'url' => $sensor_config->urlInfo('edit-form'),
           'query' => array('destination' => 'admin/reports/monitoring')
         );
 
-        \Drupal::moduleHandler()->alter('monitoring_sensor_links', $links, $sensor_info);
+        \Drupal::moduleHandler()->alter('monitoring_sensor_links', $links, $sensor_config);
 
         $row['data']['actions'] = array();
         if (!empty($links)) {

@@ -6,7 +6,7 @@
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Logger\RfcLogLevel;
-use Drupal\monitoring\Entity\SensorInfo;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\search_api\Entity\Index;
 
@@ -20,7 +20,7 @@ function monitoring_install() {
   // Declares initial set of NodeType sensors (if module exists).
   if (\Drupal::moduleHandler()->moduleExists('node')) {
     foreach (NodeType::loadMultiple() as $node_type) {
-      $sensor = SensorInfo::create(array(
+      $sensor = SensorConfig::create(array(
         'id' => 'node_new_' . $node_type->type,
         'label' => String::format('New @type nodes', array('@type' => $node_type->name)),
         'description' => String::format('New nodes of type @type', array('@type' => $node_type->name)),
@@ -49,7 +49,7 @@ function monitoring_install() {
   // Declares initial set of search api sensors (if module exists).
   if (\Drupal::moduleHandler()->moduleExists('search_api')) {
     foreach (Index::loadMultiple() as $index) {
-      $sensor = SensorInfo::create(array(
+      $sensor = SensorConfig::create(array(
         'id' => 'search_api_' . $index->machine_name,
         'label' => String::format('Search index queue size of @index', array('@index' => $index->name)),
         'sensor_id' => 'search_api_unindexed',
@@ -86,7 +86,7 @@ function monitoring_install() {
       $critical_threshold = NULL;
       $warning_threshold = NULL;
     }
-    $sensor = SensorInfo::create(array(
+    $sensor = SensorConfig::create(array(
       'id' => 'dblog_event_severity_' . $severities[$level],
       'label' => String::format('Severity @severity', array('@severity' => $name)),
       'description' => String::format('Watchdog entries of severity @severity',array('@severity' => $name)),
@@ -114,7 +114,7 @@ function monitoring_install() {
 
   // Declares sensor for missing image style
   if (\Drupal::moduleHandler()->moduleExists('image')) {
-    $sensor = SensorInfo::create(array(
+    $sensor = SensorConfig::create(array(
       'id' => 'dblog_image_missing_style',
       'label' => 'Image derivative creation fail',
       'description' => 'Image derivative creation fails',
@@ -152,7 +152,7 @@ function monitoring_install() {
     if ($module == 'update') {
       continue;
     }
-    $sensor = SensorInfo::create(array(
+    $sensor = SensorConfig::create(array(
       'id' => 'core_requirements_' . $module,
       'label' => String::format('Module @module', array('@module' => $module)),
       'description' => String::format('Requirements of the @module module', array('@module' => $module)),
