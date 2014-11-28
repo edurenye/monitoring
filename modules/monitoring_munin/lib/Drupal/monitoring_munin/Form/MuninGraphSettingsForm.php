@@ -113,7 +113,7 @@ class MuninGraphSettingsForm implements FormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
+    foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
       if ($sensor_config->isEnabled() && !empty($form_state['values'][$sensor_name])) {
         $settings = monitoring_sensor_settings_get($sensor_name);
         $settings['munin'] = $form_state['values'][$sensor_name];

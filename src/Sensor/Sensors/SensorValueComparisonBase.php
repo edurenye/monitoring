@@ -43,7 +43,7 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
    *   The expected value.
    */
   protected function getActualValueText() {
-    if ($this->info->isBool()) {
+    if ($this->sensorConfig->isBool()) {
       $actual_value = $this->getActualValue() ? 'TRUE' : 'FALSE';
     }
     else {
@@ -60,7 +60,7 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
    *   The expected value.
    */
   protected function getExpectedValue() {
-    return $this->info->getSetting('value');
+    return $this->sensorConfig->getSetting('value');
   }
 
   /**
@@ -72,13 +72,13 @@ abstract class SensorValueComparisonBase extends SensorConfigurable {
     $form['value'] = array(
       '#title' => 'Expected value',
       '#description' => $this->getValueDescription(),
-      '#default_value' => $this->info->getSetting('value'),
+      '#default_value' => $this->sensorConfig->getSetting('value'),
     );
 
-    if ($this->info->isNumeric()) {
+    if ($this->sensorConfig->isNumeric()) {
       $form['value']['#type'] = 'number';
     }
-    elseif ($this->info->isBool()) {
+    elseif ($this->sensorConfig->isBool()) {
       $form['value']['#type'] = 'checkbox';
     }
     else {

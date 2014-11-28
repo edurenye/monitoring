@@ -64,7 +64,7 @@ class SensorList extends ControllerBase {
     // Oldest sensor age in seconds.
     $oldest_sensor_age = 0;
     // Oldest sensor config.
-    $oldest_sensor_info = NULL;
+    $oldest_sensor_config = NULL;
 
     foreach ($this->sensorManager->getSensorConfigByCategories() as $category => $category_sensor_info) {
 
@@ -87,7 +87,7 @@ class SensorList extends ControllerBase {
         $sensor_result = $results[$sensor_name];
         $called_before = REQUEST_TIME - $sensor_result->getTimestamp();
         if ($called_before > $oldest_sensor_age) {
-          $oldest_sensor_info = $sensor_config;
+          $oldest_sensor_config = $sensor_config;
           $oldest_sensor_age = $called_before;
         }
 
@@ -163,9 +163,9 @@ class SensorList extends ControllerBase {
     );
 
     // We can add the oldest_sensor_* data only if there are sensor results cached.
-    if (!empty($oldest_sensor_info)) {
-      $output['summary']['#oldest_sensor_label'] = $oldest_sensor_info->getLabel();
-      $output['summary']['#oldest_sensor_category'] = $oldest_sensor_info->getCategory();
+    if (!empty($oldest_sensor_config)) {
+      $output['summary']['#oldest_sensor_label'] = $oldest_sensor_config->getLabel();
+      $output['summary']['#oldest_sensor_category'] = $oldest_sensor_config->getCategory();
       $output['summary']['#oldest_sensor_called_before'] = \Drupal::service('date.formatter')->formatInterval($oldest_sensor_age);
     }
 

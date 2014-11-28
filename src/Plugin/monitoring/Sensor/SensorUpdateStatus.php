@@ -28,7 +28,7 @@ class SensorUpdateStatus extends Sensor {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $type = $this->info->getSetting('type');
+    $type = $this->sensorConfig->getSetting('type');
     $status = $this->calculateStatus($type);
 
     $result->setStatus($status);

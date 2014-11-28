@@ -33,7 +33,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
     $type = $form_state->getValue(array('settings', 'thresholds', 'type'));
 
     if (empty($type)) {
-      $type = $this->info->getThresholdsType();
+      $type = $this->sensorConfig->getThresholdsType();
     }
 
     $form['thresholds']['type'] = array(
@@ -59,12 +59,12 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
         $form['thresholds']['warning'] = array(
           '#type' => 'number',
           '#title' => t('Warning'),
-          '#default_value' => $this->info->getThresholdValue('warning'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning'),
         );
         $form['thresholds']['critical'] = array(
           '#type' => 'number',
           '#title' => t('Critical'),
-          '#default_value' => $this->info->getThresholdValue('critical'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical'),
         );
         break;
 
@@ -73,12 +73,12 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
         $form['thresholds']['warning'] = array(
           '#type' => 'number',
           '#title' => t('Warning'),
-          '#default_value' => $this->info->getThresholdValue('warning'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning'),
         );
         $form['thresholds']['critical'] = array(
           '#type' => 'number',
           '#title' => t('Critical'),
-          '#default_value' => $this->info->getThresholdValue('critical'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical'),
         );
         break;
 
@@ -87,22 +87,22 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
         $form['thresholds']['warning_low'] = array(
           '#type' => 'number',
           '#title' => t('Warning low'),
-          '#default_value' => $this->info->getThresholdValue('warning_low'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning_low'),
         );
         $form['thresholds']['warning_high'] = array(
           '#type' => 'number',
           '#title' => t('Warning high'),
-          '#default_value' => $this->info->getThresholdValue('warning_high'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning_high'),
         );
         $form['thresholds']['critical_low'] = array(
           '#type' => 'number',
           '#title' => t('Critical low'),
-          '#default_value' => $this->info->getThresholdValue('critical_low'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical_low'),
         );
         $form['thresholds']['critical_high'] = array(
           '#type' => 'number',
           '#title' => t('Critical high'),
-          '#default_value' => $this->info->getThresholdValue('critical_high'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical_high'),
         );
         break;
 
@@ -111,22 +111,22 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
         $form['thresholds']['warning_low'] = array(
           '#type' => 'number',
           '#title' => t('Warning low'),
-          '#default_value' => $this->info->getThresholdValue('warning_low'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning_low'),
         );
         $form['thresholds']['warning_high'] = array(
           '#type' => 'number',
           '#title' => t('Warning high'),
-          '#default_value' => $this->info->getThresholdValue('warning_high'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('warning_high'),
         );
         $form['thresholds']['critical_low'] = array(
           '#type' => 'number',
           '#title' => t('Critical low'),
-          '#default_value' => $this->info->getThresholdValue('critical_low'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical_low'),
         );
         $form['thresholds']['critical_high'] = array(
           '#type' => 'number',
           '#title' => t('Critical high'),
-          '#default_value' => $this->info->getThresholdValue('critical_high'),
+          '#default_value' => $this->sensorConfig->getThresholdValue('critical_high'),
         );
         break;
     }
@@ -145,7 +145,7 @@ abstract class SensorThresholds extends SensorConfigurable implements SensorThre
    *   The validation message.
    */
   protected function setFormError($threshold_key, FormStateInterface $form_state, $message) {
-    $form_state->setErrorByName($this->info->getName() . '][thresholds][' . $threshold_key, $message);
+    $form_state->setErrorByName($this->sensorConfig->getName() . '][thresholds][' . $threshold_key, $message);
   }
 
   /**

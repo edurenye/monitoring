@@ -4,4 +4,3 @@ description: 'Test sensor with Watchdog category to test the watchdog logging'
 sensor_id: test_sensor
 category: 'Watchdog'
 settings:
-

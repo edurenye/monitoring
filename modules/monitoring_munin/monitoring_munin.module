@@ -96,7 +96,7 @@ function monitoring_munin_multigraph_delete($title) {
   \Drupal::config('monitoring.munin')->set('multigraphs', $multigraphs)->save();
 
   // Remove from settings.
-  foreach (monitoring_sensor_manager()->getSensorConfig() as $info) {
+  foreach (monitoring_sensor_manager()->getAllSensorConfig() as $info) {
     $munin_settings = $info->getSetting('munin');
 
     // If the sensor has given multigraph remove it from the settings.
@@ -135,7 +135,7 @@ function monitoring_munin_multigraph_save($title, $vlabel) {
  */
 function _monitoring_munin_result() {
 
-  $sensor_config = monitoring_sensor_manager()->getEnabledSensorConfig();
+  $sensor_config_all = monitoring_sensor_manager()->getEnabledSensorConfig();
   $munin_enabled = array();
 
   // Select only those sensors that are enabled for munin.
@@ -149,11 +149,11 @@ function _monitoring_munin_result() {
       $label = str_replace('.label', '', $value);
       $parts = explode('__', $label);
       // Check if such sensor config exists.
-      if (!isset($sensor_config[$parts[1]])) {
+      if (!isset($sensor_config_all[$parts[1]])) {
         continue;
       }
 
-      $munin_enabled[$value] = $sensor_config[$parts[1]];
+      $munin_enabled[$value] = $sensor_config_all[$parts[1]];
     }
   }
 

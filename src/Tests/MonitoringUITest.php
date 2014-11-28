@@ -196,10 +196,10 @@ class MonitoringUITest extends MonitoringTestBase {
     $tbody = $this->xpath('//table[@id="monitoring-sensors-overview"]/tbody');
     $rows = $tbody[0];
     $i = 0;
-    foreach (monitoring_sensor_config_by_categories() as $category => $category_sensor_info) {
+    foreach (monitoring_sensor_config_by_categories() as $category => $category_sensor_config) {
       $tr = $rows->tr[$i];
       $this->assertEqual($category, $tr->td->h3);
-      foreach ($category_sensor_info as $sensor_config) {
+      foreach ($category_sensor_config as $sensor_config) {
         $i++;
         $tr = $rows->tr[$i];
         $this->assertEqual($tr->td[0]->span, $sensor_config->getLabel());

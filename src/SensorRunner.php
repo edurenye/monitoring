@@ -105,7 +105,7 @@ class SensorRunner {
   /**
    * Runs the defined sensableors.
    *
-   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensors_config
+   * @param \Drupal\monitoring\Entity\SensorConfig[] $sensors_config_all
    *   List of sensor config object that we want to run.
    * @param bool $force
    *   Force sensor execution.
@@ -120,19 +120,19 @@ class SensorRunner {
    *
    * @see \Drupal\monitoring\SensorRunner::runSensor()
    */
-  public function runSensors(array $sensors_config = array(), $force = FALSE, $verbose = FALSE) {
+  public function runSensors(array $sensors_config_all = array(), $force = FALSE, $verbose = FALSE) {
 
     $this->verbose = $verbose;
     $this->forceRun = $force;
 
-    if (empty($sensors_config)) {
-      $sensors_config = $this->sensorManager->getEnabledSensorConfig();
+    if (empty($sensors_config_all)) {
+      $sensors_config_all = $this->sensorManager->getEnabledSensorConfig();
     }
 
-    $this->loadCache($sensors_config);
+    $this->loadCache($sensors_config_all);
     $results = array();
-    foreach ($sensors_config as $name => $info) {
-      if ($result = $this->runSensor($info)) {
+    foreach ($sensors_config_all as $name => $sensor_config) {
+      if ($result = $this->runSensor($sensor_config)) {
         $results[$name] = $result;
       }
     }

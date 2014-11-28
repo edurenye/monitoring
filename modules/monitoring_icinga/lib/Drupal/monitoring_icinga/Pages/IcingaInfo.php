@@ -166,7 +166,7 @@ active check of the sensor.'),
     $services_def = array();
     $servicegroups = array();
     /** @var SensorConfig $sensor_config */
-    foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
+    foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
 
       if (!$sensor_config->isEnabled()) {
         continue;

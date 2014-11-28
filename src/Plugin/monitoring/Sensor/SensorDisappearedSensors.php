@@ -31,7 +31,7 @@ class SensorDisappearedSensors extends SensorConfigurable {
    */
   public function runSensor(SensorResultInterface $result) {
     $available_sensors = \Drupal::state()->get('monitoring.available_sensors', array());
-    $sensor_config = monitoring_sensor_manager()->getSensorConfig();
+    $sensor_config = monitoring_sensor_manager()->getAllSensorConfig();
 
     $available_sensors = $this->updateAvailableSensorsList($available_sensors, $sensor_config);
     $this->checkForMissingSensors($result, $available_sensors, $sensor_config);
@@ -42,7 +42,7 @@ class SensorDisappearedSensors extends SensorConfigurable {
    */
   public function settingsForm($form, FormStateInterface $form_state) {
     try {
-      $result = monitoring_sensor_run($this->info->getName());
+      $result = monitoring_sensor_run($this->sensorConfig->getName());
     } catch (\Exception $e) {
       // @todo: Figure out why this happens.
       drupal_set_message($e->getMessage(), 'error');
@@ -86,20 +86,20 @@ class SensorDisappearedSensors extends SensorConfigurable {
   protected function updateAvailableSensorsList($available_sensors, $sensor_config) {
     $new_sensors = array();
 
-    foreach ($sensor_config as $key => $info) {
+    foreach ($sensor_config as $key => $config) {
       // Check for newly added sensors. This is needed as some sensors get
       // enabled by default and not via monitoring_sensor_enable() callback that
       // takes care of updating the available sensors list.
       if (!isset($available_sensors[$key])) {
         $new_sensors[$key] = array(
           'name' => $key,
-          'enabled' => $info->isEnabled(),
+          'enabled' => $config->isEnabled(),
         );
       }
       // Check for sensor status changes that were not updated via
       // monitoring_sensor_enable/disable callbacks.
-      elseif ($available_sensors[$key]['enabled'] != $info->isEnabled()) {
-        $available_sensors[$key]['enabled'] = $info->isEnabled();
+      elseif ($available_sensors[$key]['enabled'] != $config->isEnabled()) {
+        $available_sensors[$key]['enabled'] = $config->isEnabled();
       }
     }
 

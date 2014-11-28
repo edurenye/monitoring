@@ -83,10 +83,10 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   }
 
   /**
-   * Constructs an SensorEntityAggregator object.
+   * {@inheritdoc}
    */
-  public function __construct (SensorConfig $info, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $entity_query) {
-    parent::__construct($info, $plugin_id, $plugin_definition);
+  public function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $entity_query) {
+    parent::__construct($sensor_config, $plugin_id, $plugin_definition);
     $this->entityManager = $entityManager;
     $this->entityQueryAggregate = $entity_query;
   }
@@ -94,9 +94,9 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, SensorConfig $info, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, SensorConfig $sensor_config, $plugin_id, $plugin_definition) {
     return new static(
-      $info,
+      $sensor_config,
       $plugin_id,
       $plugin_definition,
       $container->get('entity.manager'),
@@ -105,7 +105,7 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   }
 
   protected function getEntityType() {
-    return $this->info->getSetting('entity_type');
+    return $this->sensorConfig->getSetting('entity_type');
   }
 
   /**
@@ -152,9 +152,9 @@ class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements Sen
   public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $conditions = array(array('field' => '', 'value' => ''));
-    $settings = $this->info->getSettings();
+    $settings = $this->sensorConfig->getSettings();
 
-    if (isset($this->info->settings['entity_type'])) {
+    if (isset($this->sensorConfig->settings['entity_type'])) {
       $form['old_entity_type'] = array(
         '#type' => 'select',
         '#default_value' => $this->getEntityType(),

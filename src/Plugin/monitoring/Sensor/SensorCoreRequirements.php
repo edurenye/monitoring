@@ -38,10 +38,10 @@ class SensorCoreRequirements extends Sensor {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $requirements = $this->getRequirements($this->info->getSetting('module'));
+    $requirements = $this->getRequirements($this->sensorConfig->getSetting('module'));
 
     // Ignore requirements that were explicitly excluded.
-    foreach ($this->info->getSetting('exclude keys', array()) as $exclude_key) {
+    foreach ($this->sensorConfig->getSetting('exclude keys', array()) as $exclude_key) {
       if (isset($requirements[$exclude_key])) {
         unset($requirements[$exclude_key]);
       }
@@ -147,7 +147,7 @@ class SensorCoreRequirements extends Sensor {
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    $module = $this->info->getSetting('module');
+    $module = $this->sensorConfig->getSetting('module');
     $this->addDependency('module', $module);
     return $this->dependencies;
   }

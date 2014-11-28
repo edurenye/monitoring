@@ -37,7 +37,7 @@ function monitoring_sensor_manager() {
  * @see \Drupal\monitoring\Sensor\SensorManager
  */
 function monitoring_sensor_config() {
-  return monitoring_sensor_manager()->getSensorConfig();
+  return monitoring_sensor_manager()->getAllSensorConfig();
 }
 
 /**
@@ -385,11 +385,11 @@ function monitoring_host_key() {
  */
 function monitoring_clear_missing_sensor_submit($form, FormStateInterface $form_state) {
   $available_sensors = array();
-  foreach (monitoring_sensor_manager()->getSensorConfig() as $key => $info) {
+  foreach (monitoring_sensor_manager()->getAllSensorConfig() as $key => $sensor_config) {
     $available_sensors[$key] = array(
       'name' => $key,
-      'label' => $info->getLabel(),
-      'enabled' => $info->isEnabled(),
+      'label' => $sensor_config->getLabel(),
+      'enabled' => $sensor_config->isEnabled(),
     );
   }
   \Drupal::state()->set('monitoring.available_sensors', $available_sensors);

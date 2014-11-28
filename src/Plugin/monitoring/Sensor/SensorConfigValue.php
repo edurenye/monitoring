@@ -28,7 +28,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
   protected function getValueDescription() {
     return (t('The expected value of config %key, actual value: %actVal',
       array(
-        '%key' => $this->info->getSetting('config') . ':' . $this->info->getSetting('key'),
+        '%key' => $this->sensorConfig->getSetting('config') . ':' . $this->sensorConfig->getSetting('key'),
         '%actVal' => $this->getActualValueText(),
       )));
   }
@@ -37,8 +37,8 @@ class SensorConfigValue extends SensorValueComparisonBase {
    * {@inheritdoc}
    */
   protected function getActualValue() {
-    $config = $this->getConfig($this->info->getSetting('config'));;
-    $key = $this->info->getSetting('key');
+    $config = $this->getConfig($this->sensorConfig->getSetting('config'));;
+    $key = $this->sensorConfig->getSetting('key');
     if (empty($key)) {
       return NULL;
     }
@@ -68,7 +68,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
     // Add weight to display config key before expected value.
     $form['config'] = array(
       '#type' => 'textfield',
-      '#default_value' => $this->info->getSetting('config') ? $this->info->getSetting('config') : '',
+      '#default_value' => $this->sensorConfig->getSetting('config') ? $this->sensorConfig->getSetting('config') : '',
       '#autocomplete_route_name' => 'monitoring.config_autocomplete',
       '#maxlength' => 255,
       '#title' => t('Config Object'),
@@ -77,7 +77,7 @@ class SensorConfigValue extends SensorValueComparisonBase {
     );
     $form['key'] = array(
       '#type' => 'textfield',
-      '#default_value' => $this->info->getSetting('key') ? $this->info->getSetting('key') : '',
+      '#default_value' => $this->sensorConfig->getSetting('key') ? $this->sensorConfig->getSetting('key') : '',
       '#maxlength' => 255,
       '#title' => t('Key'),
       '#required' => TRUE,

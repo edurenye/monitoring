@@ -42,7 +42,7 @@ class SensorCommerceTurnover extends SensorEntityAggregator {
     $query->addField($alias, $field_currency, 'currency_code');
     $query->groupBy($alias . '.' . $field_currency);
 
-    if ($currency_code = $this->info->getSetting('currency_code')) {
+    if ($currency_code = $this->sensorConfig->getSetting('currency_code')) {
       $query->condition($alias . '.' . $field_currency, $currency_code);
     }
 
@@ -54,7 +54,7 @@ class SensorCommerceTurnover extends SensorEntityAggregator {
    */
   public function runSensor(SensorResultInterface $result) {
     $sensor_value = 0;
-    $currency_code = $this->info->getSetting('currency_code');
+    $currency_code = $this->sensorConfig->getSetting('currency_code');
     foreach ($this->getQueryResult()->fetchAll() as $row) {
       // In case the sensor defines currency_code in settings and it is equal
       // to the currency_code from the db result the sensor value is sum of
@@ -81,7 +81,7 @@ class SensorCommerceTurnover extends SensorEntityAggregator {
    */
   public function settingsForm($form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
-    $conditions = $this->info->getSetting('conditions');
+    $conditions = $this->sensorConfig->getSetting('conditions');
 
     $options = array();
     foreach (commerce_order_statuses() as $name => $info) {

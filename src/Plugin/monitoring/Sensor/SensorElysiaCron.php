@@ -28,14 +28,14 @@ class SensorElysiaCron extends SensorThresholds {
    */
   public function runSensor(SensorResultInterface $result) {
     // The channel name.
-    $name = $this->info->getSetting('name');
-    $query = db_select('elysia_cron', 'e')->fields('e', array($this->info->getSetting('metric')));
+    $name = $this->sensorConfig->getSetting('name');
+    $query = db_select('elysia_cron', 'e')->fields('e', array($this->sensorConfig->getSetting('metric')));
     $query->condition('name', $name);
 
     $value = $query->execute()->fetchField();
 
     // In case we are querying for last_run, the value is the seconds ago.
-    if ($this->info->getSetting('metric') == 'last_run') {
+    if ($this->sensorConfig->getSetting('metric') == 'last_run') {
       $value = REQUEST_TIME - $value;
       $result->addStatusMessage('@time ago', array('@time' => \Drupal::service('date.formatter')->formatInterval($value)));
     }

@@ -33,7 +33,7 @@ class SensorSearchApiUnindexed extends SensorThresholds {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $index = Index::load($this->info->getSetting('index_id'));
+    $index = Index::load($this->sensorConfig->getSetting('index_id'));
 
     /* @var \Drupal\search_api\Tracker\TrackerInterface $tracker */
     $tracker = $index->getTracker();

@@ -27,7 +27,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     }
  *   },
  *   admin_permission = "administer monitoring",
- *   config_prefix = "sensor",
+ *   config_prefix = "sensor_config",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label"
@@ -368,7 +368,7 @@ class SensorConfig extends ConfigEntityBase {
    *   Sensor config associative array.
    */
   public function getDefinition() {
-    $info_array = array(
+    $config = array(
       'sensor' => $this->getName(),
       'label' => $this->getLabel(),
       'category' => $this->getCategory(),
@@ -381,10 +381,10 @@ class SensorConfig extends ConfigEntityBase {
     );
 
     if ($this->isDefiningThresholds()) {
-      $info_array['thresholds'] = $this->getSetting('thresholds');
+      $config['thresholds'] = $this->getSetting('thresholds');
     }
 
-    return $info_array;
+    return $config;
   }
 
   /**

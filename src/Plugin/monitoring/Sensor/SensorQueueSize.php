@@ -37,7 +37,7 @@ class SensorQueueSize extends SensorThresholds {
     $form['queue'] = array(
       '#type' => 'select',
       '#options' => $queues,
-      '#default_value' => $this->info->getSetting('queue'),
+      '#default_value' => $this->sensorConfig->getSetting('queue'),
       '#required' => TRUE,
       '#title' => t('Queues'),
     );
@@ -48,6 +48,6 @@ class SensorQueueSize extends SensorThresholds {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $result->setValue(\Drupal::queue($this->info->getSetting('queue'))->numberOfItems());
+    $result->setValue(\Drupal::queue($this->sensorConfig->getSetting('queue'))->numberOfItems());
   }
 }

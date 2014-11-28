@@ -6,8 +6,10 @@
 
 namespace Drupal\monitoring\Sensor;
 
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Interface for a sensor plugin defining basic operations.
@@ -130,17 +132,37 @@ interface SensorInterface extends PluginInspectionInterface {
    * @return array
    *   An array of dependencies grouped by type (module, theme, entity). For
    *   example:
-   *   @code
+   * @code
    *   array(
    *     'entity' => array('user.role.anonymous', 'user.role.authenticated'),
    *     'module' => array('node', 'user'),
    *     'theme' => array('seven'),
    *   );
-   *   @endcode
+   * @endcode
    *
    * @see \Drupal\Core\Config\Entity\ConfigDependencyManager
    * @see \Drupal\Core\Config\Entity\ConfigEntityInterface::getConfigDependencyName()
    */
   public function calculateDependencies();
+
+  /**
+   * Creates an instance of the sensor with config.
+   *
+   * Similar to ContainerFactoryPluginInterface but with typed config.
+   * @see \Drupal\Core\Plugin\ContainerFactoryPluginInterface
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container to pull out services used in the plugin.
+   * @param SensorConfig $sensor_config
+   *   The configuration containing information about the sensor instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   *
+   * @return static
+   *   Returns an instance of the sensor.
+   */
+  public static function create(ContainerInterface $container, SensorConfig $sensor_config, $plugin_id, $plugin_definition);
 
 }

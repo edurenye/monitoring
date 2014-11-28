@@ -341,12 +341,12 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual(String::format($log[0]->message, unserialize($log[0]->variables)),
       String::format('@count new sensor/s added: @names', array('@count' => 1, '@names' => 'comment_new')));
 
-    $sensor_config = monitoring_sensor_manager()->getSensorConfig();
-    unset($sensor_config['comment_new']);
+    $sensor_config_all = monitoring_sensor_manager()->getAllSensorConfig();
+    unset($sensor_config_all['comment_new']);
     $this->assertEqual(String::format($log[1]->message, unserialize($log[1]->variables)),
       String::format('@count new sensor/s added: @names', array(
-        '@count' => count($sensor_config),
-        '@names' => implode(', ', array_keys($sensor_config))
+        '@count' => count($sensor_config_all),
+        '@names' => implode(', ', array_keys($sensor_config_all))
       )));
 
     // Uninstall the comment module so that the comment_new sensor goes away.
@@ -444,8 +444,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
     monitoring_sensor_manager()->resetCache();
     // Make sure the extended / hidden_modules form submit cleanup worked and
     // they are not stored as a duplicate in settings.
-    $info = monitoring_sensor_manager()->getSensorConfigByName('monitoring_enabled_modules');
-    $this->assertTrue(!array_key_exists('extended', $info->settings), 'Do not persist extended module hidden selections separately.');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('monitoring_enabled_modules');
+    $this->assertTrue(!array_key_exists('extended', $sensor_config->settings), 'Do not persist extended module hidden selections separately.');
     // The sensor should escalate to CRITICAL.
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
@@ -613,14 +613,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Test with different db table.
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
-    $info = monitoring_sensor_manager()->getSensorConfigByName('db_aggregate_test');
+    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('db_aggregate_test');
     $this->drupalCreateNode(array('type' => $type1->type));
     $this->drupalCreateNode(array('type' => $type2->type));
     $this->drupalCreateNode(array('type' => $type2->type));
     // Create one node that should not meet the time_interval condition.
     $node = $this->drupalCreateNode(array('type' => $type2->type));
     db_update('node_field_data')
-      ->fields(array('created' => REQUEST_TIME - ($info->getTimeIntervalValue() + 10)))
+      ->fields(array('created' => REQUEST_TIME - ($sensor_config->getTimeIntervalValue() + 10)))
       ->condition('nid', $node->id())
       ->execute();
 

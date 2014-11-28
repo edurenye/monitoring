@@ -32,7 +32,7 @@ class SensorManager extends DefaultPluginManager {
    *
    * @var \Drupal\monitoring\Entity\SensorConfig[]
    */
-  protected $info;
+  protected $sensor_config;
 
   /**
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -82,7 +82,7 @@ class SensorManager extends DefaultPluginManager {
    * @return \Drupal\monitoring\Entity\SensorConfig[]
    *   List of SensorConfig instances.
    */
-  public function getSensorConfig() {
+  public function getAllSensorConfig() {
     $sensors = SensorConfig::loadMultiple();
 
     // Sort the sensors by category and label.
@@ -99,7 +99,7 @@ class SensorManager extends DefaultPluginManager {
    */
   public function getEnabledSensorConfig() {
     $enabled_sensors = array();
-    foreach ($this->getSensorConfig() as $sensor_config) {
+    foreach ($this->getAllSensorConfig() as $sensor_config) {
       if ($sensor_config->isEnabled()) {
         $enabled_sensors[$sensor_config->getName()] = $sensor_config;
       }
@@ -120,9 +120,9 @@ class SensorManager extends DefaultPluginManager {
    *   Thrown if the requested sensor does not exist.
    */
   public function getSensorConfigByName($sensor_name) {
-    $info = $this->getSensorConfig();
-    if (isset($info[$sensor_name])) {
-      return $info[$sensor_name];
+    $sensor_config_all = $this->getAllSensorConfig();
+    if (isset($sensor_config_all[$sensor_name])) {
+      return $sensor_config_all[$sensor_name];
     }
     throw new NonExistingSensorException(String::format('Sensor @sensor_name does not exist', array('@sensor_name' => $sensor_name)));
   }
@@ -139,23 +139,23 @@ class SensorManager extends DefaultPluginManager {
    *   Sensor config.
    */
   public function getSensorConfigByCategories($enabled = TRUE) {
-    $info_by_categories = array();
-    foreach ($this->getSensorConfig() as $sensor_name => $sensor_config) {
+    $config_by_categories = array();
+    foreach ($this->getAllSensorConfig() as $sensor_name => $sensor_config) {
       if ($sensor_config->isEnabled() != $enabled) {
         continue;
       }
 
-      $info_by_categories[$sensor_config->getCategory()][$sensor_name] = $sensor_config;
+      $config_by_categories[$sensor_config->getCategory()][$sensor_name] = $sensor_config;
     }
 
-    return $info_by_categories;
+    return $config_by_categories;
   }
 
   /**
    * Reset the static cache.
    */
   public function resetCache() {
-    $this->info = array();
+    $this->sensor_config = array();
   }
 
   /**

@@ -26,8 +26,8 @@ class TestSensor extends SensorThresholds implements SensorExtendedInfoInterface
 
   protected $testSensorResultData;
 
-  function __construct(SensorConfig $info, $sensor_id, $definition) {
-    parent::__construct($info, $sensor_id, $definition);
+  function __construct(SensorConfig $sensor_config, $sensor_id, $definition) {
+    parent::__construct($sensor_config, $sensor_id, $definition);
 
     // Load test sensor data which will be used in the runSensor() logic.
     $this->testSensorResultData = \Drupal::state()->get('monitoring_test.sensor_result_data', array(

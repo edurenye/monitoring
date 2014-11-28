@@ -119,8 +119,8 @@ class Multigraph extends ConfigEntityBase implements MultigraphInterface {
       return $this->sensorEntities;
     }
 
-    foreach ($this->sensors as $name => $info) {
-      $this->addSensorEntity($name, $info['label']);
+    foreach ($this->sensors as $name => $sensor_config) {
+      $this->addSensorEntity($name, $sensor_config['label']);
     }
     return $this->sensorEntities;
   }

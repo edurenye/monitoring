@@ -38,7 +38,7 @@ class SensorEnabledModules extends SensorConfigurable {
       '#type' => 'checkbox',
       '#title' => t('Allow additional modules to be enabled'),
       '#description' => t('If checked the additional modules being enabled will not be considered as an error state.'),
-      '#default_value' => $this->info->getSetting('allow_additional'),
+      '#default_value' => $this->sensorConfig->getSetting('allow_additional'),
     );
 
     // Get current list of available modules.
@@ -48,9 +48,9 @@ class SensorEnabledModules extends SensorConfigurable {
 
     uasort($modules, 'system_sort_modules_by_info_name');
 
-    $default_value = array_filter($this->info->getSetting('modules', NULL));
+    $default_value = array_filter($this->sensorConfig->getSetting('modules', NULL));
     // array_filter is needed to get rid off default empty setting.
-    // See monitoring.sensor.monitoring_enabled_modules.yml
+    // See monitoring.sensor_config.monitoring_enabled_modules.yml
     if (empty($default_value)) {
       $enabled_modules = Drupal::moduleHandler()->getModuleList();
       // Reduce to the module name only.
@@ -152,14 +152,14 @@ class SensorEnabledModules extends SensorConfigurable {
       }
     }
 
-    $expected_modules = array_filter($this->info->getSetting('modules'));
+    $expected_modules = array_filter($this->sensorConfig->getSetting('modules'));
 
     // If there are no expected modules, the sensor is not configured, so init
     // the expected modules list as currently enabled modules.
     if (empty($expected_modules)) {
       $expected_modules = $monitoring_enabled_modules;
-      $this->info->settings['modules'] = $monitoring_enabled_modules;
-      $this->info->save();
+      $this->sensorConfig->settings['modules'] = $monitoring_enabled_modules;
+      $this->sensorConfig->save();
     }
 
     // Check for modules not being installed but expected.
@@ -181,7 +181,7 @@ class SensorEnabledModules extends SensorConfigurable {
     // In case we do not allow additional modules check for modules installed
     // but not expected.
     $unexpected_modules = array_diff($monitoring_enabled_modules, $expected_modules);
-    if (!$this->info->getSetting('allow_additional') && !empty($unexpected_modules)) {
+    if (!$this->sensorConfig->getSetting('allow_additional') && !empty($unexpected_modules)) {
       $delta += count($unexpected_modules);
       $unexpected_modules_info = array();
       foreach ($unexpected_modules as $unexpected_module) {

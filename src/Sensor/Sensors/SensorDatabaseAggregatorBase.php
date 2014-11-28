@@ -36,7 +36,7 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
    *   - operator: Any of the supported operators.
    */
   protected function getConditions() {
-    return $this->info->getSetting('conditions', array());
+    return $this->sensorConfig->getSetting('conditions', array());
   }
 
   /**
@@ -46,11 +46,11 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
    *   Time interval field.
    */
   protected function getTimeIntervalField() {
-    return $this->info->getSetting('time_interval_field');
+    return $this->sensorConfig->getSetting('time_interval_field');
   }
 
   protected function getTimeIntervalValue() {
-    return $this->info->getTimeIntervalValue();
+    return $this->sensorConfig->getTimeIntervalValue();
   }
 
   /**
@@ -64,7 +64,7 @@ abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
       '#title' => t('Aggregate time interval'),
       '#options' => $this->getTimeIntervalOptions(),
       '#description' => t('Select the time interval for which the results will be aggregated.'),
-      '#default_value' => $this->info->getTimeIntervalValue(),
+      '#default_value' => $this->sensorConfig->getTimeIntervalValue(),
     );
 
     return $form;

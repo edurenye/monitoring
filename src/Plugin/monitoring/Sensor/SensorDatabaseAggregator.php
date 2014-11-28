@@ -68,7 +68,7 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements S
   protected function getAggregateQuery() {
     /* @var \Drupal\Core\Database\Connection $database */
     $database = $this->getService('database');
-    $query = $database->select($this->info->getSetting('table'));
+    $query = $database->select($this->sensorConfig->getSetting('table'));
     $this->addAggregateExpression($query);
 
     foreach ($this->getConditions() as $condition) {
@@ -121,7 +121,7 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements S
   public function calculateDependencies() {
     parent::calculateDependencies();
 
-    $schema = drupal_get_schema($this->info->getSetting('table'));
+    $schema = drupal_get_schema($this->sensorConfig->getSetting('table'));
     if ($schema) {
       $this->addDependency('module', $schema['module']);
     }
@@ -135,15 +135,15 @@ class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements S
     $form = parent::settingsForm($form, $form_state);
     $field = '';
     $field_value = '';
-    $settings = $this->info->getSettings();
+    $settings = $this->sensorConfig->getSettings();
     $form['table'] = array(
       '#type' => 'textfield',
-      '#default_value' => $this->info->getSetting('table'),
+      '#default_value' => $this->sensorConfig->getSetting('table'),
       '#maxlength' => 255,
       '#title' => t('Table'),
       '#required' => TRUE,
     );
-    if (isset($this->info->settings['table'])) {
+    if (isset($this->sensorConfig->settings['table'])) {
       $field = $settings['conditions'][0]['field'];
       $field_value = $settings['conditions'][0]['value'];
     }

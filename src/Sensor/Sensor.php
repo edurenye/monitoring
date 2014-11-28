@@ -22,7 +22,7 @@ abstract class Sensor implements SensorInterface {
    *
    * @var SensorConfig
    */
-  protected $info;
+  protected $sensorConfig;
   protected $services = array();
 
   /**
@@ -42,17 +42,17 @@ abstract class Sensor implements SensorInterface {
   /**
    * Instantiates a sensor object.
    *
-   * @param SensorConfig $info
+   * @param SensorConfig $sensor_config
    *   Sensor config object.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  function __construct(SensorConfig $info, $plugin_id, $plugin_definition) {
+  function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition) {
     $this->pluginId = $plugin_id;
     $this->pluginDefinition = $plugin_definition;
-    $this->info = $info;
+    $this->sensorConfig = $sensor_config;
   }
 
   /**
@@ -75,14 +75,14 @@ abstract class Sensor implements SensorInterface {
    * {@inheritdoc}
    */
   public function getSensorName() {
-    return $this->info->getName();
+    return $this->sensorConfig->getName();
   }
 
   /**
    * {@inheritdoc}
    */
   public function isEnabled() {
-    return (boolean) $this->info->isEnabled();
+    return (boolean) $this->sensorConfig->isEnabled();
   }
 
   /**
@@ -109,9 +109,9 @@ abstract class Sensor implements SensorInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, SensorConfig $info, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, SensorConfig $sensor_config, $plugin_id, $plugin_definition) {
     return new static(
-      $info,
+      $sensor_config,
       $plugin_id,
       $plugin_definition
     );

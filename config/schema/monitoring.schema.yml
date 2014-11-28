@@ -1,6 +1,6 @@
 #Schema for the configuration of the monitoring module.
 
-monitoring.sensor.*:
+monitoring.sensor_config.*:
   type: config_entity
   label: 'Monitoring Sensor'
   mapping:

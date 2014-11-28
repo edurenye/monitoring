@@ -77,7 +77,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $response_data = $this->doRequest('monitoring-sensor-info');
     $this->assertResponse(200);
 
-    foreach (monitoring_sensor_manager()->getSensorConfig() as $sensor_name => $sensor_config) {
+    foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
       $this->assertEqual($response_data[$sensor_name]['sensor'], $sensor_config->getName());
       $this->assertEqual($response_data[$sensor_name]['label'], $sensor_config->getLabel());
       $this->assertEqual($response_data[$sensor_name]['category'], $sensor_config->getCategory());

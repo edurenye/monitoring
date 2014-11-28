@@ -95,18 +95,18 @@ class MonitoringSensorConfigResource extends ResourceBase {
   public function get($sensor_name = NULL) {
     if ($sensor_name) {
       try {
-        $info = $this->sensorManager->getSensorConfigByName($sensor_name);
+        $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
       }
       catch (NonExistingSensorException $e) {
         throw new NotFoundHttpException($e->getMessage(), $e);
       }
-      $response = $info->getDefinition();
+      $response = $sensor_config->getDefinition();
       $response['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor-info/' . $sensor_name);
       return new ResourceResponse($response);
     }
 
     $list = array();
-    foreach ($this->sensorManager->getSensorConfig() as $sensor_name => $sensor_config) {
+    foreach ($this->sensorManager->getAllSensorConfig() as $sensor_name => $sensor_config) {
       $list[$sensor_name] = $sensor_config->getDefinition();
       $list[$sensor_name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor-info/' . $sensor_name);
     }
