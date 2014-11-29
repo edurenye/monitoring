@@ -224,6 +224,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Run sensor and test the output.
     $severities = monitoring_event_severities();
     $result = $this->runSensor('dblog_event_severity_' . $severities[RfcLogLevel::ALERT]);
+    debug(db_query('SELECT * FROM {watchdog} WHERE severity = :severity', array(':severity' => RfcLogLevel::ALERT))->fetchAll());
     $this->assertEqual($result->getValue(), 1);
 
     // ======= SensorUserFailedLogins tests ======= //
