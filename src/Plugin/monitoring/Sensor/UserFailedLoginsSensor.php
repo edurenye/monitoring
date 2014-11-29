@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorUserFailedLogins.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\UserFailedLoginsSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
@@ -21,7 +21,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Helps to identify bots or brute force attacks.
  */
-class SensorUserFailedLogins extends SensorDatabaseAggregator {
+class UserFailedLoginsSensor extends DatabaseAggregatorSensor {
 
   /**
    * {@inheritdoc}

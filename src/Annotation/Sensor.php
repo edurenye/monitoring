@@ -10,8 +10,7 @@ namespace Drupal\monitoring\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines Sensor annotation object which will be
- * for reference by Sensor Plugins.
+ * Defines Sensor annotation object for reference by Sensor Plugins.
  *
  * @Annotation
  */

@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorUpdateStatus.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\UpdateStatusSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\Sensor;
+use Drupal\monitoring\Sensor\SensorBase;
 
 /**
  * Monitors for available updates of Drupal core and installed contrib modules.
@@ -22,7 +22,7 @@ use Drupal\monitoring\Sensor\Sensor;
  *
  * Based on drupal core update module.
  */
-class SensorUpdateStatus extends Sensor {
+class UpdateStatusSensor extends SensorBase {
 
   /**
    * {@inheritdoc}

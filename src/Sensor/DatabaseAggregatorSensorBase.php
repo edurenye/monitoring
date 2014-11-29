@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\Sensors\SensorSimpleDatabaseAggregator.
+ * Contains \Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase.
  */
 
-namespace Drupal\monitoring\Sensor\Sensors;
+namespace Drupal\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\SensorThresholds;
+use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 
 /**
  * Base class for database aggregator sensors.
@@ -23,7 +23,7 @@ use Drupal\monitoring\Sensor\SensorThresholds;
  *
  * Adds time interval to sensor settings form.
  */
-abstract class SensorDatabaseAggregatorBase extends SensorThresholds {
+abstract class DatabaseAggregatorSensorBase extends ThresholdsSensorBase {
 
   /**
    * Gets conditions to be used in the select query.

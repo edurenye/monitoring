@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorQueueSize.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\QueueSizeSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorThresholds;
+use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -26,7 +26,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @see \DrupalQueue
  */
-class SensorQueueSize extends SensorThresholds {
+class QueueSizeSensor extends ThresholdsSensorBase {
 
   /**
    * Adds UI to select Queue for the sensor.

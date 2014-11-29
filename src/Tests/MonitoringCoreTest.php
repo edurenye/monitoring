@@ -37,7 +37,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
    */
   public function testSensors() {
 
-    // ======= SensorCronLastRunAge tests ======= //
+    // ======= CronLastRunAgeSensor tests ======= //
 
     $time_shift = (60 * 60 * 24 + 1);
     \Drupal::state()->set('system.cron_last', REQUEST_TIME - $time_shift);
@@ -94,7 +94,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $result = $this->runSensor('core_queue_monitoring_test');
     $this->assertEqual($result->getValue(), 2);
 
-    // ======= SensorCoreRequirements tests ======= //
+    // ======= CoreRequirementsSensor tests ======= //
 
     // @todo - This should not be necessary after sensor requirements are updated.
     $sensor_config = SensorConfig::create(array(
@@ -189,7 +189,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual($result->getValue(), 101);
     $this->assertTrue($result->isCritical());
 
-    // ======= SensorImageMissingStyle tests ======= //
+    // ======= ImageMissingStyleSensor tests ======= //
 
     $file = file_save_data($this->randomMachineName());
     /** @var FileUsageInterface $usage */
@@ -227,7 +227,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     debug(db_query('SELECT * FROM {watchdog} WHERE severity = :severity', array(':severity' => RfcLogLevel::ALERT))->fetchAll());
     $this->assertEqual($result->getValue(), 1);
 
-    // ======= SensorUserFailedLogins tests ======= //
+    // ======= UserFailedLoginsSensor tests ======= //
 
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
@@ -248,7 +248,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual($result->getValue(), 3);
     $this->assertEqual($result->getMessage(), '3 logouts in 1 day');
 
-    // ======= SensorGitDirtyTree tests ======= //
+    // ======= GitDirtyTreeSensor tests ======= //
 
     // Enable the sensor and set cmd to output something
     $sensor_config = SensorConfig::load('monitoring_git_dirty_tree');
@@ -320,9 +320,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Tests for SensorDisappearedSensors.
+   * Tests for DisappearedSensorsSensor.
    *
-   * We provide a separate test method for the SensorDisappearedSensors as we
+   * We provide a separate test method for the DisappearedSensorsSensor as we
    * need to enable and disable additional modules.
    */
   public function testSensorDisappearedSensors() {
@@ -487,7 +487,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Test cases for SensorEnabledModules sensor.
+   * Test cases for EnabledModulesSensor sensor.
    *
    * We use separate test method as we need to enable/disable modules.
    */

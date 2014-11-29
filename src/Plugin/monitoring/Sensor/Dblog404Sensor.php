@@ -1,12 +1,11 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorDblog404.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\Dblog404Sensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -22,7 +21,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Displays URL with highest occurrence as message.
  */
-class SensorDblog404 extends SensorDatabaseAggregator {
+class Dblog404Sensor extends DatabaseAggregatorSensor {
 
   /**
    * {@inheritdoc}

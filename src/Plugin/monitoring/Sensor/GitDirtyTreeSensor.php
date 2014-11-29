@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorGitDirtyTree.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\GitDirtyTreeSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorConfigurable;
+use Drupal\monitoring\Sensor\ConfigurableSensorBase;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 
 /**
@@ -27,7 +27,7 @@ use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
  * - Does not work as long as submodules are not initialized.
  * - Does not check branch / tag.
  */
-class SensorGitDirtyTree extends SensorConfigurable implements SensorExtendedInfoInterface {
+class GitDirtyTreeSensor extends ConfigurableSensorBase implements SensorExtendedInfoInterface {
 
   /**
    * The executed command output.

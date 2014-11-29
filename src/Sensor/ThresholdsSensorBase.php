@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\SensorThresholds.
+ * Contains \Drupal\monitoring\Sensor\ThresholdsSensorBase.
  */
 
 namespace Drupal\monitoring\Sensor;
@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Sensors may provide thresholds that apply by default.
  * Threshold values are validated for sequence.
  */
-abstract class SensorThresholds extends SensorConfigurable implements SensorThresholdsInterface {
+abstract class ThresholdsSensorBase extends ConfigurableSensorBase implements ThresholdsSensorInterface {
 
   /**
    * {@inheritdoc}

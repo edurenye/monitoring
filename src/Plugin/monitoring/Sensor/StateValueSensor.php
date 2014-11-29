@@ -2,13 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorStateValue
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\StateValueSensor
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
-use Drupal;
-use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
+use Drupal\monitoring\Sensor\ValueComparisonSensorBase;
 
 /**
  * Generic sensor that checks for a state value.
@@ -20,7 +19,7 @@ use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
  *   addable = FALSE
  * )
  */
-class SensorStateValue extends SensorValueComparisonBase {
+class StateValueSensor extends ValueComparisonSensorBase {
 
   /**
    * {@inheritdoc}

@@ -9,7 +9,7 @@ namespace Drupal\monitoring_test\Plugin\monitoring\Sensor;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorThresholds;
+use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 
 /**
  * Test sensor to report status as provided by external arguments.
@@ -22,7 +22,7 @@ use Drupal\monitoring\Sensor\SensorThresholds;
  * )
  *
  */
-class TestSensor extends SensorThresholds implements SensorExtendedInfoInterface {
+class TestSensor extends ThresholdsSensorBase implements SensorExtendedInfoInterface {
 
   protected $testSensorResultData;
 
@@ -39,6 +39,9 @@ class TestSensor extends SensorThresholds implements SensorExtendedInfoInterface
     ));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $result) {
     // Sleep here for a while as running this sensor may result in 0 execution
     // time.
@@ -61,6 +64,9 @@ class TestSensor extends SensorThresholds implements SensorExtendedInfoInterface
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function resultVerbose(SensorResultInterface $result) {
     return 'call debug';
   }

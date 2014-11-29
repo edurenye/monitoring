@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorConfigValue
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\ConfigValueSensor
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
+use Drupal\monitoring\Sensor\ValueComparisonSensorBase;
 
 /**
  * Generic sensor that checks for a configuration value.
@@ -20,7 +20,7 @@ use Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase;
  *   addable = TRUE
  * )
  */
-class SensorConfigValue extends SensorValueComparisonBase {
+class ConfigValueSensor extends ValueComparisonSensorBase {
 
   /**
    * {@inheritdoc}

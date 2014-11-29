@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @todo more
  */
-interface SensorConfigurableInterface {
+interface ConfigurableSensorInterface {
 
   /**
    * Gets settings form for a specific sensor.

@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorEnabledModules.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\EnabledModulesSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorConfigurable;
+use Drupal\monitoring\Sensor\ConfigurableSensorBase;
 use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -23,7 +23,7 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  *
  */
-class SensorEnabledModules extends SensorConfigurable {
+class EnabledModulesSensor extends ConfigurableSensorBase {
 
 
   /**

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\Sensor.
+ * Contains \Drupal\monitoring\Sensor\SensorBase.
  */
 
 namespace Drupal\monitoring\Sensor;
@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo more
  */
-abstract class Sensor implements SensorInterface {
+abstract class SensorBase implements SensorInterface {
 
   /**
    * Current sensor config object.

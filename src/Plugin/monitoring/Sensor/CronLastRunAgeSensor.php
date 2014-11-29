@@ -1,12 +1,12 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorCronLastRunAge.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CronLastRunAgeSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
-use Drupal\monitoring\Sensor\SensorThresholds;
+use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal;
 
@@ -20,9 +20,9 @@ use Drupal;
  *   addable = FALSE
  * )
  *
- * Based on the drupal core variable cron_last.
+ * Based on the drupal core system state cron_last.
  */
-class SensorCronLastRunAge extends SensorThresholds {
+class CronLastRunAgeSensor extends ThresholdsSensorBase {
 
   /**
    * {@inheritdoc}

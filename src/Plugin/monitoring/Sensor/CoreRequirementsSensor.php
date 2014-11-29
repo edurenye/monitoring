@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorCoreRequirements.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CoreRequirementsSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\Sensor;
+use Drupal\monitoring\Sensor\SensorBase;
 use Drupal\Core\Entity\DependencyTrait;
 
 /**
@@ -23,7 +23,7 @@ use Drupal\Core\Entity\DependencyTrait;
  *
  * @todo Shorten sensor message and add improved verbose output.
  */
-class SensorCoreRequirements extends Sensor {
+class CoreRequirementsSensor extends SensorBase {
 
   use DependencyTrait;
 

@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\Sensors\SensorValueComparisonBase
+ * Contains \Drupal\monitoring\Sensor\ValueComparisonSensorBase
  */
 
-namespace Drupal\monitoring\Sensor\Sensors;
+namespace Drupal\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\SensorConfigurable;
+use Drupal\monitoring\Sensor\ConfigurableSensorBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * value will be compared to. You can prepopulate this offset with initial
  * value that will be used as the expected one on the sensor enable.
  */
-abstract class SensorValueComparisonBase extends SensorConfigurable {
+abstract class ValueComparisonSensorBase extends ConfigurableSensorBase {
 
   /**
    * Gets the value description that will be shown in the settings form.

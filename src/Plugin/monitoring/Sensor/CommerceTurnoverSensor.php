@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorCommerceTurnover.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CommerceTurnoverSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
@@ -22,7 +22,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * )
  *
  */
-class SensorCommerceTurnover extends SensorEntityAggregator {
+class CommerceTurnoverSensor extends EntityAggregatorSensor {
 
   /**
    * {@inheritdoc}

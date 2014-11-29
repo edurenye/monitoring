@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorDisappearedSensors.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\DisappearedSensorsSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorConfigurable;
+use Drupal\monitoring\Sensor\ConfigurableSensorBase;
 
 /**
  * Monitors if sensors disappeared without prior being disabled.
@@ -24,7 +24,7 @@ use Drupal\monitoring\Sensor\SensorConfigurable;
  * and compares it to the current sensor config retrieved via
  * monitoring_sensor_config() callback.
  */
-class SensorDisappearedSensors extends SensorConfigurable {
+class DisappearedSensorsSensor extends ConfigurableSensorBase {
 
   /**
    * {@inheritdoc}

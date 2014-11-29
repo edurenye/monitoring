@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\SensorConfigurable.
+ * Contains \Drupal\monitoring\Sensor\ConfigurableSensorBase.
  */
 
 namespace Drupal\monitoring\Sensor;
@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * Custom sensor settings need to be implemented in an extending class.
  */
-abstract class SensorConfigurable extends Sensor implements SensorConfigurableInterface {
+abstract class ConfigurableSensorBase extends SensorBase implements ConfigurableSensorInterface {
 
   /**
    * {@inheritdoc}

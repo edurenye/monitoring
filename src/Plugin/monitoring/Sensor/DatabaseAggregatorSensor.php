@@ -1,17 +1,16 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorDatabaseAggregator.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\DatabaseAggregatorSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
-
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
-use Drupal\monitoring\Sensor\Sensors\SensorDatabaseAggregatorBase;
+use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
 use Drupal\Core\Entity\DependencyTrait;
 
 /**
@@ -25,7 +24,7 @@ use Drupal\Core\Entity\DependencyTrait;
  * )
  *
  */
-class SensorDatabaseAggregator extends SensorDatabaseAggregatorBase implements SensorExtendedInfoInterface {
+class DatabaseAggregatorSensor extends DatabaseAggregatorSensorBase implements SensorExtendedInfoInterface {
   
   use DependencyTrait;
 

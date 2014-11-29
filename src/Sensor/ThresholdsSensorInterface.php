@@ -11,6 +11,6 @@ namespace Drupal\monitoring\Sensor;
  *
  * Sensors implementing this interface can have thresholds.
  */
-interface SensorThresholdsInterface {
+interface ThresholdsSensorInterface {
 
 }

@@ -1,17 +1,16 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorEntityAggregator.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\EntityAggregatorSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
-
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
-use Drupal\monitoring\Sensor\Sensors\SensorDatabaseAggregatorBase;
+use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -31,7 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   addable = TRUE
  * )
  */
-class SensorEntityAggregator extends SensorDatabaseAggregatorBase implements SensorExtendedInfoInterface {
+class EntityAggregatorSensor extends DatabaseAggregatorSensorBase implements SensorExtendedInfoInterface {
 
   use DependencySerializationTrait;
   use DependencyTrait;

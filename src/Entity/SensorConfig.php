@@ -196,10 +196,10 @@ class SensorConfig extends ConfigEntityBase {
   /**
    * Gets sensor value label.
    *
-   * In case the sensor defines value_type, it will use the label provided for
-   * that type by monitoring_value_types().
+   * In case the sensor defined a value_label, it will use it as label.
    *
-   * Next it searches for the label within the sensor definition value_label.
+   * Next if the sensor defines a value_type, it will use the label provided for
+   * that type by monitoring_value_types().
    *
    * If nothing is defined, it returns NULL.
    *
@@ -340,7 +340,7 @@ class SensorConfig extends ConfigEntityBase {
    * @return bool
    */
   public function isConfigurable() {
-    return in_array('Drupal\monitoring\Sensor\SensorConfigurableInterface', class_implements($this->getSensorClass()));
+    return in_array('Drupal\monitoring\Sensor\ConfigurableSensorInterface', class_implements($this->getSensorClass()));
   }
 
   /**
@@ -358,7 +358,7 @@ class SensorConfig extends ConfigEntityBase {
    * @return bool
    */
   public function isDefiningThresholds() {
-    return in_array('Drupal\monitoring\Sensor\SensorThresholdsInterface', class_implements($this->getSensorClass()));
+    return in_array('Drupal\monitoring\Sensor\ThresholdsSensorInterface', class_implements($this->getSensorClass()));
   }
 
   /**

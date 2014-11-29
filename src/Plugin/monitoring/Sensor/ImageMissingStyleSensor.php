@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorImageMissingStyle.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\ImageMissingStyleSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
@@ -22,7 +22,7 @@ use Drupal;
  *
  * Displays image derivate with highest occurrence as message.
  */
-class SensorImageMissingStyle extends SensorDatabaseAggregator {
+class ImageMissingStyleSensor extends DatabaseAggregatorSensor {
 
   /**
    * The path of the most failed image.

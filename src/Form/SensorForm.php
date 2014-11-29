@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
-use Drupal\monitoring\Sensor\SensorConfigurableInterface;
+use Drupal\monitoring\Sensor\ConfigurableSensorInterface;
 
 /**
  * Sensor settings form controller.
@@ -132,7 +132,7 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_config->status(),
     );
 
-    if (isset($sensor_config->sensor_id) && $sensor_config->getPlugin() instanceof SensorConfigurableInterface) {
+    if (isset($sensor_config->sensor_id) && $sensor_config->getPlugin() instanceof ConfigurableSensorInterface) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
@@ -187,7 +187,7 @@ class SensorForm extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
-    /* @var SensorConfigurableInterface $sensor */
+    /* @var ConfigurableSensorInterface $sensor */
     if ($this->entity->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
       $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
@@ -210,7 +210,7 @@ class SensorForm extends EntityForm {
     /* @var SensorInterface */
     $sensor = $sensor_config->getPlugin();
 
-    if ($sensor instanceof SensorConfigurableInterface) {
+    if ($sensor instanceof ConfigurableSensorInterface) {
       $sensor->settingsFormSubmit($form, $form_state);
     }
   }

@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorSearchApiUnindexed.
+ * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SearchApiUnindexedSensor.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorThresholds;
+use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 use Drupal\search_api\Entity\Index;
 
 /**
@@ -27,7 +27,7 @@ use Drupal\search_api\Entity\Index;
  *
  * @see search_api_index_status()
  */
-class SensorSearchApiUnindexed extends SensorThresholds {
+class SearchApiUnindexedSensor extends ThresholdsSensorBase {
 
   /**
    * {@inheritdoc}
