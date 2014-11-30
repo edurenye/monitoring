@@ -14,13 +14,13 @@ use Drupal\Core\Form\FormStateInterface;
  * Sensors may provide thresholds that apply by default.
  * Threshold values are validated for sequence.
  */
-abstract class ThresholdsSensorBase extends ConfigurableSensorBase implements ThresholdsSensorInterface {
+abstract class ThresholdsSensorBase extends SensorBase implements ThresholdsSensorInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['thresholds'] = array(
       '#type' => 'fieldset',
@@ -151,7 +151,7 @@ abstract class ThresholdsSensorBase extends ConfigurableSensorBase implements Th
   /**
    * {@inheritdoc}
    */
-  public function settingsFormValidate($form, FormStateInterface $form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue(array('settings', 'thresholds'));
     $type = $values['type'];
 

@@ -130,8 +130,8 @@ class DatabaseAggregatorSensor extends DatabaseAggregatorSensorBase implements S
   /**
    * Adds UI for variables table and conditions.
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
     $field = '';
     $field_value = '';
     $settings = $this->sensorConfig->getSettings();

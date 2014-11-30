@@ -381,7 +381,7 @@ function monitoring_host_key() {
 /**
  * Submit callback to clear the disappeared sensors list.
  *
- * @see \Drupal\monitoring\Sensor\SensorDisappearedSensors::settingsForm()
+ * @see \Drupal\monitoring\Sensor\SensorDisappearedSensors::buildConfigurationForm()
  */
 function monitoring_clear_missing_sensor_submit($form, FormStateInterface $form_state) {
   $available_sensors = array();

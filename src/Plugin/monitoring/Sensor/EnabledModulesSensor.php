@@ -8,7 +8,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ConfigurableSensorBase;
+use Drupal\monitoring\Sensor\SensorBase;
 use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -23,14 +23,14 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  *
  */
-class EnabledModulesSensor extends ConfigurableSensorBase {
+class EnabledModulesSensor extends SensorBase {
 
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     module_load_include('inc', 'system', 'system.admin');
 
@@ -114,10 +114,10 @@ class EnabledModulesSensor extends ConfigurableSensorBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsFormSubmit($form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $sensor_config = $form_state->getFormObject()->getEntity();
 
-    parent::settingsFormSubmit($form, $form_state);
+    parent::submitConfigurationForm($form, $form_state);
 
     $modules = $form_state->getValue(array('settings', 'modules'));
     $hidden_modules = $form_state->getValue(array(

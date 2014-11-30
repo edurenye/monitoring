@@ -8,7 +8,7 @@ namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ConfigurableSensorBase;
+use Drupal\monitoring\Sensor\SensorBase;
 
 /**
  * Monitors if sensors disappeared without prior being disabled.
@@ -24,7 +24,7 @@ use Drupal\monitoring\Sensor\ConfigurableSensorBase;
  * and compares it to the current sensor config retrieved via
  * monitoring_sensor_config() callback.
  */
-class DisappearedSensorsSensor extends ConfigurableSensorBase {
+class DisappearedSensorsSensor extends SensorBase {
 
   /**
    * {@inheritdoc}
@@ -40,7 +40,7 @@ class DisappearedSensorsSensor extends ConfigurableSensorBase {
   /**
    * Adds UI to clear the missing sensor status.
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     try {
       $result = monitoring_sensor_run($this->sensorConfig->getName());
     } catch (\Exception $e) {
@@ -48,7 +48,7 @@ class DisappearedSensorsSensor extends ConfigurableSensorBase {
       drupal_set_message($e->getMessage(), 'error');
       return array();
     }
-    $form = parent::settingsForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     if ($result->isCritical()) {
       $form['clear_missing_sensors_wrapper'] = array(

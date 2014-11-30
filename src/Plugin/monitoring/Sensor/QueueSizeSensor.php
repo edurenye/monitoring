@@ -31,8 +31,8 @@ class QueueSizeSensor extends ThresholdsSensorBase {
   /**
    * Adds UI to select Queue for the sensor.
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
     $queues = array_keys(Drupal::moduleHandler()->invokeAll('queue_info'));
     $form['queue'] = array(
       '#type' => 'select',

@@ -335,15 +335,6 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Checks if sensor is configurable.
-   *
-   * @return bool
-   */
-  public function isConfigurable() {
-    return in_array('Drupal\monitoring\Sensor\ConfigurableSensorInterface', class_implements($this->getSensorClass()));
-  }
-
-  /**
    * Checks if sensor provides extended info.
    *
    * @return bool

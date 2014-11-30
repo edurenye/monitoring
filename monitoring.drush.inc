@@ -180,7 +180,6 @@ function monitoring_drush_info_single($sensor_name) {
   $rows[] = array(dt('Caching time'), \Drupal::service('date.formatter')->formatInterval($sensor_config->getCachingTime()));
   $rows[] = array(dt('Enabled'), $sensor_config->isEnabled() ? dt('Yes') : dt('No'));
   $rows[] = array(dt('Has thresholds'), $sensor_config->isDefiningThresholds() ? dt('Yes') : dt('No'));
-  $rows[] = array(dt('Is configurable'), $sensor_config->isConfigurable() ? dt('Yes') : dt('No'));
 
   drush_print_table($rows);
 }

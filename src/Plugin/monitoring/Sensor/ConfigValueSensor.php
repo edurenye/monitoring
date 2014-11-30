@@ -62,8 +62,8 @@ class ConfigValueSensor extends ValueComparisonSensorBase {
   /**
    * Adds UI for variables config object and key.
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     // Add weight to display config key before expected value.
     $form['config'] = array(

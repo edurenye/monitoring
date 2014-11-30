@@ -6,6 +6,8 @@
 
 namespace Drupal\monitoring\Sensor;
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo more
  */
-abstract class SensorBase implements SensorInterface {
+abstract class SensorBase implements SensorInterface, PluginFormInterface {
 
   /**
    * Current sensor config object.
@@ -116,4 +118,27 @@ abstract class SensorBase implements SensorInterface {
       $plugin_definition
     );
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Do nothing.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Do nothing.
+  }
+
 }

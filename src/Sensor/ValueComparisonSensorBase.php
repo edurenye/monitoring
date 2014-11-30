@@ -8,7 +8,7 @@
 namespace Drupal\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\ConfigurableSensorBase;
+use Drupal\monitoring\Sensor\SensorBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * value will be compared to. You can prepopulate this offset with initial
  * value that will be used as the expected one on the sensor enable.
  */
-abstract class ValueComparisonSensorBase extends ConfigurableSensorBase {
+abstract class ValueComparisonSensorBase extends SensorBase {
 
   /**
    * Gets the value description that will be shown in the settings form.
@@ -66,8 +66,8 @@ abstract class ValueComparisonSensorBase extends ConfigurableSensorBase {
   /**
    * Adds expected value setting field into the sensor settings form.
    */
-  public function settingsForm($form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['value'] = array(
       '#title' => 'Expected value',

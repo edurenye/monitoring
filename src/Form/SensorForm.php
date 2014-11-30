@@ -10,8 +10,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
-use Drupal\monitoring\Sensor\ConfigurableSensorInterface;
-use Drupal\monitoring\Sensor\SensorInterface;
+use Drupal\monitoring\Sensor\SensorBase;
 
 /**
  * Sensor settings form controller.
@@ -25,7 +24,7 @@ class SensorForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $form['#tree'] = TRUE;
 
-    /* @var SensorConfig $sensor_config */
+    /** @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
 
     $form['category'] = array(
@@ -130,7 +129,8 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_config->status(),
     );
 
-    if (isset($sensor_config->sensor_id) && $sensor_config->getPlugin() instanceof ConfigurableSensorInterface) {
+    if (isset($sensor_config->sensor_id) && $sensor = $sensor_config->getPlugin()) {
+      /** @var SensorBase $sensor */
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
@@ -138,9 +138,10 @@ class SensorForm extends EntityForm {
         '#prefix' => '<div id="monitoring-sensor-plugin">',
         '#suffix' => '</div>',
       );
-      $form['settings'] += (array) $sensor_config->getPlugin()->settingsForm($form['settings'], $form_state);
+      $form['settings'] += (array) $sensor->buildConfigurationForm($form['settings'], $form_state);
     }
     else {
+      // @todo remove?
       $form['settings'] = array(
         '#type' => 'container',
         '#prefix' => '<div id="monitoring-sensor-plugin">',
@@ -187,6 +188,7 @@ class SensorForm extends EntityForm {
 
     /* @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
+    /** @var SensorBase $sensor */
     if ($sensor_config->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
       $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
@@ -195,9 +197,7 @@ class SensorForm extends EntityForm {
       $sensor = $sensor_config->getPlugin();
     }
 
-    if ($sensor instanceof ConfigurableSensorInterface) {
-      $sensor->settingsFormValidate($form, $form_state);
-    }
+    $sensor->validateConfigurationForm($form, $form_state);
   }
 
   /**
@@ -208,11 +208,10 @@ class SensorForm extends EntityForm {
 
     /** @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
+    /** @var SensorBase $sensor */
     $sensor = $sensor_config->getPlugin();
 
-    if ($sensor instanceof ConfigurableSensorInterface) {
-      $sensor->settingsFormSubmit($form, $form_state);
-    }
+    $sensor->submitConfigurationForm($form, $form_state);
   }
 
   /**

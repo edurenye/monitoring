@@ -7,7 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\Sensor;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ConfigurableSensorBase;
+use Drupal\monitoring\Sensor\SensorBase;
 use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
 
 /**
@@ -27,7 +27,7 @@ use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
  * - Does not work as long as submodules are not initialized.
  * - Does not check branch / tag.
  */
-class GitDirtyTreeSensor extends ConfigurableSensorBase implements SensorExtendedInfoInterface {
+class GitDirtyTreeSensor extends SensorBase implements SensorExtendedInfoInterface {
 
   /**
    * The executed command output.
