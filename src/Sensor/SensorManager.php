@@ -110,6 +110,8 @@ class SensorManager extends DefaultPluginManager {
   /**
    * Returns monitoring sensor config for a given sensor.
    *
+   * Directly use SensorConfig::load($name) if sensor existence assured.
+   *
    * @param string $sensor_name
    *   Sensor id.
    *
@@ -120,11 +122,11 @@ class SensorManager extends DefaultPluginManager {
    *   Thrown if the requested sensor does not exist.
    */
   public function getSensorConfigByName($sensor_name) {
-    $sensor_config_all = $this->getAllSensorConfig();
-    if (isset($sensor_config_all[$sensor_name])) {
-      return $sensor_config_all[$sensor_name];
+    $sensor_config = SensorConfig::load($sensor_name);
+    if ($sensor_config == NULL) {
+      throw new NonExistingSensorException(String::format('Sensor @sensor_name does not exist', array('@sensor_name' => $sensor_name)));
     }
-    throw new NonExistingSensorException(String::format('Sensor @sensor_name does not exist', array('@sensor_name' => $sensor_name)));
+    return $sensor_config;
   }
 
   /**

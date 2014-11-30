@@ -445,7 +445,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     monitoring_sensor_manager()->resetCache();
     // Make sure the extended / hidden_modules form submit cleanup worked and
     // they are not stored as a duplicate in settings.
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('monitoring_enabled_modules');
+    $sensor_config = SensorConfig::load('monitoring_enabled_modules');
     $this->assertTrue(!array_key_exists('extended', $sensor_config->settings), 'Do not persist extended module hidden selections separately.');
     // The sensor should escalate to CRITICAL.
     $result = $this->runSensor('monitoring_enabled_modules');
@@ -614,7 +614,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Test with different db table.
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('db_aggregate_test');
+    $sensor_config = SensorConfig::load('db_aggregate_test');
     $this->drupalCreateNode(array('type' => $type1->type));
     $this->drupalCreateNode(array('type' => $type2->type));
     $this->drupalCreateNode(array('type' => $type2->type));

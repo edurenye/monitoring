@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring_munin\Tests;
 
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Tests\MonitoringTestBase;
 
 /**
@@ -44,7 +45,7 @@ class MonitoringMuninTest extends MonitoringTestBase {
     // Deleting the multigraph must remove it form sensors settings as well.
     monitoring_munin_multigraph_delete('test multigraph');
     monitoring_sensor_manager()->resetCache();
-    $info = $this->sensorManager->getSensorConfigByName('dblog_404');
+    monitoring_sensor_manager()->getSensorConfigByName('dblog_404');
     $munin_settings = $info->getSetting('munin');
     $this->assertTrue(!in_array('test multigraph', $munin_settings['multigraphs']));
   }
@@ -73,7 +74,7 @@ class MonitoringMuninTest extends MonitoringTestBase {
       if (!isset($multigraphs[$category])) {
         continue;
       }
-      /** @var \Drupal\monitoring\Sensor\SensorConfig $sensor */
+      /** @var SensorConfig $sensor */
       foreach ($sensors as $sensor) {
         $munin_settings = $sensor->getSetting('munin');
         $this->assertTrue($munin_settings['munin_enabled']);

@@ -54,7 +54,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     );
     monitoring_sensor_manager()->resetCache();
     $test_sensor_config = SensorConfig::load('test_sensor_info');
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
+    $sensor_config = SensorConfig::load('test_sensor_info');
 
     $this->assertEqual($sensor_config->getLabel(), $sensor_config_data['label']);
     $this->assertEqual($sensor_config->getDescription(), $sensor_config_data['description']);
@@ -74,7 +74,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     $test_sensor_config->value_label = 'Test label';
     $test_sensor_config->save();
     monitoring_sensor_manager()->resetCache();
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
+    $sensor_config = SensorConfig::load('test_sensor_info');
     // Test all custom defined.
     // Flag numeric must be false.
     $this->assertEqual($sensor_config->isNumeric(), FALSE);
@@ -89,7 +89,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     $test_sensor_config->save();
     unset($sensor_config_data['value_label']);
     monitoring_sensor_manager()->resetCache();
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('test_sensor_info');
+    $sensor_config = SensorConfig::load('test_sensor_info');
     $value_types = monitoring_value_types();
     $this->assertEqual($sensor_config->getValueLabel(), $value_types['time_interval']['label']);
 
@@ -362,7 +362,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     debug(\Drupal::config('monitoring.settings')->get('test_sensor'));
     /** @var SensorRunner $runner */
     $runner = \Drupal::service('monitoring.sensor_runner');
-    $runner->runSensors(array(monitoring_sensor_manager()->getSensorConfigByName('test_sensor')));
+    $runner->runSensors(array(SensorConfig::load('test_sensor')));
     //$this->runSensor('test_sensor');
     $logs = $this->loadSensorLog('test_sensor');
     $this->assertEqual(count($logs), 1);

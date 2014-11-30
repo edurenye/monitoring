@@ -101,7 +101,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $sensor_name = 'dblog_event_severity_error';
     $response_data = $this->doRequest('monitoring-sensor-info/' . $sensor_name);
     $this->assertResponse(200);
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName($sensor_name);
+    $sensor_config = SensorConfig::load($sensor_name);
     $this->assertEqual($response_data['sensor'], $sensor_config->getName());
     $this->assertEqual($response_data['label'], $sensor_config->getLabel());
     $this->assertEqual($response_data['category'], $sensor_config->getCategory());
@@ -158,7 +158,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertResponse(200);
     // The response must contain the sensor_info.
     $this->assertTrue(isset($response_data['sensor_info']));
-    $this->assertSensorResult($response_data, monitoring_sensor_manager()->getSensorConfigByName($sensor_name));
+    $this->assertSensorResult($response_data, SensorConfig::load($sensor_name));
 
     // Try a request without expanding the sensor config and check that it is not
     // present.

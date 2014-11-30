@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\String;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\SensorRunner;
 
 /**
@@ -126,7 +127,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons in 1 day');
 
-    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
+    $sensor_config = SensorConfig::load('db_aggregate_test');
     $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
     // Test for the default value.
     $this->assertFieldByName('settings[time_interval_value]', $sensor_config->getTimeIntervalValue());
@@ -137,8 +138,8 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[time_interval_value]' => $time_interval,
     ), t('Save'));
 
-    $this->sensorManager->resetCache();
-    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
+    monitoring_sensor_manager()->resetCache();
+    $sensor_config = SensorConfig::load('db_aggregate_test');
     $this->assertEqual($sensor_config->getTimeIntervalValue(), $time_interval);
 
     // Check the sensor overview to verify that the sensor result is
@@ -152,8 +153,8 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[time_interval_value]' => $time_interval,
     ), t('Save'));
 
-    $this->sensorManager->resetCache();
-    $sensor_config = $this->sensorManager->getSensorConfigByName('db_aggregate_test');
+    monitoring_sensor_manager()->resetCache();
+    $sensor_config = SensorConfig::load('db_aggregate_test');
     $this->assertEqual($sensor_config->getTimeIntervalValue(), $time_interval);
 
     // Visit the overview and make sure that no time interval is displayed.
@@ -219,7 +220,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalCreateNode(array('promote' => NODE_PROMOTED));
 
-    $sensor_config = monitoring_sensor_manager()->getSensorConfigByName('db_aggregate_test');
+    $sensor_config = SensorConfig::load('db_aggregate_test');
     $this->drupalGet('admin/reports/monitoring/sensors/db_aggregate_test');
     $this->assertTitle(t('@label (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
 
@@ -279,7 +280,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // Test that accessing a disabled or nisot-existing sensor results in a page
     // not found response.
-    $this->sensorManager->disableSensor('test_sensor');
+    monitoring_sensor_manager()->disableSensor('test_sensor');
     $this->drupalGet('admin/reports/monitoring/sensors/test_sensor');
     $this->assertResponse(404);
 
@@ -373,7 +374,7 @@ class MonitoringUITest extends MonitoringTestBase {
    */
   protected function submitThresholdSettings($sensor_name, array $thresholds) {
     $data = array();
-    $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
+    $sensor_config = SensorConfig::load($sensor_name);
     foreach ($thresholds as $key => $value) {
       $form_field_name = 'settings' . '[thresholds][' . $key . ']';
       $data[$form_field_name] = $value;
@@ -392,7 +393,7 @@ class MonitoringUITest extends MonitoringTestBase {
    *   values.
    */
   protected function assertThresholdSettingsUIDefaults($sensor_name, $thresholds) {
-    $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
+    $sensor_config = SensorConfig::load($sensor_name);
     $this->drupalGet('admin/config/system/monitoring/sensors/' . $sensor_name);
     $this->assertTitle(t('@label settings (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
     foreach ($thresholds as $key => $value) {
@@ -423,7 +424,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText(t('Sensor settings saved.'));
     $this->assertThresholdSettingsUIDefaults('test_sensor_exceeds', $thresholds);
 
-    $this->sensorManager->resetCache();
+    monitoring_sensor_manager()->resetCache();
     \Drupal::service('monitoring.sensor_runner')->resetCache();
     $sensor_result = $this->runSensor('test_sensor_exceeds');
     $this->assertTrue($sensor_result->isOk());
