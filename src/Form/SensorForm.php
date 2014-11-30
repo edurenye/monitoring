@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Sensor\ConfigurableSensorInterface;
+use Drupal\monitoring\Sensor\SensorInterface;
 
 /**
  * Sensor settings form controller.
@@ -115,6 +116,7 @@ class SensorForm extends EntityForm {
       // validate and submit callbacks.
       $form_state->set('sensor_object', $sensor_config->getPlugin());
 
+      // @todo odd name but this can not be set to sensor_id.
       $form['old_sensor_id'] = array(
         '#type' => 'item',
         '#title' => t('Sensor Plugin'),
@@ -187,16 +189,19 @@ class SensorForm extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
-    /* @var ConfigurableSensorInterface $sensor */
-    if ($this->entity->isNew()) {
+    /* @var SensorConfig $sensor_config */
+    $sensor_config = $this->entity;
+    if ($sensor_config->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
       $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
     }
     else {
-      $sensor = $form_state->get('sensor_object');
+      $sensor = $sensor_config->getPlugin();
     }
 
-    $sensor->settingsFormValidate($form, $form_state);
+    if ($sensor instanceof ConfigurableSensorInterface) {
+      $sensor->settingsFormValidate($form, $form_state);
+    }
   }
 
   /**
@@ -205,9 +210,8 @@ class SensorForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /* @var SensorConfig $sensor_config */
+    /** @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
-    /* @var SensorInterface */
     $sensor = $sensor_config->getPlugin();
 
     if ($sensor instanceof ConfigurableSensorInterface) {
