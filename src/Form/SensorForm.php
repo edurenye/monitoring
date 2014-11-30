@@ -112,10 +112,6 @@ class SensorForm extends EntityForm {
 
     }
     else {
-      // Set the sensor object into $form_state to make it available for
-      // validate and submit callbacks.
-      $form_state->set('sensor_object', $sensor_config->getPlugin());
-
       // @todo odd name but this can not be set to sensor_id.
       $form['old_sensor_id'] = array(
         '#type' => 'item',
