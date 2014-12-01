@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo more
  */
-abstract class SensorBase implements SensorInterface, PluginFormInterface {
+abstract class SensorBase implements SensorInterface {
 
   /**
    * Current sensor config object.

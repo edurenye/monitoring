@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Sensor;
 
+use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo more
  */
-interface SensorInterface extends PluginInspectionInterface {
+interface SensorInterface extends PluginInspectionInterface, PluginFormInterface {
 
   /**
    * Service setter.

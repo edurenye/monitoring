@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Sensor\SensorBase;
+use Drupal\monitoring\Sensor\SensorInterface;
 
 /**
  * Sensor settings form controller.
@@ -141,7 +142,7 @@ class SensorForm extends EntityForm {
       $form['settings'] += (array) $sensor->buildConfigurationForm($form['settings'], $form_state);
     }
     else {
-      // @todo remove?
+      // Placeholder for ajax settings.
       $form['settings'] = array(
         '#type' => 'container',
         '#prefix' => '<div id="monitoring-sensor-plugin">',
@@ -188,7 +189,7 @@ class SensorForm extends EntityForm {
 
     /* @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
-    /** @var SensorBase $sensor */
+    /** @var SensorInterface $sensor */
     if ($sensor_config->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
       $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
@@ -208,7 +209,7 @@ class SensorForm extends EntityForm {
 
     /** @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
-    /** @var SensorBase $sensor */
+    /** @var SensorInterface $sensor */
     $sensor = $sensor_config->getPlugin();
 
     $sensor->submitConfigurationForm($form, $form_state);
