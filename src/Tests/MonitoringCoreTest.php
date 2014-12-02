@@ -219,12 +219,17 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // ======= Watchdog sensor tests ======= //
 
     // Create watchdog entry with severity alert.
+    // The testbot reported random fails with an unexpected watchdog record.
+    // ALERT: "Missing filter plugin: %filter." with %filter = "filter_null"
+    // Thus we drop all ALERT messages first.
+    db_delete('watchdog')
+      ->condition('severity', RfcLogLevel::ALERT)
+      ->execute();
     \Drupal::logger('test')->alert('test message');
 
     // Run sensor and test the output.
     $severities = monitoring_event_severities();
     $result = $this->runSensor('dblog_event_severity_' . $severities[RfcLogLevel::ALERT]);
-    debug(db_query('SELECT * FROM {watchdog} WHERE severity = :severity', array(':severity' => RfcLogLevel::ALERT))->fetchAll());
     $this->assertEqual($result->getValue(), 1);
 
     // ======= UserFailedLoginsSensor tests ======= //
