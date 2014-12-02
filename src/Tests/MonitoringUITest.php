@@ -304,10 +304,14 @@ class MonitoringUITest extends MonitoringTestBase {
     // and make sure the expected and actual values are displayed.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_maintenance_mode');
     $this->assertText('The expected value of state system.maintenance_mode, actual value: FALSE');
+    // Make sure delete link is not available for this sensor.
+    $this->assertNoLink(t('Delete'));
 
     // Test the checkbox in edit sensor settings for the bool sensor
     // Cron safe threshold enabled/disabled.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_cron_safe_threshold');
+    // Make sure delete action available for this sensor.
+    $this->assertLink(t('Delete'));
     $this->assertNoFieldChecked('edit-settings-value');
     $this->drupalPostForm(NULL, array('settings[value]' => 'Checked'), t('Save'));
 
