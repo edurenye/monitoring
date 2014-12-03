@@ -25,17 +25,17 @@ class StateValueSensor extends ValueComparisonSensorBase {
    * {@inheritdoc}
    */
   protected function getValueDescription() {
-    return (t('The expected value of state %key, actual value: %actVal',
+    return (t('The expected value of state %key, current value: %actVal',
       array(
         '%key' => $this->sensorConfig->getSetting('key'),
-        '%actVal' => $this->getActualValueText(),
+        '%actVal' => $this->getValueText(),
       )));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getActualValue() {
+  protected function getValue() {
     $state = $this->getState();
     $key = $this->sensorConfig->getSetting('key');
     if (empty($key)) {

@@ -26,17 +26,17 @@ class ConfigValueSensor extends ValueComparisonSensorBase {
    * {@inheritdoc}
    */
   protected function getValueDescription() {
-    return (t('The expected value of config %key, actual value: %actVal',
+    return (t('The expected value of config %key, current value: %actVal',
       array(
         '%key' => $this->sensorConfig->getSetting('config') . ':' . $this->sensorConfig->getSetting('key'),
-        '%actVal' => $this->getActualValueText(),
+        '%actVal' => $this->getValueText(),
       )));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getActualValue() {
+  protected function getValue() {
     $config = $this->getConfig($this->sensorConfig->getSetting('config'));;
     $key = $this->sensorConfig->getSetting('key');
     if (empty($key)) {

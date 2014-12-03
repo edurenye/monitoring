@@ -295,15 +295,15 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalLogin($account);
 
     // Visit the edit page of "core theme default" (config value sensor)
-    // and make sure the expected and actual values are displayed.
+    // and make sure the expected and current values are displayed.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_theme_default');
-    $this->assertText('The expected value of config system.theme:default, actual value: classy');
+    $this->assertText('The expected value of config system.theme:default, current value: classy');
 
 
     // Visit the edit page of "core maintainance mode" (state value sensor)
-    // and make sure the expected and actual values are displayed.
+    // and make sure the expected and current values are displayed.
     $this->drupalGet('admin/config/system/monitoring/sensors/core_maintenance_mode');
-    $this->assertText('The expected value of state system.maintenance_mode, actual value: FALSE');
+    $this->assertText('The expected value of state system.maintenance_mode, current value: FALSE');
     // Make sure delete link is not available for this sensor.
     $this->assertNoLink(t('Delete'));
 

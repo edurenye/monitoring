@@ -29,25 +29,25 @@ abstract class ValueComparisonSensorBase extends SensorBase {
   abstract protected function getValueDescription();
 
   /**
-   * Gets the actual value.
+   * Gets the current value.
    *
    * @return mixed
-   *   The actual value.
+   *   The current value.
    */
-  abstract protected function getActualValue();
+  abstract protected function getValue();
 
   /**
-   * Gets the actual value as text.
+   * Gets the current value as text.
    *
    * @return string
    *   The expected value.
    */
-  protected function getActualValueText() {
+  protected function getValueText() {
     if ($this->sensorConfig->isBool()) {
-      $actual_value = $this->getActualValue() ? 'TRUE' : 'FALSE';
+      $actual_value = $this->getValue() ? 'TRUE' : 'FALSE';
     }
     else {
-      $actual_value = $this->getActualValue();
+      $actual_value = $this->getValue();
     }
 
     return $actual_value;
@@ -92,7 +92,7 @@ abstract class ValueComparisonSensorBase extends SensorBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $result->setValue($this->getActualValue());
+    $result->setValue($this->getValue());
     $result->setExpectedValue($this->getExpectedValue());
   }
 }
