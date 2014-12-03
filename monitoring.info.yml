@@ -5,11 +5,10 @@ package: Monitoring
 core: 8.x
 
 test_dependencies:
- - dblog
  - search_api
- - search_api_db
  - simplenews
  - elysia_cron
+ - payment
 
 simplytest_dependencies:
  - monitoring_demo
