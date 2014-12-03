@@ -14,6 +14,7 @@ use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\node\NodeTypeInterface;
+use Drupal\search_api\IndexInterface;
 
 /**
  * Returns an instance of the sensor manager.
