@@ -476,7 +476,7 @@ function monitoring_install_optional_configuration($modules, Extension $extensio
  *   formatter_callback.
  */
 function monitoring_value_types() {
-  // @todo Allow extension of those types throgh a hook or plugin system.
+  // @todo Allow extension of those types through a hook or plugin system.
   return array(
     'time_interval' => array(
       'label' => 'Seconds',
