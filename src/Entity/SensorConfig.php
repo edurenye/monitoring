@@ -107,13 +107,6 @@ class SensorConfig extends ConfigEntityBase {
   public $value_type;
 
   /**
-   * The sensor value numeric flag.
-   *
-   * @var bool
-   */
-  public $numeric = TRUE;
-
-  /**
    * The sensor caching time.
    *
    * @var integer
@@ -213,8 +206,11 @@ class SensorConfig extends ConfigEntityBase {
     }
     if ($this->value_type) {
       $value_types = monitoring_value_types();
-      return $value_types[$this->value_type]['label'];
+      if (isset($value_types[$this->value_type]['value_label'])) {
+        return $value_types[$this->value_type]['value_label'];
+      }
     }
+    return NULL;
   }
 
   /**
@@ -236,7 +232,11 @@ class SensorConfig extends ConfigEntityBase {
    *   TRUE if the sensor value is numeric.
    */
   public function isNumeric() {
-    return $this->numeric;
+    $value_types = monitoring_value_types();
+    if (empty($this->value_type)) {
+      return FALSE;
+    }
+    return $value_types[$this->value_type]['numeric'];
   }
 
   /**
@@ -246,7 +246,7 @@ class SensorConfig extends ConfigEntityBase {
    *   TRUE if the sensor value type is boolean.
    */
   public function isBool() {
-    return  $this->getValueType() == 'bool';
+    return $this->getValueType() == 'bool';
   }
 
   /**

@@ -109,11 +109,28 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/config/system/monitoring/sensors/add');
 
     $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
+      'label' => 'UI created Sensor config',
+      'description' => 'Sensor created to test UI',
+      'id' => 'ui_test_sensor_config',
+      'value_label' => 'Test Value',
+      'caching_time' => 100,
       'sensor_id' => 'config_value',
+      'value_type' => 'bool',
     ), t('Select sensor'));
 
     $this->assertText('Expected value');
-    $this->assertFieldByName('settings[value]');
+
+    $this->assertText('Sensor plugin settings');
+    $this->drupalPostForm(NULL, array(
+      'settings[key]' => 'threshold.autorun',
+      'settings[config]' => 'system.cron',
+    ), t('Save'));
+    $this->assertText('Sensor settings saved.');
+
+    // Go back to the sensor edit page,
+    // Check the value type is properly selected.
+    $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor_config');
+    $this->assertOptionSelected('edit-value-type', 'bool');
   }
 
   /**
@@ -277,6 +294,10 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalPostForm(NULL, array(), t('Run now'));
     // Check that the verbose output is displayed.
     $this->assertText('Aggregate field nid');
+
+    // Check the if the sensor message includes value type.
+    $this->drupalGet('admin/reports/monitoring/sensors/core_cron_safe_threshold');
+    $this->assertText('FALSE');
 
     // Test that accessing a disabled or nisot-existing sensor results in a page
     // not found response.

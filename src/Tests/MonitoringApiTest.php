@@ -46,53 +46,42 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
   public function testAPI() {
 
     // == Test sensor config. == //
-    // @todo - complete the sensor config tests in followup.
-    $sensor_config_data = array(
-      'label' => 'Test sensor config',
-      'description' => 'To test correct sensor config hook implementation precedence.',
-      'settings' => array(),
-    );
-    monitoring_sensor_manager()->resetCache();
-    $test_sensor_config = SensorConfig::load('test_sensor_info');
     $sensor_config = SensorConfig::load('test_sensor_info');
 
-    $this->assertEqual($sensor_config->getLabel(), $sensor_config_data['label']);
-    $this->assertEqual($sensor_config->getDescription(), $sensor_config_data['description']);
+    $this->assertEqual($sensor_config->getLabel(), 'Test sensor config');
+    $this->assertEqual($sensor_config->getDescription(), 'To test correct sensor config hook implementation precedence.');
     // @todo - add tests for compulsory sensor config attributes.
 
-    // Test all defaults.
-    // Flag numeric should default to TRUE.
-    $this->assertEqual($sensor_config->isNumeric(), TRUE);
     // @todo - add tests for default values of attributes.
 
     // @todo - override remaining attributes.
-    $sensor_config_data['numeric'] = FALSE;
-    $test_sensor_config->numeric = FALSE;
-    // Define custom value label and NO value type. In this setup the sensor
+
+    // Define custom value label and number value type. In this setup the sensor
     // defined value label must be used.
-    $sensor_config_data['value_label'] = 'Test label';
-    $test_sensor_config->value_label = 'Test label';
-    $test_sensor_config->save();
-    monitoring_sensor_manager()->resetCache();
-    $sensor_config = SensorConfig::load('test_sensor_info');
-    // Test all custom defined.
-    // Flag numeric must be false.
-    $this->assertEqual($sensor_config->isNumeric(), FALSE);
-    $this->assertEqual($sensor_config->getValueLabel(), $sensor_config_data['value_label']);
-    // @todo - add tests for overridden values of attributes.
+    $sensor_config->value_label = 'Test label';
+    $sensor_config->save();
+    $this->assertEqual($sensor_config->getValueType(), 'number');
+    $this->assertEqual($sensor_config->getValueLabel(), 'Test label');
+    $this->assertTrue($sensor_config->isNumeric());
+    $this->assertFalse($sensor_config->isBool());
 
     // Test value label provided by the monitoring_value_types().
     // Set the value type to one defined by the monitoring_value_types().
-    $sensor_config_data['value_type'] = 'time_interval';
-    $test_sensor_config->value_type = 'time_interval';
-    $test_sensor_config->value_label = '';
-    $test_sensor_config->save();
-    unset($sensor_config_data['value_label']);
-    monitoring_sensor_manager()->resetCache();
-    $sensor_config = SensorConfig::load('test_sensor_info');
+    $sensor_config->value_type = 'time_interval';
+    $sensor_config->value_label = '';
+    $sensor_config->save();
     $value_types = monitoring_value_types();
-    $this->assertEqual($sensor_config->getValueLabel(), $value_types['time_interval']['label']);
+    $this->assertEqual($sensor_config->getValueLabel(), $value_types['time_interval']['value_label']);
+    $this->assertTrue($sensor_config->isNumeric());
+    $this->assertFalse($sensor_config->isBool());
 
+    // Test value type without value label.
+    $sensor_config->value_type = 'bool';
+    $sensor_config->save();
+    $value_types = monitoring_value_types();
+    $this->assertEqual($sensor_config->getValueLabel(), NULL);
+    $this->assertFalse($sensor_config->isNumeric());
+    $this->assertTrue($sensor_config->isBool());
     // == Test basic sensor infrastructure - value, status and message. == //
 
     $test_sensor_result_data = array(

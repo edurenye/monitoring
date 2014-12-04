@@ -8,7 +8,6 @@
 namespace Drupal\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\SensorBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -70,16 +69,16 @@ abstract class ValueComparisonSensorBase extends SensorBase {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['value'] = array(
-      '#title' => 'Expected value',
+      '#title' => t('Expected value'),
       '#description' => $this->getValueDescription(),
-      '#default_value' => $this->sensorConfig->getSetting('value'),
+      '#default_value' => $this->getExpectedValue(),
     );
 
-    if ($this->sensorConfig->isNumeric()) {
-      $form['value']['#type'] = 'number';
-    }
-    elseif ($this->sensorConfig->isBool()) {
+    if ($this->sensorConfig->isBool()) {
       $form['value']['#type'] = 'checkbox';
+    }
+    elseif ($this->sensorConfig->isNumeric()) {
+      $form['value']['#type'] = 'number';
     }
     else {
       $form['value']['#type'] = 'textfield';

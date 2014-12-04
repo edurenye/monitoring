@@ -4,6 +4,7 @@ description: ''
 category: Content
 sensor_id: entity_aggregator
 value_label: Comments
+value_type: 'number'
 status: FALSE
 caching_time: 3600
 settings:

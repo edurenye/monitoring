@@ -3,7 +3,6 @@ label: 'Maintenance mode'
 description: 'Site maintenance mode'
 sensor_id: state_value
 value_type: 'bool'
-numeric: FALSE
 category: 'Other'
 status: TRUE
 settings:

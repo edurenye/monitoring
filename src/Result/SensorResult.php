@@ -296,23 +296,31 @@ class SensorResult implements SensorResultInterface {
    * @throws \Drupal\monitoring\Sensor\SensorCompilationException
    */
   public function getFormattedValue($value) {
+
+    $value_type = $this->getSensorConfig()->getValueType();
     // If the value type is defined we have the formatter that will format the
     // value to be ready for display.
-    if ($value_type = $this->getSensorConfig()->getValueType()) {
+
+    if (!empty($value_type)) {
+
       $value_types = monitoring_value_types();
       if (!isset($value_types[$value_type])) {
         throw new SensorCompilationException(String::format('Invalid value type @type', array('@type' => $value_type)));
+      }
+      elseif (empty($value_types[$value_type]['formatter_callback']) && $label = $this->getSensorConfig()->getValueLabel()) {
+        $label = Unicode::strtolower($label);
+        return String::format('!value !label', array('!value' => $value, '!label' => $label));
       }
       elseif (isset($value_types[$value_type]['formatter_callback']) && !function_exists($value_types[$value_type]['formatter_callback'])) {
         throw new SensorCompilationException(String::format('Formatter callback @callback for @type does not exist',
           array('@callback' => $value_types[$value_type]['formatter_callback'], '@type' => $value_type)));
       }
-      else {
+      elseif(isset($value_types[$value_type]['formatter_callback'])) {
         $callback = $value_types[$value_type]['formatter_callback'];
         return $callback($this);
       }
     }
-
+    
     // If there is no value formatter we try to provide something human readable
     // by concatenating the value and label.
 

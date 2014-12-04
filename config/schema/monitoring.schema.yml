@@ -28,9 +28,6 @@ monitoring.sensor_config.*:
     value_type:
       type: string
       label: 'Value Type'
-    numeric:
-      type: boolean
-      label: 'Flag if the value is numeric'
     status:
       type: boolean
       label: 'Enabled'

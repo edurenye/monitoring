@@ -478,17 +478,29 @@ function monitoring_install_optional_configuration($modules, Extension $extensio
 function monitoring_value_types() {
   // @todo Allow extension of those types through a hook or plugin system.
   return array(
+    'number' => array(
+      'label' => 'Number',
+      'numeric' => TRUE,
+    ),
+    'string' => array(
+      'label' => 'Text',
+      'numeric' => FALSE,
+    ),
     'time_interval' => array(
-      'label' => 'Seconds',
+      'label' => 'Time interval',
+      'value_label' => 'Seconds',
       'formatter_callback' => 'monitoring_value_label_callback_interval',
+      'numeric' => TRUE,
     ),
     'bool' => array(
-      'label' => 'Status',
+      'label' => 'Boolean',
       'formatter_callback' => 'monitoring_value_label_callback_bool',
+      'numeric' => FALSE,
     ),
     'commerce_currency' => array(
       'label' => 'Commerce currency',
       'formatter_callback' => 'monitoring_value_label_callback_commerce_currency',
+      'numeric' => TRUE,
     ),
   );
 }

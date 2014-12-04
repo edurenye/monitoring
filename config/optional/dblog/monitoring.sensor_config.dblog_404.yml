@@ -5,6 +5,7 @@ category: Watchdog
 sensor_id: dblog_404
 result_class: null
 value_label: 'Watchdog events'
+value_type: 'number'
 status: TRUE
 caching_time: 3600
 settings:

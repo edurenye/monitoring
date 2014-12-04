@@ -2,7 +2,7 @@ id: core_theme_default
 label: 'Default theme'
 description: 'Site default theme'
 sensor_id: config_value
-numeric: FALSE
+value_type: 'string'
 category: 'Other'
 status: FALSE
 settings:

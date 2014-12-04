@@ -3,6 +3,7 @@ label: 'DB Aggregate test'
 description: 'Tests the generic DB aggregate sensor.'
 category: 'Test'
 sensor_id: entity_aggregator
+value_type : 'number'
 value_label: 'Druplicons'
 result_logging: TRUE
 caching_time: 3600

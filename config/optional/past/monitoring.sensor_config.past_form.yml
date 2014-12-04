@@ -4,6 +4,7 @@ description: 'Past event logging form submissions'
 category: Past
 sensor_id: database_aggregator
 value_label: 'Past events'
+value_type: 'number'
 status: TRUE
 caching_time: 3600
 settings:

@@ -3,6 +3,7 @@ label: 'Watchdog aggregate test'
 description: 'Test sensor for watchdog aggregate.'
 category: 'Test'
 sensor_id: database_aggregator
+value_type : 'number'
 settings:
   result_logging: FALSE
   thresholds:

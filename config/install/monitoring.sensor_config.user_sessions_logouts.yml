@@ -3,6 +3,7 @@ label: 'User session logouts'
 description: 'User session logouts by Watchdog'
 category: 'User activity'
 sensor_id: database_aggregator
+value_type: 'number'
 value_label: 'Logouts'
 status: TRUE
 caching_time: 3600

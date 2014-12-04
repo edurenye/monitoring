@@ -4,8 +4,8 @@ label: 'Core'
 description: 'Available updates for Drupal core'
 category: 'Update'
 sensor_id: update_status
+value_type : 'number'
 value_label: 'Outdated modules'
-numeric: FALSE
 caching_time: '86400'
 settings:
   type: 'core'

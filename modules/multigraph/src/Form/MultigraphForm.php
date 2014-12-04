@@ -26,7 +26,6 @@ class MultigraphForm extends EntityForm {
 
     // Find sensors that can be included.
     $sensor_ids = \Drupal::entityQuery('monitoring_sensor_config')
-      ->condition('numeric', TRUE)
       ->condition('status', TRUE)
       ->execute();
     $sensor_ids = array_diff($sensor_ids, array_keys($multigraph->getSensorsRaw()));
@@ -75,7 +74,9 @@ class MultigraphForm extends EntityForm {
     // Create an array suitable for the sensor_add_select element.
     $sensors_options = array();
     foreach ($sensors as $sensor) {
-      $sensors_options[$sensor->getName()] = $sensor->getLabel();
+      if ($sensor->isNumeric()) {
+        $sensors_options[$sensor->getName()] = $sensor->getLabel();
+      }
     }
 
     // Select element for available sensors.

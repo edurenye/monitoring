@@ -121,6 +121,17 @@ class SensorForm extends EntityForm {
       );
     }
 
+    foreach (monitoring_value_types() as $value_type => $info) {
+      $value_types[$value_type] = $info['label'];
+    }
+
+    $form['value_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Expected value type'),
+      '#options' => $value_types,
+      '#default_value' => $sensor_config->getValueType(),
+    );
+
     // If sensor provides settings form, automatically provide settings to
     // enable the sensor.
     $form['status'] = array(
