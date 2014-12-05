@@ -7,6 +7,8 @@
 namespace Drupal\monitoring\Sensor;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\Form\SensorForm;
 use Drupal\monitoring\Sensor\ThresholdsSensorBase;
 
 /**
@@ -40,7 +42,7 @@ abstract class DatabaseAggregatorSensorBase extends ThresholdsSensorBase {
   }
 
   /**
-   * Gets the time filed.
+   * Gets the time field.
    *
    * @return string
    *   Time interval field.
@@ -49,6 +51,12 @@ abstract class DatabaseAggregatorSensorBase extends ThresholdsSensorBase {
     return $this->sensorConfig->getSetting('time_interval_field');
   }
 
+  /**
+   * Gets the time interval value.
+   *
+   * @return int
+   *   Time interval value.
+   */
   protected function getTimeIntervalValue() {
     return $this->sensorConfig->getTimeIntervalValue();
   }
@@ -58,16 +66,62 @@ abstract class DatabaseAggregatorSensorBase extends ThresholdsSensorBase {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
+    $form['aggregation'] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Time Aggregation',
+    );
 
-    $form['time_interval_value'] = array(
+    $form['aggregation']['time_interval_field'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Timestamp field'),
+      '#description' => t('A UNIX timestamp in seconds since epoch.'),
+      '#default_value' => $this->sensorConfig->getSetting('time_interval_field'),
+    );
+
+    $form['aggregation']['time_interval_value'] = array(
       '#type' => 'select',
-      '#title' => t('Aggregate time interval'),
+      '#title' => t('Interval'),
       '#options' => $this->getTimeIntervalOptions(),
       '#description' => t('Select the time interval for which the results will be aggregated.'),
-      '#default_value' => $this->sensorConfig->getTimeIntervalValue(),
+      '#default_value' => $this->getTimeIntervalValue(),
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="settings[aggregation][time_interval_field]"]' => array('value' => ""),
+        ),
+      )
     );
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
+    /** @var SensorForm $sensor_form */
+    $sensor_form = $form_state->getFormObject();
+    /** @var SensorConfig $sensor_config */
+    $sensor_config = $sensor_form->getEntity();
+
+    // Copy time interval field & value into settings if the field is specified.
+     if ($interval_field = $form_state->getValue(array(
+      'settings', 'aggregation', 'time_interval_field'))) {
+       $sensor_config->settings['time_interval_field'] = $interval_field;
+       $interval_value = $form_state->getValue(array(
+         'settings', 'aggregation', 'time_interval_value'));
+
+       $sensor_config->settings['time_interval_value'] = $interval_value;
+       // Remove UI structure originated settings leftover.
+       unset($sensor_config->settings['aggregation']);
+     }
+    else {
+      // For consistency, empty the field + value setting if no field defined.
+      unset($sensor_config->settings['time_interval_field']);
+      unset($sensor_config->settings['time_interval_value']);
+    }
+    return $form_state;
   }
 
   /**

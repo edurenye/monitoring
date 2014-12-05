@@ -25,7 +25,7 @@ use Drupal\Core\Entity\DependencyTrait;
  *
  */
 class DatabaseAggregatorSensor extends DatabaseAggregatorSensorBase implements SensorExtendedInfoInterface {
-  
+
   use DependencyTrait;
 
   /**
@@ -74,7 +74,7 @@ class DatabaseAggregatorSensor extends DatabaseAggregatorSensorBase implements S
       $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
     }
 
-    if ($time_interval_field = $this->getTimeIntervalField()) {
+    if ($this->getTimeIntervalField() && $this->getTimeIntervalValue()) {
       $query->condition($this->getTimeIntervalField(), REQUEST_TIME - $this->getTimeIntervalValue(), '>');
     }
 

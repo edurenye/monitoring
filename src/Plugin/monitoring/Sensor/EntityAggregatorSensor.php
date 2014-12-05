@@ -74,8 +74,8 @@ class EntityAggregatorSensor extends DatabaseAggregatorSensorBase implements Sen
       $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
     }
 
-    if ($time_interval_field = $this->getTimeIntervalField()) {
-      $query->condition($time_interval_field, REQUEST_TIME - $this->getTimeIntervalValue(), '>');
+    if ($this->getTimeIntervalField() && $this->getTimeIntervalValue()) {
+      $query->condition($this->getTimeIntervalField(), REQUEST_TIME - $this->getTimeIntervalValue(), '>');
     }
 
     return $query;
@@ -103,6 +103,12 @@ class EntityAggregatorSensor extends DatabaseAggregatorSensorBase implements Sen
     );
   }
 
+  /**
+   * Gets the entity type setting.
+   *
+   * @return string
+   *   The entity type.
+   */
   protected function getEntityType() {
     return $this->sensorConfig->getSetting('entity_type');
   }
