@@ -131,6 +131,26 @@ class MonitoringUITest extends MonitoringTestBase {
     // Check the value type is properly selected.
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor_config');
     $this->assertOptionSelected('edit-value-type', 'bool');
+
+    // Try to enable a sensor which is disabled by default and vice versa.
+    // Check the default status of cron safe threshold and new users sensors.
+    $sensor_cron = SensorConfig::load('core_cron_safe_threshold');
+    $this->assertTrue($sensor_cron->status());
+    $sensor_comment = SensorConfig::load('user_new');
+    $this->assertFalse($sensor_comment->status());
+
+    // Change the status of these sensors.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors', array(
+      'sensors[core_cron_safe_threshold]' => FALSE,
+      'sensors[user_new]' => TRUE,
+    ), t('Update enabled sensors'));
+
+    // Make sure the changes have been made.
+    $sensor_cron = SensorConfig::load('core_cron_safe_threshold');
+    $this->assertFalse($sensor_cron->status());
+    $sensor_comment = SensorConfig::load('user_new');
+    $this->assertTrue($sensor_comment->status());
+
   }
 
   /**

@@ -85,7 +85,7 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => $this->t('Save configuration'),
+      '#value' => $this->t('Update enabled sensors'),
     );
 
     return $form;
