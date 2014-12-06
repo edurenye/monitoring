@@ -42,6 +42,7 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
       'description' => 'Count all users through the users view.',
       'id' => 'view_user_count',
       'value_label' => 'Users',
+      'value_type' => 'number',
       'caching_time' => 0,
       'plugin_id' => 'view_display_aggregator',
     ), t('Select sensor'));

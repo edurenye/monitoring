@@ -51,6 +51,7 @@ function monitoring_install() {
         'id' => 'search_api_' . $index->id(),
         'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
         'plugin_id' => 'search_api_unindexed',
+        'value_type' => 'number',
         'value_label' => 'Unindexed items',
         'category' => 'Search API',
         // Cache for 15 minutes.
@@ -157,6 +158,7 @@ function monitoring_install() {
       'label' => String::format('Module @module', array('@module' => $module)),
       'description' => String::format('Requirements of the @module module', array('@module' => $module)),
       'plugin_id' => 'core_requirements',
+      'value_type' => 'no_value',
       'category' => 'Requirements',
       'caching_time' => 3600,
       'status' => TRUE,

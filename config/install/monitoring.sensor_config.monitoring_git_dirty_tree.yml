@@ -3,7 +3,7 @@ label: 'Git dirty working tree'
 description: 'Repository local file changes'
 plugin_id: monitoring_git_dirty_tree
 category: 'System'
-value_type: 'string'
+value_type: 'no_value'
 status: FALSE
 settings:
   repo_path: NULL

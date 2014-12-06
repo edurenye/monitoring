@@ -449,6 +449,10 @@ function monitoring_install_optional_configuration($modules, Extension $extensio
 function monitoring_value_types() {
   // @todo Allow extension of those types through a hook or plugin system.
   return array(
+    'no_value' => array(
+      'label' => '- No value -',
+      'numeric' => FALSE,
+    ),
     'number' => array(
       'label' => 'Number',
       'numeric' => TRUE,
