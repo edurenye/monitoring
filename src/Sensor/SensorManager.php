@@ -6,14 +6,13 @@
 
 namespace Drupal\monitoring\Sensor;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\monitoring\SensorRunner;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\SensorPlugin\SensorPluginInterface;
 
 /**
  * Manages sensor definitions and settings.
@@ -56,7 +55,7 @@ class SensorManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config) {
-    parent::__construct('Plugin/monitoring/Sensor', $namespaces, $module_handler, '\Drupal\monitoring\Sensor\SensorInterface', 'Drupal\monitoring\Annotation\Sensor');
+    parent::__construct('Plugin/monitoring/SensorPlugin', $namespaces, $module_handler, '\Drupal\monitoring\SensorPlugin\SensorPluginInterface', 'Drupal\monitoring\Annotation\SensorPlugin');
     $this->alterInfo('block');
     $this->setCacheBackend($cache_backend, 'monitoring_sensor_plugins');
     $this->config = $config;
@@ -66,13 +65,14 @@ class SensorManager extends DefaultPluginManager {
    * {@inheritdoc}
    */
   public function createInstance($plugin_id, array $configuration = array()) {
-    // Configuration contains sensor_info object. Extracting
+    // Configuration contains SensorConfig object. Extracting
     // it to use for sensor object creation.
     $sensor_config = $configuration['sensor_info'];
     $definition = $this->getDefinition($plugin_id);
-    // Sensor class from the sensor definition.
+    // SensorPlugin class from the sensor definition.
+    /** @var SensorPluginInterface $class */
     $class = $definition['class'];
-    // Creating instance of the sensor. Refer Sensor.php for arguments.
+    // Creating instance of the sensor. Refer SensorPlugin.php for arguments.
     return $class::create(\Drupal::getContainer(), $sensor_config, $plugin_id, $definition);
   }
 
@@ -137,7 +137,7 @@ class SensorManager extends DefaultPluginManager {
    * @param bool $enabled
    *   Sensor isEnabled flag.
    *
-   * @return \Drupal\monitoring\Entity\SensorConfig[]
+   * @return \Drupal\monitoring\Entity\SensorConfig[][]
    *   Sensor config.
    */
   public function getSensorConfigByCategories($enabled = TRUE) {

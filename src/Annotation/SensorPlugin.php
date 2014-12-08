@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Annotation\Sensor.
+ * Contains \Drupal\monitoring\Annotation\SensorPlugin.
  */
 
 namespace Drupal\monitoring\Annotation;
@@ -10,11 +10,11 @@ namespace Drupal\monitoring\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines Sensor annotation object for reference by Sensor Plugins.
+ * Defines SensorPlugin annotation object for reference by SensorPlugin Plugins.
  *
  * @Annotation
  */
-class Sensor extends Plugin {
+class SensorPlugin extends Plugin {
 
    /**
    * The plugin ID.

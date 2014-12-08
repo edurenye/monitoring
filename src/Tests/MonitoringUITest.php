@@ -1,14 +1,13 @@
 <?php
 /**
  * @file
- * Contains \MonitoringUITest.
+ * Contains \Drupal\monitoring\Tests\MonitoringUITest.
  */
 
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Entity\SensorConfig;
-use Drupal\monitoring\SensorRunner;
 
 /**
  * Tests for the Monitoring UI.

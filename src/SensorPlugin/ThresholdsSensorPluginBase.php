@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\ThresholdsSensorBase.
+ * Contains \Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase.
  */
 
-namespace Drupal\monitoring\Sensor;
+namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Abstract class providing configuration form for Sensor with thresholds.
+ * Abstract class with configuration form for Sensor plugins with thresholds.
  *
  * Sensors may provide thresholds that apply by default.
  * Threshold values are validated for sequence.
  */
-abstract class ThresholdsSensorBase extends SensorBase implements ThresholdsSensorInterface {
+abstract class ThresholdsSensorPluginBase extends SensorPluginBase implements ThresholdsSensorPluginInterface {
 
   /**
    * {@inheritdoc}

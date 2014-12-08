@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\SensorInterface.
+ * Contains \Drupal\monitoring\SensorPlugin\SensorPluginInterface.
  */
 
-namespace Drupal\monitoring\Sensor;
+namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo more
  */
-interface SensorInterface extends PluginInspectionInterface, PluginFormInterface {
+interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInterface {
 
   /**
    * Service setter.
@@ -57,9 +57,9 @@ interface SensorInterface extends PluginInspectionInterface, PluginFormInterface
    *  - Set the sensor status to critical, warning, ok, info or unknown with
    *    SensorResultInterface::setStatus(). Defaults to unknown.
    *  - Set the sensor value with SensorResultInterface::setValue(). This can
-   *    be a number or a string. Note that hook_monitoring_sensor_info()
-   *    defaults to numeric. If a sensor does not return a numeric result,
-   *    it must be defined accordingly.
+   *    be a number or a string. Note that value_type defaults to numeric.
+   *    If a sensor does not return a numeric result, it must be defined
+   *    accordingly.
    *  - Set the expected sensor value with SensorResultInterface::setExpectedValue().
    *    When doing so, it is not necessary to set the sensor status explicitly,
    *    as that will happen implicitly. See below.
@@ -77,17 +77,16 @@ interface SensorInterface extends PluginInspectionInterface, PluginFormInterface
    * Sensors with unknown status can either be set based on an expected value or
    * thresholds. If the value does not match the expected value, the status
    * is set to critical. Sensors that support thresholds should either subclass
-   * \Drupal\monitoring\Sensor\ThresholdsSensorBase or implement
-   * \Drupal\monitoring\ThresholdsSensorInterface and provide their own
-   * configuration form.
+   * \Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase or implement
+   * \Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginInterface and provide
+   * their own configuration form.
    *
    * The default sensor message will include information about the sensor value,
    * expected value, thresholds, the configured time interval and additional
    * status messages defined.
    * Provided value labels and value types will be considered for displaying the
-   * sensor value, see hook_monitoring_sensor_info() for their documentation. If
-   * neither value nor status messages are provided, the message will default to
-   * "No value".
+   * sensor value. If neither value nor status messages are provided, the
+   * message will default to "No value".
    *
    * Compiled message examples:
    *  - $90.00 in 1 day, expected $100.00.

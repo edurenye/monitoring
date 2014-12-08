@@ -1,17 +1,17 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\Dblog404Sensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\Dblog404SensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
  * Monitors 404 page errors from dblog.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "dblog_404",
  *   provider = "dblog",
  *   label = @Translation("404 page errors (database log)"),
@@ -21,7 +21,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Displays URL with highest occurrence as message.
  */
-class Dblog404Sensor extends DatabaseAggregatorSensor {
+class Dblog404SensorPlugin extends DatabaseAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}

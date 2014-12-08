@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Sensor Extended Info interface.
+ * Contains \Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface.
  */
 
-namespace Drupal\monitoring\Sensor;
+namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
 
@@ -13,7 +13,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Implemented by sensors with verbose information.
  */
-interface SensorExtendedInfoInterface {
+interface ExtendedInfoSensorPluginInterface {
 
   /**
    * Provide additional info about sensor call.

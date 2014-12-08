@@ -1,25 +1,25 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\PaymentCountSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\PaymentCountSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
+use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 
 /**
  * Monitors payment count.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "payment_count",
  *   label = @Translation("Payment Count"),
  *   description = @Translation("Monitors the number of successful transactions for payments with effective date."),
  *   addable = TRUE
  * )
  */
-class PaymentCountSensor extends DatabaseAggregatorSensorBase {
+class PaymentCountSensorPlugin extends DatabaseAggregatorSensorPluginBase {
 
   /**
    * {@inheritdoc}

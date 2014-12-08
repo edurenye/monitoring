@@ -6,12 +6,12 @@
 
 namespace Drupal\monitoring\Tests;
 
-use Drupal\simpletest\DrupalUnitTestBase;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Base class for all monitoring tests.
  */
-abstract class MonitoringUnitTestBase extends DrupalUnitTestBase {
+abstract class MonitoringUnitTestBase extends KernelTestBase {
 
   /**
    * Modules to enable.

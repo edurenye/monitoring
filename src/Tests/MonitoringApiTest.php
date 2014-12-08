@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \MonitoringApiTest.
+ * Contains \Drupal\monitoring\Tests\MonitoringApiTest.
  */
 
 namespace Drupal\monitoring\Tests;
@@ -78,7 +78,6 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     // Test value type without value label.
     $sensor_config->value_type = 'bool';
     $sensor_config->save();
-    $value_types = monitoring_value_types();
     $this->assertEqual($sensor_config->getValueLabel(), NULL);
     $this->assertFalse($sensor_config->isNumeric());
     $this->assertTrue($sensor_config->isBool());

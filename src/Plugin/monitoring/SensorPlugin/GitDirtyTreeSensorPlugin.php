@@ -1,19 +1,19 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\GitDirtyTreeSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\GitDirtyTreeSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorBase;
-use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 
 /**
  * Monitors the git repository for dirty files.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "monitoring_git_dirty_tree",
  *   label = @Translation("Git Dirty Tree"),
  *   description = @Translation("Monitors the git repository for dirty files."),
@@ -27,7 +27,7 @@ use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
  * - Does not work as long as submodules are not initialized.
  * - Does not check branch / tag.
  */
-class GitDirtyTreeSensor extends SensorBase implements SensorExtendedInfoInterface {
+class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   /**
    * The executed command output.

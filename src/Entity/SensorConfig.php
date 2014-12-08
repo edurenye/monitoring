@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * Represents a sensor config entity class.
  *
  * @todo more
+ *
  * @ConfigEntityType(
  *   id = "monitoring_sensor_config",
  *   label = @Translation("Monitoring Sensor"),
@@ -121,11 +122,11 @@ class SensorConfig extends ConfigEntityBase {
   public $status = TRUE;
 
   /**
-   * The sensor ID.
+   * Gets Sensor ID.
    *
-   * @var string
+   * @return string
+   *   Sensor ID.
    */
-
   public function getName() {
     return $this->id;
   }
@@ -155,10 +156,10 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets sensor class.
+   * Gets sensor plugin class.
    *
    * @return string
-   *   Sensor class
+   *   SensorPlugin class
    */
   public function getSensorClass() {
     $definition = monitoring_sensor_manager()->getDefinition($this->sensor_id);
@@ -168,13 +169,13 @@ class SensorConfig extends ConfigEntityBase {
   /**
    * Gets the sensor plugin.
    *
-   * @return \Drupal\monitoring\Sensor\SensorInterface
+   * @return \Drupal\monitoring\SensorPlugin\SensorPluginInterface
    *   Instantiated sensor.
    */
   public function getPlugin() {
     $configuration = array('sensor_info' => $this);
-    $sensor = monitoring_sensor_manager()->createInstance($this->sensor_id, $configuration);
-    return $sensor;
+    $plugin = monitoring_sensor_manager()->createInstance($this->sensor_id, $configuration);
+    return $plugin;
   }
 
   /**
@@ -341,7 +342,7 @@ class SensorConfig extends ConfigEntityBase {
    * @return bool
    */
   public function isExtendedInfo() {
-    return in_array('Drupal\monitoring\Sensor\SensorExtendedInfoInterface', class_implements($this->getSensorClass()));
+    return in_array('Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface', class_implements($this->getSensorClass()));
   }
 
   /**
@@ -350,7 +351,7 @@ class SensorConfig extends ConfigEntityBase {
    * @return bool
    */
   public function isDefiningThresholds() {
-    return in_array('Drupal\monitoring\Sensor\ThresholdsSensorInterface', class_implements($this->getSensorClass()));
+    return in_array('Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginInterface', class_implements($this->getSensorClass()));
   }
 
   /**
@@ -383,6 +384,10 @@ class SensorConfig extends ConfigEntityBase {
    * {@inheritdoc}
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    /**
+     * @var SensorConfig $a
+     * @var SensorConfig $b
+     */
     // Checks whether both labels and categories are equal.
     if ($a->getLabel() == $b->getLabel() && $a->getCategory() == $b->getCategory()) {
       return 0;

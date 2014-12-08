@@ -2,25 +2,25 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\ConfigValueSensor
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\ConfigValueSensorPlugin
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Sensor\ValueComparisonSensorBase;
+use Drupal\monitoring\SensorPlugin\ValueComparisonSensorPluginBase;
 
 /**
  * Generic sensor that checks for a configuration value.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "config_value",
  *   label = @Translation("Config Value"),
  *   description = @Translation("Checks for a specific configuration value."),
  *   addable = TRUE
  * )
  */
-class ConfigValueSensor extends ValueComparisonSensorBase {
+class ConfigValueSensorPlugin extends ValueComparisonSensorPluginBase {
 
   /**
    * {@inheritdoc}

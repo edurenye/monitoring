@@ -10,8 +10,8 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
-use Drupal\monitoring\Sensor\SensorBase;
-use Drupal\monitoring\Sensor\SensorInterface;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginInterface;
 
 /**
  * Sensor settings form controller.
@@ -121,6 +121,7 @@ class SensorForm extends EntityForm {
       );
     }
 
+    $value_types = [];
     foreach (monitoring_value_types() as $value_type => $info) {
       $value_types[$value_type] = $info['label'];
     }
@@ -141,8 +142,7 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_config->status(),
     );
 
-    if (isset($sensor_config->sensor_id) && $sensor = $sensor_config->getPlugin()) {
-      /** @var SensorBase $sensor */
+    if (isset($sensor_config->sensor_id) && $plugin = $sensor_config->getPlugin()) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
@@ -150,7 +150,7 @@ class SensorForm extends EntityForm {
         '#prefix' => '<div id="monitoring-sensor-plugin">',
         '#suffix' => '</div>',
       );
-      $form['settings'] += (array) $sensor->buildConfigurationForm($form['settings'], $form_state);
+      $form['settings'] += (array) $plugin->buildConfigurationForm($form['settings'], $form_state);
     }
     else {
       // Placeholder for ajax settings.
@@ -200,16 +200,16 @@ class SensorForm extends EntityForm {
 
     /* @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
-    /** @var SensorInterface $sensor */
+    /** @var SensorPluginInterface $plugin */
     if ($sensor_config->isNew()) {
       $plugin = $form_state->getValue('sensor_id');
-      $sensor = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
+      $plugin = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
     }
     else {
-      $sensor = $sensor_config->getPlugin();
+      $plugin = $sensor_config->getPlugin();
     }
 
-    $sensor->validateConfigurationForm($form, $form_state);
+    $plugin->validateConfigurationForm($form, $form_state);
   }
 
   /**
@@ -220,10 +220,9 @@ class SensorForm extends EntityForm {
 
     /** @var SensorConfig $sensor_config */
     $sensor_config = $this->entity;
-    /** @var SensorInterface $sensor */
-    $sensor = $sensor_config->getPlugin();
+    $plugin = $sensor_config->getPlugin();
 
-    $sensor->submitConfigurationForm($form, $form_state);
+    $plugin->submitConfigurationForm($form, $form_state);
   }
 
   /**

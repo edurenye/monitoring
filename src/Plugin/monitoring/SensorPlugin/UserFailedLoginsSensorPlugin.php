@@ -1,18 +1,17 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\UserFailedLoginsSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\UserFailedLoginsSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
  * Monitors user failed login from dblog messages.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "user_failed_logins",
  *   label = @Translation("User Failed Logins"),
  *   description = @Translation("Monitors user failed login from dblog messages."),
@@ -21,7 +20,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Helps to identify bots or brute force attacks.
  */
-class UserFailedLoginsSensor extends DatabaseAggregatorSensor {
+class UserFailedLoginsSensorPlugin extends DatabaseAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}

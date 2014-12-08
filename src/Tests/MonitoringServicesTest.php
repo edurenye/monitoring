@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \MonitoringServicesTest.
+ * Contains \Drupal\monitoring\Tests\MonitoringServicesTest.
  */
 
 namespace Drupal\monitoring\Tests;

@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\QueueSizeSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\QueueSizeSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ThresholdsSensorBase;
+use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Monitors number of items for a given core queue.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "queue_size",
  *   label = @Translation("Queue Size"),
  *   description = @Translation("Monitors number of items for a given core queue."),
@@ -26,7 +26,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @see \DrupalQueue
  */
-class QueueSizeSensor extends ThresholdsSensorBase {
+class QueueSizeSensorPlugin extends ThresholdsSensorPluginBase {
 
   /**
    * Adds UI to select Queue for the sensor.

@@ -1,10 +1,11 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CommerceTurnoverSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\CommerceTurnoverSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
+
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 
@@ -13,7 +14,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Based on SensorEntityDatabaseAggregator using commerce_order table.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "commerce_turnover",
  *   label = @Translation("Commerce order turnover"),
  *   description = @Translation("Monitors how much money was earned with commerce orders."),
@@ -22,7 +23,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * )
  *
  */
-class CommerceTurnoverSensor extends EntityAggregatorSensor {
+class CommerceTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}

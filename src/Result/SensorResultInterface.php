@@ -120,7 +120,7 @@ interface SensorResultInterface {
    *
    * If the status is STATUS_UNKNOWN, this will attempt to set the status
    * based on expected value and threshold configurations. See
-   * \Drupal\monitoring\Sensor\SensorInterface::runSensor() for details.
+   * \Drupal\monitoring\SensorPlugin\SensorPluginInterface::runSensor() for details.
    *
    * @throws \Drupal\monitoring\Sensor\SensorCompilationException
    *   Thrown if an error occurs during the sensor result compilation.
@@ -187,7 +187,7 @@ interface SensorResultInterface {
    * Sets sensor execution time in ms.
    *
    * @param float $time
-   *   Sensor execution time in ms
+   *   Sensor execution time in ms.
    */
   public function setExecutionTime($time);
 

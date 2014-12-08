@@ -1,22 +1,22 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\DatabaseAggregatorSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\DatabaseAggregatorSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
-use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
+use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
 
 /**
  * Simple database aggregator able to query a single db table.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "database_aggregator",
  *   label = @Translation("Simple Database Aggregator"),
  *   description = @Translation("Simple database aggregator able to query a single db table."),
@@ -24,7 +24,7 @@ use Drupal\Core\Entity\DependencyTrait;
  * )
  *
  */
-class DatabaseAggregatorSensor extends DatabaseAggregatorSensorBase implements SensorExtendedInfoInterface {
+class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   use DependencyTrait;
 

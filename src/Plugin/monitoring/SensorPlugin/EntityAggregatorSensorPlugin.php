@@ -1,16 +1,16 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\EntityAggregatorSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\EntityAggregatorSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
-use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
+use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -23,14 +23,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * It utilises the entity query aggregate functionality.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "entity_aggregator",
  *   label = @Translation("Entity Aggregator"),
  *   description = @Translation("Utilises the entity query aggregate functionality."),
  *   addable = TRUE
  * )
  */
-class EntityAggregatorSensor extends DatabaseAggregatorSensorBase implements SensorExtendedInfoInterface {
+class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   use DependencySerializationTrait;
   use DependencyTrait;

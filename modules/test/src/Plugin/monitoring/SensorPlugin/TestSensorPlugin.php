@@ -1,28 +1,28 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring_test\Plugin\monitoring\Sensor\TestSensor.
+ * Contains \Drupal\monitoring_test\Plugin\monitoring\SensorPlugin\TestSensorPlugin.
  */
 
-namespace Drupal\monitoring_test\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring_test\Plugin\monitoring\SensorPlugin;
 
-use Drupal\monitoring\Sensor\SensorExtendedInfoInterface;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ThresholdsSensorBase;
+use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 
 /**
  * Test sensor to report status as provided by external arguments.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "test_sensor",
- *   label = @Translation("Test Sensor"),
+ *   label = @Translation("Test SensorPlugin"),
  *   description = @Translation("Test sensor to report status as provided by external arguments."),
  *   addable = TRUE
  * )
  *
  */
-class TestSensor extends ThresholdsSensorBase implements SensorExtendedInfoInterface {
+class TestSensorPlugin extends ThresholdsSensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   protected $testSensorResultData;
 

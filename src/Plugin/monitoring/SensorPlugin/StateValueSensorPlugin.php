@@ -2,24 +2,24 @@
 
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\StateValueSensor
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\StateValueSensorPlugin
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\monitoring\Sensor\ValueComparisonSensorBase;
+use Drupal\monitoring\SensorPlugin\ValueComparisonSensorPluginBase;
 
 /**
  * Generic sensor that checks for a state value.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "state_value",
  *   label = @Translation("State Value"),
  *   description = @Translation("Checks for a specific state value."),
  *   addable = FALSE
  * )
  */
-class StateValueSensor extends ValueComparisonSensorBase {
+class StateValueSensorPlugin extends ValueComparisonSensorPluginBase {
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\monitoring\Plugin\rest\resource\MonitoringSensorInfoResource.
+ * Definition of Drupal\monitoring\Plugin\rest\resource\MonitoringSensorResource.
  */
 
 namespace Drupal\monitoring\Plugin\rest\resource;

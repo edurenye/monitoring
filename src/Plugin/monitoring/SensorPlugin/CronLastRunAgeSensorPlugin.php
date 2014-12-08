@@ -1,19 +1,19 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CronLastRunAgeSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\CronLastRunAgeSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\monitoring\Sensor\ThresholdsSensorBase;
+use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal;
 
 /**
  * Monitors the last cron run time.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "cron_last_run_time",
  *   label = @Translation("Cron Last Run Age"),
  *   description = @Translation("Monitors the last cron run time."),
@@ -22,7 +22,7 @@ use Drupal;
  *
  * Based on the drupal core system state cron_last.
  */
-class CronLastRunAgeSensor extends ThresholdsSensorBase {
+class CronLastRunAgeSensorPlugin extends ThresholdsSensorPluginBase {
 
   /**
    * {@inheritdoc}

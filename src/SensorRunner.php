@@ -13,8 +13,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Entity\SensorConfig;
-use Drupal;
 use Drupal\monitoring\Sensor\SensorManager;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 
 /**
  * Instantiate and run requested sensors.
@@ -103,7 +103,7 @@ class SensorRunner {
   }
 
   /**
-   * Runs the defined sensableors.
+   * Runs the defined sensors.
    *
    * @param \Drupal\monitoring\Entity\SensorConfig[] $sensors_config_all
    *   List of sensor config object that we want to run.
@@ -156,9 +156,9 @@ class SensorRunner {
    * @see \Drupal\monitoring\Sensor\SensorInterface::runSensor()
    */
   protected function runSensor(SensorConfig $sensor_config) {
-    $sensor = $sensor_config->getPlugin();
+    $plugin = $sensor_config->getPlugin();
     // Check if sensor is enabled.
-    if (!$sensor->isEnabled()) {
+    if (!$plugin->isEnabled()) {
       throw new DisabledSensorException(String::format('Sensor @sensor_name is not enabled and must not be run.', array('@sensor_name' => $sensor_config->getName())));
     }
 
@@ -168,7 +168,7 @@ class SensorRunner {
     if (!$result->isCached()) {
       Timer::start($sensor_config->getName());
       try {
-        $sensor->runSensor($result);
+        $plugin->runSensor($result);
       } catch (\Exception $e) {
         // In case the sensor execution results in an exception, mark it as
         // critical and set the sensor status message.
@@ -185,7 +185,8 @@ class SensorRunner {
 
       // Capture verbose output if requested and if we are able to do so.
       if ($this->verbose && $sensor_config->isExtendedInfo()) {
-        $result->setVerboseOutput($sensor->resultVerbose($result));
+        /** @var ExtendedInfoSensorPluginInterface $plugin */
+        $result->setVerboseOutput($plugin->resultVerbose($result));
       }
 
       try {
@@ -196,7 +197,6 @@ class SensorRunner {
         $result->setMessage(get_class($e) . ': ' . $e->getMessage());
       }
     }
-
 
     return $result;
   }
@@ -242,7 +242,6 @@ class SensorRunner {
    */
   protected function needsLogging($result, $old_status = NULL, $new_status = NULL) {
     $log_activity = $result->getSensorConfig()->getSetting('result_logging', FALSE);
-
 
     // We log if requested or on status change.
     if ($this->config->get('sensor_call_logging') == 'on_request') {

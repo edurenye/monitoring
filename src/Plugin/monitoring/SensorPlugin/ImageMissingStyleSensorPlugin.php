@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\ImageMissingStyleSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\ImageMissingStyleSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal;
@@ -12,7 +12,7 @@ use Drupal;
 /**
  * Monitors image derivate creation errors from dblog.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "image_style_missing",
  *   label = @Translation("Image Missing Style"),
  *   description = @Translation("Monitors image derivate creation errors from database log."),
@@ -22,7 +22,7 @@ use Drupal;
  *
  * Displays image derivate with highest occurrence as message.
  */
-class ImageMissingStyleSensor extends DatabaseAggregatorSensor {
+class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
 
   /**
    * The path of the most failed image.

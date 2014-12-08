@@ -1,23 +1,22 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Sensor\SensorBase.
+ * Contains \Drupal\monitoring\SensorPlugin\SensorPluginBase.
  */
 
-namespace Drupal\monitoring\Sensor;
+namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Abstract SensorInterface implementation with common behaviour and will be extended by
+ * Abstract SensorPluginInterface implementation with common behaviour and will be extended by
  * sensor plugins.
  *
  * @todo more
  */
-abstract class SensorBase implements SensorInterface {
+abstract class SensorPluginBase implements SensorPluginInterface {
 
   /**
    * Current sensor config object.

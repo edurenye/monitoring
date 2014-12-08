@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Returns autocomplete responses for config.
+ * Returns auto complete responses for config.
  */
 class ConfigAutocompleteController {
 
   /**
-   * Retrieves suggestions for config autocompletion.
+   * Retrieves suggestions for config auto completion.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.

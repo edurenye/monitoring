@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SensorPaymentTurnover.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\SensorPaymentTurnover.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
+use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 
 /**
  * Monitors payment turnover stats.
@@ -15,14 +15,14 @@ use Drupal\monitoring\Sensor\DatabaseAggregatorSensorBase;
  * A custom database query is used here instead of entity manager for
  * performance reasons.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "payment_turnover",
  *   label = @Translation("Payment Turnover"),
  *   description = @Translation("Monitors how much money was transferred for payments with effective date."),
  *   addable = TRUE
  * )
  */
-class PaymentTurnoverSensor extends DatabaseAggregatorSensorBase {
+class PaymentTurnoverSensorPlugin extends DatabaseAggregatorSensorPluginBase {
 
   /**
    * {@inheritdoc}

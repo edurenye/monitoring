@@ -18,7 +18,7 @@ monitoring.sensor_config.*:
       label: 'Category'
     sensor_id:
       type: string
-      label: 'Sensor ID'
+      label: 'Sensor plugin ID'
     result_class:
       type: string
       label: 'Result Class'

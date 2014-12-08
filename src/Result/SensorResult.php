@@ -501,5 +501,4 @@ class SensorResult implements SensorResultInterface {
     return $this->verboseOutput;
   }
 
-
 }

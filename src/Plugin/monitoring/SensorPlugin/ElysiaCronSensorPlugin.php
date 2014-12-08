@@ -1,18 +1,18 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\ElysiaCronSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\ElysiaCronSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ThresholdsSensorBase;
+use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 
 /**
  * Monitors elysia cron channels for last execution.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "elysia_cron",
  *   label = @Translation("Elysia Cron"),
  *   description = @Translation("Monitors elysia cron channels for last execution."),
@@ -21,7 +21,7 @@ use Drupal\monitoring\Sensor\ThresholdsSensorBase;
  * )
  *
  */
-class ElysiaCronSensor extends ThresholdsSensorBase {
+class ElysiaCronSensorPlugin extends ThresholdsSensorPluginBase {
 
   /**
    * {@inheritdoc}

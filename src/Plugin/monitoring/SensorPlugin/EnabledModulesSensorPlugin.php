@@ -1,21 +1,21 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\EnabledModulesSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\EnabledModulesSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Monitors installed modules.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "monitoring_enabled_modules",
  *   label = @Translation("Enabled Modules"),
  *   description = @Translation("Monitors installed modules."),
@@ -23,8 +23,7 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  *
  */
-class EnabledModulesSensor extends SensorBase {
-
+class EnabledModulesSensorPlugin extends SensorPluginBase {
 
   /**
    * {@inheritdoc}

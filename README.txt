@@ -20,7 +20,7 @@
  * * Watchdog
  * * Cron execution
  * * Content and User activity
- * Sensor interface that can be easily implemented to provide custom sensors.
+ * SensorPluginInterface that can be easily implemented to provide custom sensor plugins.
  * Integration with Munin.
  * Integration with Icinga/Nagios
 
@@ -50,6 +50,6 @@
  variable, for example in settings.php. This allows to enforce environment
  specific settings, like disabling a certain sensor.
 
- $conf['monitoring_sensor_info']['name_of_the_sensor']['settings']['enabled'] = FALSE;
+ @todo needs documentation with config overrides.
 
  Anything defined through the hook can be overridden.

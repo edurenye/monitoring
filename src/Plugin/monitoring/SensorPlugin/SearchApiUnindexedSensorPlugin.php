@@ -1,19 +1,19 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\SearchApiUnindexedSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\SearchApiUnindexedSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\ThresholdsSensorBase;
+use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 use Drupal\search_api\Entity\Index;
 
 /**
  * Monitors unindexed items for a search api index.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "search_api_unindexed",
  *   label = @Translation("Unindexed Search Items"),
  *   description = @Translation("Monitors unindexed items for a search api index."),
@@ -27,7 +27,7 @@ use Drupal\search_api\Entity\Index;
  *
  * @see search_api_index_status()
  */
-class SearchApiUnindexedSensor extends ThresholdsSensorBase {
+class SearchApiUnindexedSensorPlugin extends ThresholdsSensorPluginBase {
 
   /**
    * {@inheritdoc}

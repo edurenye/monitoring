@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\Sensor\CoreRequirementsSensor.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\CoreRequirementsSensorPlugin.
  */
 
-namespace Drupal\monitoring\Plugin\monitoring\Sensor;
+namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\String;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\Sensor\SensorBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
 
 /**
  * Monitors a specific module hook_requirements.
  *
- * @Sensor(
+ * @SensorPlugin(
  *   id = "core_requirements",
  *   label = @Translation("Core Requirements"),
  *   description = @Translation("Monitors a specific module hook_requirements."),
@@ -23,7 +23,7 @@ use Drupal\Core\Entity\DependencyTrait;
  *
  * @todo Shorten sensor message and add improved verbose output.
  */
-class CoreRequirementsSensor extends SensorBase {
+class CoreRequirementsSensorPlugin extends SensorPluginBase {
 
   use DependencyTrait;
 
