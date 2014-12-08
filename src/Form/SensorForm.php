@@ -87,11 +87,11 @@ class SensorForm extends EntityForm {
         }
       }
       uasort($plugin_types, 'strnatcasecmp');
-      $form['sensor_id'] = array(
+      $form['plugin_id'] = array(
         '#type' => 'select',
         '#options' => $plugin_types,
         '#title' => $this->t('Sensor Plugin'),
-        '#limit_validation_errors' => array(array('sensor_id')),
+        '#limit_validation_errors' => array(array('plugin_id')),
         '#submit' => array('::submitSelectPlugin'),
         '#required' => TRUE,
         '#executes_submit_callback' => TRUE,
@@ -105,19 +105,19 @@ class SensorForm extends EntityForm {
       $form['update'] = array(
         '#type' => 'submit',
         '#value' => $this->t('Select sensor'),
-        '#limit_validation_errors' => array(array('sensor_id')),
+        '#limit_validation_errors' => array(array('plugin_id')),
         '#submit' => array('::submitSelectPlugin'),
         '#attributes' => array('class' => array('js-hide')),
       );
 
     }
     else {
-      // @todo odd name but this can not be set to sensor_id.
-      $form['old_sensor_id'] = array(
+      // @todo odd name but this can not be set to plugin_id.
+      $form['old_plugin_id'] = array(
         '#type' => 'item',
         '#title' => t('Sensor Plugin'),
         '#maxlength' => 255,
-        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_config->sensor_id)['label']->render(),
+        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_config->plugin_id)['label']->render(),
       );
     }
 
@@ -142,7 +142,7 @@ class SensorForm extends EntityForm {
       '#default_value' => $sensor_config->status(),
     );
 
-    if (isset($sensor_config->sensor_id) && $plugin = $sensor_config->getPlugin()) {
+    if (isset($sensor_config->plugin_id) && $plugin = $sensor_config->getPlugin()) {
       $form['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
@@ -202,7 +202,7 @@ class SensorForm extends EntityForm {
     $sensor_config = $this->entity;
     /** @var SensorPluginInterface $plugin */
     if ($sensor_config->isNew()) {
-      $plugin = $form_state->getValue('sensor_id');
+      $plugin = $form_state->getValue('plugin_id');
       $plugin = monitoring_sensor_manager()->createInstance($plugin, array('sensor_info' => $this->entity));
     }
     else {

@@ -3,7 +3,7 @@ label: 'Test sensor'
 description: 'Test sensor status.'
 category: 'Test'
 value_type : 'number'
-sensor_id: test_sensor
+plugin_id: test_sensor
 caching_time: 3600
 settings:
   result_logging: TRUE

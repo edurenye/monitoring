@@ -2,6 +2,6 @@ id: monitoring_disappeared_sensors
 label: 'Disappeared sensors'
 description: 'Keeps track of active sensors and reports if a sensor disappears'
 category: System
-sensor_id: monitoring_disappeared_sensors
+plugin_id: monitoring_disappeared_sensors
 value_type: 'number'
 status: TRUE

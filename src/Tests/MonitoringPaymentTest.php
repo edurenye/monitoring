@@ -45,7 +45,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
 
     $sensor_config = SensorConfig::create(array(
       'id' => 'payment_count',
-      'sensor_id' => 'payment_count',
+      'plugin_id' => 'payment_count',
       'value_label' => 'transactions',
       'caching_time' => 3600,
       'settings' => array(
@@ -59,7 +59,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
 
     $sensor_config = SensorConfig::create(array(
       'id' => 'payment_turnover',
-      'sensor_id' => 'payment_turnover',
+      'plugin_id' => 'payment_turnover',
       'caching_time' => 3600,
       'value_label' => 'JPY',
       'settings' => array(

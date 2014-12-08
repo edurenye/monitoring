@@ -2,7 +2,7 @@ id: monitoring_enabled_modules
 label: 'Enabled modules'
 description: 'Enabled only expected modules'
 category: 'System'
-sensor_id: monitoring_enabled_modules
+plugin_id: monitoring_enabled_modules
 value_type: 'number'
 value_label: 'Modules delta'
 status: FALSE

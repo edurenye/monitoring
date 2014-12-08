@@ -1,7 +1,7 @@
 id: core_cron_safe_threshold
 label: 'Cron safe threshold enabled'
 description: 'Cron safe threshold (Poormanscron) is enabled'
-sensor_id: config_value
+plugin_id: config_value
 value_type: 'bool'
 category: 'Cron'
 status: TRUE

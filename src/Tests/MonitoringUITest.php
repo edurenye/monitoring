@@ -84,7 +84,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'id' => 'ui_test_sensor',
       'value_label' => 'Test Value',
       'caching_time' => 100,
-      'sensor_id' => 'entity_aggregator',
+      'plugin_id' => 'entity_aggregator',
     ), t('Select sensor'));
 
     $this->assertText('Sensor plugin settings');
@@ -113,7 +113,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'id' => 'ui_test_sensor_config',
       'value_label' => 'Test Value',
       'caching_time' => 100,
-      'sensor_id' => 'config_value',
+      'plugin_id' => 'config_value',
       'value_type' => 'bool',
     ), t('Select sensor'));
 

@@ -77,7 +77,7 @@ class SensorConfig extends ConfigEntityBase {
    *
    * @var string
    */
-  public $sensor_id;
+  public $plugin_id;
 
   /**
    * The sensor result class.
@@ -162,7 +162,7 @@ class SensorConfig extends ConfigEntityBase {
    *   SensorPlugin class
    */
   public function getSensorClass() {
-    $definition = monitoring_sensor_manager()->getDefinition($this->sensor_id);
+    $definition = monitoring_sensor_manager()->getDefinition($this->plugin_id);
     return $definition['class'];
   }
 
@@ -174,7 +174,7 @@ class SensorConfig extends ConfigEntityBase {
    */
   public function getPlugin() {
     $configuration = array('sensor_info' => $this);
-    $plugin = monitoring_sensor_manager()->createInstance($this->sensor_id, $configuration);
+    $plugin = monitoring_sensor_manager()->createInstance($this->plugin_id, $configuration);
     return $plugin;
   }
 

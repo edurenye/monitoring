@@ -2,7 +2,7 @@ id: user_new
 label: 'New users'
 description: ''
 category: 'User activity'
-sensor_id: entity_aggregator
+plugin_id: entity_aggregator
 value_label: 'Users'
 value_type: 'number'
 status: FALSE

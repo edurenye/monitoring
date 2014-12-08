@@ -16,7 +16,7 @@ monitoring.sensor_config.*:
     category:
       type: string
       label: 'Category'
-    sensor_id:
+    plugin_id:
       type: string
       label: 'Sensor plugin ID'
     result_class:
@@ -35,7 +35,7 @@ monitoring.sensor_config.*:
       type: integer
       label: 'Sensor Caching Time'
     settings:
-      type: monitoring.settings.[sensor_id]
+      type: monitoring.settings.[plugin_id]
       label: 'Settings'
 
 monitoring.settings.monitoring_git_dirty_tree:

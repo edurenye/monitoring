@@ -83,7 +83,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     $sensor_config = SensorConfig::create(array(
       'id' => 'core_queue_monitoring_test',
-      'sensor_id' => 'queue_size',
+      'plugin_id' => 'queue_size',
       'settings' => array(
         'queue' => 'monitoring_test'
       )
@@ -100,7 +100,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // @todo - This should not be necessary after sensor requirements are updated.
     $sensor_config = SensorConfig::create(array(
       'id' => 'core_requirements_monitoring_test',
-      'sensor_id' => 'core_requirements',
+      'plugin_id' => 'core_requirements',
       'settings' => array(
         'module' => 'monitoring_test'
       )

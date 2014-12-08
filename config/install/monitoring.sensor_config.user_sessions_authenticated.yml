@@ -2,7 +2,7 @@ id: user_sessions_authenticated
 label: 'Authenticated user sessions'
 description: 'Authenticated user sessions without logout'
 category: 'User activity'
-sensor_id: database_aggregator
+plugin_id: database_aggregator
 value_type: 'number'
 value_label: 'Active sessions'
 status: TRUE

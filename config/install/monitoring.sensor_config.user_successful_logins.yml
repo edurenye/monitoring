@@ -2,7 +2,7 @@ id: user_successful_logins
 label: 'Successful user logins'
 description: 'Successful user logins by Watchdog'
 category: 'User activity'
-sensor_id: database_aggregator
+plugin_id: database_aggregator
 value_type : 'number'
 value_label: 'Login attempts'
 status: TRUE

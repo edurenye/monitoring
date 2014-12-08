@@ -1,7 +1,7 @@
 id: core_cron_last_run_age
 label: 'Last cron run age'
 description: 'Time since last cron run'
-sensor_id: cron_last_run_time
+plugin_id: cron_last_run_time
 value_type: time_interval
 category: 'Cron'
 status: TRUE

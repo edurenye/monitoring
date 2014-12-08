@@ -1,7 +1,7 @@
 id: monitoring_git_dirty_tree
 label: 'Git dirty working tree'
 description: 'Repository local file changes'
-sensor_id: monitoring_git_dirty_tree
+plugin_id: monitoring_git_dirty_tree
 category: 'System'
 value_type: 'string'
 status: FALSE

@@ -1,6 +1,6 @@
 id: maillog_records_count
 label: 'Maillog records count'
-sensor_id: database_aggregator
+plugin_id: database_aggregator
 value_label: 'Mail records'
 value_type: 'number'
 category: 'Other'

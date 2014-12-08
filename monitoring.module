@@ -576,7 +576,7 @@ function monitoring_node_type_insert(NodeTypeInterface $type) {
     'id' => 'node_new_' . $type->id(),
     'label' => String::format('New @type nodes', array('@type' => $type->label())),
     'description' => String::format('New nodes of type @type', array('@type' => $type->label())),
-    'sensor_id' => 'entity_aggregator',
+    'plugin_id' => 'entity_aggregator',
     'value_label' => String::format('@type nodes', array('@type' => $type->label())),
     'category' => 'Content',
     'status' => FALSE,
@@ -643,7 +643,7 @@ function monitoring_search_api_index_insert(IndexInterface $index) {
   $sensor = SensorConfig::create(array(
     'id' => 'search_api_' . $index->id(),
     'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
-    'sensor_id' => 'search_api_unindexed',
+    'plugin_id' => 'search_api_unindexed',
     'value_label' => 'Unindexed items',
     'category' => 'Search API',
     'caching_time' => 900,

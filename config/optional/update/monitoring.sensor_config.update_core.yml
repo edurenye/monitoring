@@ -3,7 +3,7 @@ status: true
 label: 'Core'
 description: 'Available updates for Drupal core'
 category: 'Update'
-sensor_id: update_status
+plugin_id: update_status
 value_type : 'number'
 value_label: 'Outdated modules'
 caching_time: '86400'

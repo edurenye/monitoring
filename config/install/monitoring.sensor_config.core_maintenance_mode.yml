@@ -1,7 +1,7 @@
 id: core_maintenance_mode
 label: 'Maintenance mode'
 description: 'Site maintenance mode'
-sensor_id: state_value
+plugin_id: state_value
 value_type: 'bool'
 category: 'Other'
 status: TRUE

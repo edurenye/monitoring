@@ -1,7 +1,7 @@
 id: core_theme_default
 label: 'Default theme'
 description: 'Site default theme'
-sensor_id: config_value
+plugin_id: config_value
 value_type: 'string'
 category: 'Other'
 status: FALSE

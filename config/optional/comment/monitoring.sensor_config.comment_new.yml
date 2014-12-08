@@ -2,7 +2,7 @@ id: comment_new
 label: 'New Comments'
 description: ''
 category: Content
-sensor_id: entity_aggregator
+plugin_id: entity_aggregator
 value_label: Comments
 value_type: 'number'
 status: FALSE

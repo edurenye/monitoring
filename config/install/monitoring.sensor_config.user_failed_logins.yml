@@ -2,7 +2,7 @@ id: user_failed_logins
 label: 'Failed user logins'
 description: 'Failed user logins by Watchdog'
 category: 'User activity'
-sensor_id: user_failed_logins
+plugin_id: user_failed_logins
 value_type: 'number'
 value_label: 'Login attempts'
 status: TRUE

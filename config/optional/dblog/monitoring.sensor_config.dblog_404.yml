@@ -2,7 +2,7 @@ id: dblog_404
 label: 'Page not found errors'
 description: 'Page not found errors logged by watchdog'
 category: Watchdog
-sensor_id: dblog_404
+plugin_id: dblog_404
 result_class: null
 value_label: 'Watchdog events'
 value_type: 'number'

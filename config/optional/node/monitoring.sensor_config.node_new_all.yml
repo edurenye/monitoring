@@ -1,7 +1,7 @@
 id: node_new_all
 label: 'All new nodes'
 description: 'All new nodes'
-sensor_id: entity_aggregator
+plugin_id: entity_aggregator
 value_type : 'number'
 value_label: 'Nodes'
 category: 'Content'

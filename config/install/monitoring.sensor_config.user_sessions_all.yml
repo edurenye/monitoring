@@ -2,7 +2,7 @@ id: user_sessions_all
 label: 'All active sessions'
 description: 'All active sessions of logged in and anonymous users without logout'
 category: 'User activity'
-sensor_id: database_aggregator
+plugin_id: database_aggregator
 value_type: 'number'
 value_label: 'Active sessions'
 status: TRUE
