@@ -4,7 +4,7 @@ namespace Drupal\monitoring\Controller;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\SensorConfigInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorManager;
 use Drupal\monitoring\SensorRunner;
@@ -80,7 +80,7 @@ class SensorList extends ControllerBase {
       );
       $ok_row_count = 0;
 
-      /** @var SensorConfig $sensor_config */
+      /** @var SensorConfigInterface $sensor_config */
       foreach ($category_sensor_config as $sensor_name => $sensor_config) {
         if (!isset($results[$sensor_name])) {
           continue;

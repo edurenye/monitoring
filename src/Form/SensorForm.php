@@ -9,7 +9,7 @@ namespace Drupal\monitoring\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\SensorConfigInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\monitoring\SensorPlugin\SensorPluginInterface;
 
@@ -25,7 +25,7 @@ class SensorForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $form['#tree'] = TRUE;
 
-    /** @var SensorConfig $sensor_config */
+    /** @var SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
 
     $form['category'] = array(
@@ -198,7 +198,7 @@ class SensorForm extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
-    /* @var SensorConfig $sensor_config */
+    /** @var SensorPluginInterface $plugin */
     $sensor_config = $this->entity;
     /** @var SensorPluginInterface $plugin */
     if ($sensor_config->isNew()) {
@@ -218,7 +218,7 @@ class SensorForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var SensorConfig $sensor_config */
+    /** @var SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
     $plugin = $sensor_config->getPlugin();
 
@@ -243,7 +243,7 @@ class SensorForm extends EntityForm {
    *
    * @return string
    */
-  public function formTitle(SensorConfig $monitoring_sensor_config) {
+  public function formTitle(SensorConfigInterface $monitoring_sensor_config) {
     return $this->t('@label settings (@category)', array('@category' => $monitoring_sensor_config->getCategory(), '@label' => $monitoring_sensor_config->getLabel()));
   }
 }

@@ -101,7 +101,7 @@ abstract class DatabaseAggregatorSensorPluginBase extends ThresholdsSensorPlugin
 
     /** @var SensorForm $sensor_form */
     $sensor_form = $form_state->getFormObject();
-    /** @var SensorConfig $sensor_config */
+    /** @var SensorConfigInterface $sensor_config */
     $sensor_config = $sensor_form->getEntity();
 
     // Copy time interval field & value into settings if the field is specified.

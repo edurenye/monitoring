@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Tests;
 
+use Drupal\monitoring\SensorConfigInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;

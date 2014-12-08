@@ -6,9 +6,10 @@
 
 namespace Drupal\monitoring\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\monitoring\SensorConfigInterface;
 
 /**
  * Represents a sensor config entity class.
@@ -42,7 +43,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   }
  * )
  */
-class SensorConfig extends ConfigEntityBase {
+class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
 
   /**
    * The config id.
@@ -122,44 +123,27 @@ class SensorConfig extends ConfigEntityBase {
   public $status = TRUE;
 
   /**
-   * Gets Sensor ID.
-   *
-   * @return string
-   *   Sensor ID.
+   * {@inheritdoc}
    */
   public function getName() {
     return $this->id;
   }
 
   /**
-   * Gets sensor label.
-   *
-   * The sensor label might not be self-explaining enough or unique without
-   * the category, the category should always be present when the label is
-   * displayed.
-   *
-   * @return string
-   *   Sensor label.
+   * {@inheritdoc}
    */
   public function getLabel() {
     return $this->label;
   }
-
   /**
-   * Gets sensor description.
-   *
-   * @return string
-   *   Sensor description.
+   * {@inheritdoc}
    */
   public function getDescription() {
     return $this->description;
   }
 
   /**
-   * Gets sensor plugin class.
-   *
-   * @return string
-   *   SensorPlugin class
+   * {@inheritdoc}
    */
   public function getSensorClass() {
     $definition = monitoring_sensor_manager()->getDefinition($this->plugin_id);
@@ -167,10 +151,7 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets the sensor plugin.
-   *
-   * @return \Drupal\monitoring\SensorPlugin\SensorPluginInterface
-   *   Instantiated sensor.
+   * {@inheritdoc}
    */
   public function getPlugin() {
     $configuration = array('sensor_info' => $this);
@@ -179,27 +160,14 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets sensor categories.
-   *
-   * @return string
-   *   Categories.
+   * {@inheritdoc}
    */
   public function getCategory() {
     return $this->category;
   }
 
   /**
-   * Gets sensor value label.
-   *
-   * In case the sensor defined a value_label, it will use it as label.
-   *
-   * Next if the sensor defines a value_type, it will use the label provided for
-   * that type by monitoring_value_types().
-   *
-   * If nothing is defined, it returns NULL.
-   *
-   * @return string|null
-   *   Sensor value label.
+   * {@inheritdoc}
    */
   public function getValueLabel() {
     if ($this->value_label) {
@@ -215,22 +183,14 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets sensor value type.
-   *
-   * @return string|null
-   *   Sensor value type.
-   *
-   * @see monitoring_value_types().
+   * {@inheritdoc}
    */
   public function getValueType() {
     return $this->value_type;
   }
 
   /**
-   * Determines if the sensor value is numeric.
-   *
-   * @return bool
-   *   TRUE if the sensor value is numeric.
+   * {@inheritdoc}
    */
   public function isNumeric() {
     $value_types = monitoring_value_types();
@@ -241,32 +201,21 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Determines if the sensor value type is boolean.
-   *
-   * @return bool
-   *   TRUE if the sensor value type is boolean.
+   * {@inheritdoc}
    */
   public function isBool() {
     return $this->getValueType() == 'bool';
   }
 
   /**
-   * Gets sensor caching time.
-   *
-   * @return int
-   *   Caching time in seconds.
+   * {@inheritdoc}
    */
   public function getCachingTime() {
     return $this->caching_time;
   }
 
   /**
-   * Gets configured threshold type.
-   *
-   * Defaults to none.
-   *
-   * @return string|null
-   *   Threshold type.
+   * {@inheritdoc}
    */
   public function getThresholdsType() {
     if (!empty($this->settings['thresholds']['type'])) {
@@ -277,13 +226,7 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets the configured threshold value.
-   *
-   * @param string $key
-   *   Name of the threshold, for example warning or critical.
-   *
-   * @return int|null
-   *   The threshold value or NULL if not configured.
+   * {@inheritdoc}
    */
   public function getThresholdValue($key) {
     if (isset($this->settings['thresholds'][$key]) && $this->settings['thresholds'][$key] !== '') {
@@ -292,73 +235,49 @@ class SensorConfig extends ConfigEntityBase {
   }
 
   /**
-   * Gets all settings.
-   *
-   * @return array
-   *   Settings as an array.
+   * {@inheritdoc}
    */
   public function getSettings() {
     return $this->settings;
   }
 
   /**
-   * Gets the time interval value.
-   *
-   * @return int
-   *   Number of seconds of the time interval.
-   *   NULL in case the sensor does not define the time interval.
+   * {@inheritdoc}
    */
   public function getTimeIntervalValue() {
     return $this->getSetting('time_interval_value', NULL);
   }
 
   /**
-   * Gets the setting of a key.
-   *
-   * @param string $key
-   *   Setting key.
-   * @param mixed $default
-   *   Default value if the setting does not exist.
-   *
-   * @return mixed
-   *   Setting value.
+   * {@inheritdoc}
    */
   public function getSetting($key, $default = NULL) {
     return isset($this->settings[$key]) ? $this->settings[$key] : $default;
   }
 
   /**
-   * Checks if sensor is enabled.
-   *
-   * @return bool
+   * {@inheritdoc}
    */
   public function isEnabled() {
     return (boolean) $this->status;
   }
 
   /**
-   * Checks if sensor provides extended info.
-   *
-   * @return bool
+   * {@inheritdoc}
    */
   public function isExtendedInfo() {
     return in_array('Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface', class_implements($this->getSensorClass()));
   }
 
   /**
-   * Checks if sensor defines thresholds.
-   *
-   * @return bool
+   * {@inheritdoc}
    */
   public function isDefiningThresholds() {
     return in_array('Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginInterface', class_implements($this->getSensorClass()));
   }
 
   /**
-   * Compiles sensor values to an associative array.
-   *
-   * @return array
-   *   Sensor config associative array.
+   * {@inheritdoc}
    */
   public function getDefinition() {
     $config = array(

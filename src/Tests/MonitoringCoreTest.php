@@ -11,7 +11,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\monitoring\Entity\SensorConfig;
-
+use Drupal\monitoring\SensorConfigInterface;
 
 /**
  * Tests for the core pieces of monitoring.

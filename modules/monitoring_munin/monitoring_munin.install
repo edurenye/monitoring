@@ -5,6 +5,7 @@
  */
 
 use Drupal\monitoring\Sensor\NonExistingSensorException;
+use Drupal\monitoring\SensorConfigInterface;
 
 /**
  * Implements hook_install()
@@ -26,7 +27,7 @@ function monitoring_munin_install() {
       if (isset($multigraph_info['categories'])) {
         foreach ($multigraph_info['categories'] as $category) {
           if (isset($sensor_config_by_categories[$category])) {
-            /** @var SensorConfig $sensor_config */
+            /** @var SensorConfigInterface $sensor_config */
             foreach ($sensor_config_by_categories[$category] as $sensor_config) {
               if ($sensor_config->isNumeric()) {
                 $settings = monitoring_sensor_settings_get($sensor_config->getName());

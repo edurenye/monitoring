@@ -8,7 +8,7 @@ namespace Drupal\monitoring\Form;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\SensorConfigInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -65,7 +65,7 @@ class SensorDetailForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    /** @var SensorConfig $sensor_config */
+    /** @var SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
     try {
       $results = $this->sensorRunner->runSensors(array($sensor_config), FALSE, TRUE);
@@ -224,7 +224,7 @@ class SensorDetailForm extends EntityForm {
    *
    * @return string
    */
-  public function formTitle(SensorConfig $monitoring_sensor_config) {
+  public function formTitle(SensorConfigInterface $monitoring_sensor_config) {
     return $this->t('@label (@category)', array('@category' => $monitoring_sensor_config->getCategory(), '@label' => $monitoring_sensor_config->getLabel()));
   }
 }

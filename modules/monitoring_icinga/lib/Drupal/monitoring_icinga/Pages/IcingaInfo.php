@@ -2,7 +2,7 @@
 
 namespace Drupal\monitoring_icinga\Pages;
 
-use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\SensorConfigInterface;
 
 class IcingaInfo {
 
@@ -165,7 +165,7 @@ active check of the sensor.'),
 
     $services_def = array();
     $servicegroups = array();
-    /** @var SensorConfig $sensor_config */
+    /** @var SensorConfigInterface $sensor_config */
     foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
 
       if (!$sensor_config->isEnabled()) {
