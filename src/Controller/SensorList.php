@@ -4,6 +4,7 @@ namespace Drupal\monitoring\Controller;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\SensorManager;
 use Drupal\monitoring\SensorRunner;
@@ -66,7 +67,7 @@ class SensorList extends ControllerBase {
     // Oldest sensor config.
     $oldest_sensor_config = NULL;
 
-    foreach ($this->sensorManager->getSensorConfigByCategories() as $category => $category_sensor_info) {
+    foreach ($this->sensorManager->getSensorConfigByCategories() as $category => $category_sensor_config) {
 
       // Category grouping row.
       $rows[] = array(
@@ -79,7 +80,8 @@ class SensorList extends ControllerBase {
       );
       $ok_row_count = 0;
 
-      foreach ($category_sensor_info as $sensor_name => $sensor_config) {
+      /** @var SensorConfig $sensor_config */
+      foreach ($category_sensor_config as $sensor_name => $sensor_config) {
         if (!isset($results[$sensor_name])) {
           continue;
         }
