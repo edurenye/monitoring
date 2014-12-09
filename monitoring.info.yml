@@ -9,6 +9,7 @@ test_dependencies:
  - simplenews
  - elysia_cron
  - payment
+ - captcha
 
 simplytest_dependencies:
  - monitoring_demo
