@@ -42,7 +42,7 @@ class DisappearedSensorsSensorPlugin extends SensorPluginBase {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     try {
-      $result = monitoring_sensor_run($this->sensorConfig->getName());
+      $result = monitoring_sensor_run($this->sensorConfig->id());
     } catch (\Exception $e) {
       // @todo: Figure out why this happens.
       drupal_set_message($e->getMessage(), 'error');

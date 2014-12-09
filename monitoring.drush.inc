@@ -169,7 +169,7 @@ function monitoring_drush_info_single($sensor_name) {
     return drush_set_error('MONITORING_SENSOR_INVALID_NAME', dt('Sensor "@name" does not exist.', array('@name' => $sensor_name)));
   }
 
-  $rows[] = array(String::format("@label (@name)", array('@label' => $sensor_config->getLabel(), '@name' => $sensor_config->getName())), '====================');
+  $rows[] = array(String::format("@label (@id)", array('@label' => $sensor_config->getLabel(), '@id' => $sensor_config->id())), '====================');
   $rows[] = array(dt('Category'), $sensor_config->getCategory());
   $rows[] = array(dt('Description'), $sensor_config->getDescription());
   $rows[] = array(dt('Value info'), String::format('type: @type, label: @label, numeric: @numeric', array(
@@ -259,9 +259,9 @@ function monitoring_drush_run($sensor_name = NULL) {
 function monitoring_drush_result_output_json(array $results, $expand = NULL) {
   $json_output = array();
   foreach ($results as $result) {
-    $json_output[$result->getSensorName()] = $result->toArray();
+    $json_output[$result->getSensorId()] = $result->toArray();
     if ($expand == 'sensor_info') {
-      $json_output[$result->getSensorName()]['sensor_info'] = $result->getSensorConfig()->toArray();
+      $json_output[$result->getSensorId()]['sensor_info'] = $result->getSensorConfig()->toArray();
     }
   }
   drush_print(Json::encode($json_output));
@@ -291,7 +291,7 @@ function monitoring_drush_result_output_table(array $results, $show_exec_time = 
  *   Sensor result object.
  */
 function monitoring_drush_result_output_table_single(SensorResultInterface $result) {
-  $rows[] = array(dt('Name'), $result->getSensorConfig()->getName());
+  $rows[] = array(dt('ID'), $result->getSensorConfig()->id());
   $rows[] = array(dt('Label'), $result->getSensorConfig()->getLabel());
   $rows[] = array(dt('Status'), $result->getStatusLabel());
   $rows[] = array(dt('Message'), $result->getMessage());
@@ -321,15 +321,15 @@ function monitoring_drush_result_output_table_multiple(array $results, $show_exe
   }
 
   foreach ($results as $result) {
-    $rows[$result->getSensorName()] = array(
-      String::format("@label\n(@name)", array('@label' => Unicode::truncate($result->getSensorConfig()->getLabel(), 40, TRUE, TRUE), '@name' => $result->getSensorName())),
+    $rows[$result->getSensorId()] = array(
+      String::format("@label\n(@id)", array('@label' => Unicode::truncate($result->getSensorConfig()->getLabel(), 40, TRUE, TRUE), '@id' => $result->getSensorId())),
       $result->getStatusLabel(),
       Unicode::truncate($result->getMessage(), 40, TRUE, TRUE),
       \Drupal::service('date.formatter')->formatInterval(time() - $result->getTimestamp()),
     );
 
     if ($show_exec_time) {
-      $rows[$result->getSensorName()][] = $result->getExecutionTime() . 'ms';
+      $rows[$result->getSensorId()][] = $result->getExecutionTime() . 'ms';
     }
   }
 

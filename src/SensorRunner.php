@@ -92,7 +92,7 @@ class SensorRunner {
     // Only load sensor caches if they define caching.
     foreach ($sensors_config as $sensor_config) {
       if ($sensor_config->getCachingTime()) {
-        $cids[] = $this->getSensorCid($sensor_config->getName());
+        $cids[] = $this->getSensorCid($sensor_config->id());
       }
     }
     if ($cids) {
@@ -159,14 +159,14 @@ class SensorRunner {
     $plugin = $sensor_config->getPlugin();
     // Check if sensor is enabled.
     if (!$plugin->isEnabled()) {
-      throw new DisabledSensorException(String::format('Sensor @sensor_name is not enabled and must not be run.', array('@sensor_name' => $sensor_config->getName())));
+      throw new DisabledSensorException(String::format('Sensor @sensor_name is not enabled and must not be run.', array('@sensor_name' => $sensor_config->id())));
     }
 
     $result = $this->getResultObject($sensor_config);
 
     // In case result is not yet cached run sensor.
     if (!$result->isCached()) {
-      Timer::start($sensor_config->getName());
+      Timer::start($sensor_config->id());
       try {
         $plugin->runSensor($result);
       } catch (\Exception $e) {
@@ -180,7 +180,7 @@ class SensorRunner {
         //   backtrace as part of the sensor verbose output.
       }
 
-      $timer = Timer::stop($sensor_config->getName());
+      $timer = Timer::stop($sensor_config->id());
       $result->setExecutionTime($timer['time']);
 
       // Capture verbose output if requested and if we are able to do so.
@@ -216,7 +216,7 @@ class SensorRunner {
 
       $old_status = NULL;
       // Try to load the previous log result for this sensor.
-      if ($last_result = monitoring_sensor_result_last($result->getSensorName())) {
+      if ($last_result = monitoring_sensor_result_last($result->getSensorId())) {
         $old_status = $last_result->sensor_status->value;
       }
 
@@ -267,7 +267,7 @@ class SensorRunner {
       $definition = $result->getSensorConfig();
       if ($definition->getCachingTime() && !$result->isCached()) {
         $data = array(
-          'name' => $result->getSensorName(),
+          'name' => $result->getSensorId(),
           'sensor_status' => $result->getStatus(),
           'sensor_message' => $result->getMessage(),
           'sensor_expected_value' => $result->getExpectedValue(),
@@ -276,7 +276,7 @@ class SensorRunner {
           'timestamp' => $result->getTimestamp(),
         );
         $this->cache->set(
-          $this->getSensorCid($result->getSensorName()),
+          $this->getSensorCid($result->getSensorId()),
           $data,
           REQUEST_TIME + $definition->getCachingTime(),
           array('monitoring_sensor_result')
@@ -297,8 +297,8 @@ class SensorRunner {
   protected function getResultObject(SensorConfig $sensor_config) {
     $result_class = '\Drupal\monitoring\Result\SensorResult';
 
-    if (!$this->forceRun && isset($this->sensorResultCache[$sensor_config->getName()])) {
-      $result = new $result_class($sensor_config, $this->sensorResultCache[$sensor_config->getName()]);
+    if (!$this->forceRun && isset($this->sensorResultCache[$sensor_config->id()])) {
+      $result = new $result_class($sensor_config, $this->sensorResultCache[$sensor_config->id()]);
     }
     else {
       $result = new $result_class($sensor_config);

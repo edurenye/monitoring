@@ -228,7 +228,7 @@ interface SensorResultInterface {
    *
    * @return string
    */
-  public function getSensorName();
+  public function getSensorId();
 
   /**
    * Gets sensor config.

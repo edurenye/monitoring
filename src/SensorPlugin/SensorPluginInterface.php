@@ -45,7 +45,7 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
    * @return string
    *   Sensor name.
    */
-  public function getSensorName();
+  public function getSensorId();
 
   /**
    * Runs the sensor, updating $sensor_result.

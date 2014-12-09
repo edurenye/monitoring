@@ -415,7 +415,7 @@ class MonitoringUITest extends MonitoringTestBase {
       $form_field_name = 'settings' . '[thresholds][' . $key . ']';
       $data[$form_field_name] = $value;
     }
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/' . $sensor_config->getName(), $data, t('Save'));
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/' . $sensor_config->id(), $data, t('Save'));
   }
 
   /**

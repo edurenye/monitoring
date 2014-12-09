@@ -6,14 +6,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 
 interface SensorConfigInterface extends ConfigEntityInterface {
   /**
-   * Gets Sensor ID.
-   *
-   * @return string
-   *   Sensor ID.
-   */
-  public function getName();
-
-  /**
    * Gets sensor label.
    *
    * The sensor label might not be self-explaining enough or unique without

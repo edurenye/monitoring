@@ -50,7 +50,7 @@ function monitoring_icinga_menu() {
  *   Icinga service description.
  */
 function monitoring_icinga_service_description(SensorConfig $sensor_config) {
-  return $sensor_config->getCategory() . ' - ' . $sensor_config->getLabel() . ' - ' . $sensor_config->getName();
+  return $sensor_config->getCategory() . ' - ' . $sensor_config->getLabel() . ' - ' . $sensor_config->id();
 }
 
 /**

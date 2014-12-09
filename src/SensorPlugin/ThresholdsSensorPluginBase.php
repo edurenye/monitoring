@@ -145,7 +145,7 @@ abstract class ThresholdsSensorPluginBase extends SensorPluginBase implements Th
    *   The validation message.
    */
   protected function setFormError($threshold_key, FormStateInterface $form_state, $message) {
-    $form_state->setErrorByName($this->sensorConfig->getName() . '][thresholds][' . $threshold_key, $message);
+    $form_state->setErrorByName($this->sensorConfig->id() . '][thresholds][' . $threshold_key, $message);
   }
 
   /**

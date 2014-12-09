@@ -75,7 +75,7 @@ class MultigraphForm extends EntityForm {
     $sensors_options = array();
     foreach ($sensors as $sensor) {
       if ($sensor->isNumeric()) {
-        $sensors_options[$sensor->getName()] = $sensor->getLabel();
+        $sensors_options[$sensor->id()] = $sensor->getLabel();
       }
     }
 

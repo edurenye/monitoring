@@ -125,13 +125,6 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
   /**
    * {@inheritdoc}
    */
-  public function getName() {
-    return $this->id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getLabel() {
     return $this->label;
   }
@@ -281,7 +274,7 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    */
   public function getDefinition() {
     $config = array(
-      'sensor' => $this->getName(),
+      'sensor' => $this->id(),
       'label' => $this->getLabel(),
       'category' => $this->getCategory(),
       'description' => $this->getDescription(),

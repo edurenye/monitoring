@@ -101,7 +101,7 @@ class SensorManager extends DefaultPluginManager {
     $enabled_sensors = array();
     foreach ($this->getAllSensorConfig() as $sensor_config) {
       if ($sensor_config->isEnabled()) {
-        $enabled_sensors[$sensor_config->getName()] = $sensor_config;
+        $enabled_sensors[$sensor_config->id()] = $sensor_config;
       }
     }
     return $enabled_sensors;

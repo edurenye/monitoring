@@ -205,7 +205,7 @@ class SensorResult implements SensorResultInterface {
 
       // Set the default message variables.
       $default_variables = array(
-        '@sensor' => $this->getSensorName(),
+        '@sensor' => $this->getSensorId(),
         '!formatted_value' => $this->getFormattedValue($this->getValue()),
         '@time' => $this->getTimestamp(),
         '!expected' => $msg_expected,
@@ -448,7 +448,7 @@ class SensorResult implements SensorResultInterface {
    */
   public function toArray() {
     return array(
-      'sensor_name' => $this->getSensorName(),
+      'sensor_name' => $this->getSensorId(),
       'value' => $this->getValue(),
       'expected_value' => $this->getExpectedValue(),
       'numeric_value' => $this->toNumber(),
@@ -476,8 +476,8 @@ class SensorResult implements SensorResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSensorName() {
-    return $this->sensorConfig->getName();
+  public function getSensorId() {
+    return $this->sensorConfig->id();
   }
 
   /**

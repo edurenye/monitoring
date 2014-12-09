@@ -188,7 +188,7 @@ class SensorDetailForm extends EntityForm {
     $view = Views::getView('monitoring_sensor_results');
     if (!empty($view)) {
       $view->initDisplay();
-      $output = $view->preview('detail_page_log', array($sensor_config->getName()));
+      $output = $view->preview('detail_page_log', array($sensor_config->id()));
       if (!empty($view->result)) {
         $form['sensor_log'] = array(
           '#type' => 'details',

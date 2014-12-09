@@ -106,9 +106,9 @@ function monitoring_munin_multigraph_delete($title) {
           unset($munin_settings['multigraphs'][$i]);
         }
       }
-      $settings = monitoring_sensor_settings_get($info->getName());
+      $settings = monitoring_sensor_settings_get($info->id());
       $settings['munin'] = $munin_settings;
-      monitoring_sensor_settings_save($info->getName(), $settings);
+      monitoring_sensor_settings_save($info->id(), $settings);
     }
   }
 }

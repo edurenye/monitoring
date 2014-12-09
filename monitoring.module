@@ -209,7 +209,7 @@ function monitoring_sensor_settings_get($sensor_name) {
  */
 function monitoring_sensor_result_save(SensorResultInterface $result) {
   $values = array(
-    'sensor_name' => $result->getSensorName(),
+    'sensor_name' => $result->getSensorId(),
     'sensor_status' => $result->getStatus(),
     'sensor_message' => $result->getMessage(),
     'sensor_value' => $result->getValue(),

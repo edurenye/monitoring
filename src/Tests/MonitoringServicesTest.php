@@ -78,7 +78,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertResponse(200);
 
     foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
-      $this->assertEqual($response_data[$sensor_name]['sensor'], $sensor_config->getName());
+      $this->assertEqual($response_data[$sensor_name]['sensor'], $sensor_config->id());
       $this->assertEqual($response_data[$sensor_name]['label'], $sensor_config->getLabel());
       $this->assertEqual($response_data[$sensor_name]['category'], $sensor_config->getCategory());
       $this->assertEqual($response_data[$sensor_name]['description'], $sensor_config->getDescription());
@@ -87,7 +87,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['caching_time'], $sensor_config->getCachingTime());
       $this->assertEqual($response_data[$sensor_name]['time_interval'], $sensor_config->getTimeIntervalValue());
       $this->assertEqual($response_data[$sensor_name]['enabled'], $sensor_config->isEnabled());
-      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->getName(), array('absolute' => TRUE))->toString());
+      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
       if ($sensor_config->isDefiningThresholds()) {
         $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getSetting('thresholds'));
@@ -102,7 +102,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $response_data = $this->doRequest('monitoring-sensor-info/' . $sensor_name);
     $this->assertResponse(200);
     $sensor_config = SensorConfig::load($sensor_name);
-    $this->assertEqual($response_data['sensor'], $sensor_config->getName());
+    $this->assertEqual($response_data['sensor'], $sensor_config->id());
     $this->assertEqual($response_data['label'], $sensor_config->getLabel());
     $this->assertEqual($response_data['category'], $sensor_config->getCategory());
     $this->assertEqual($response_data['description'], $sensor_config->getDescription());
@@ -111,7 +111,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['caching_time'], $sensor_config->getCachingTime());
     $this->assertEqual($response_data['time_interval'], $sensor_config->getTimeIntervalValue());
     $this->assertEqual($response_data['enabled'], $sensor_config->isEnabled());
-    $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->getName(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     if ($sensor_config->isDefiningThresholds()) {
       $this->assertEqual($response_data['thresholds'], $sensor_config->getSetting('thresholds'));
@@ -176,16 +176,16 @@ class MonitoringServicesTest extends RESTTestBase {
    *   Sensor config for which we have the result.
    */
   protected function assertSensorResult($response_result, SensorConfig $sensor_config) {
-    $this->assertEqual($response_result['sensor_name'], $sensor_config->getName());
+    $this->assertEqual($response_result['sensor_name'], $sensor_config->id());
     // Test the uri - the hardcoded endpoint is defined in the
     // monitoring_test.default_services.inc.
-    $this->assertEqual($response_result['uri'], Url::fromUri('base://monitoring-sensor-result/' . $sensor_config->getName(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_result['uri'], Url::fromUri('base://monitoring-sensor-result/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     // If the result is cached test also for the result values. In case of
     // result which is not cached we might not get the same values.
     if ($sensor_config->getCachingTime()) {
       // Cannot use $this->runSensor() as the cache needs to remain.
-      $result = monitoring_sensor_run($sensor_config->getName());
+      $result = monitoring_sensor_run($sensor_config->id());
       $this->assertEqual($response_result['status'], $result->getStatus());
       $this->assertEqual($response_result['value'], $result->getValue());
       $this->assertEqual($response_result['expected_value'], $result->getExpectedValue());

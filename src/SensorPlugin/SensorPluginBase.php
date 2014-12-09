@@ -75,8 +75,8 @@ abstract class SensorPluginBase implements SensorPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSensorName() {
-    return $this->sensorConfig->getName();
+  public function getSensorId() {
+    return $this->sensorConfig->id();
   }
 
   /**
