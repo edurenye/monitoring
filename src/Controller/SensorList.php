@@ -197,7 +197,7 @@ class SensorList extends ControllerBase {
         'drupalSettings' => [
           'monitoring_escalated_sensors' => $monitoring_escalated_sensors,
         ],
-        'library' => 'monitoring/monitoring',
+        'library' => ['monitoring/monitoring'],
       ],
     );
 

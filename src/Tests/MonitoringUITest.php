@@ -221,6 +221,10 @@ class MonitoringUITest extends MonitoringTestBase {
     // for the cached time as such test contains a risk of random fail.
     $this->assertRaw(String::format('Sensor %sensor (%category) cached before', array('%sensor' => 'Test sensor', '%category' => 'Test')));
 
+    // Assert if .js & .css are loaded.
+    $this->assertRaw('monitoring.js');
+    $this->assertRaw('monitoring.css');
+
     // Test the action buttons are clickable.
     $this->assertLink(t('Details'));
     $this->assertLink(t('Edit'));
