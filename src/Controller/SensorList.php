@@ -193,21 +193,12 @@ class SensorList extends ControllerBase {
         'class' => array('monitoring-severity-colors'),
         'id' => 'monitoring-sensors-overview',
       ),
-      '#attached' => array(
-        'css' => array(
-          drupal_get_path('module', 'monitoring') . '/monitoring.css',
-        ),
-        'js' => array(
-          array(
-            'data' => drupal_get_path('module', 'monitoring') . '/monitoring.js',
-            'type' => 'file',
-          ),
-          array(
-            'data' => array('monitoring_escalated_sensors' => $monitoring_escalated_sensors),
-            'type' => 'setting',
-          ),
-        ),
-      ),
+      '#attached' => [
+        'drupalSettings' => [
+          'monitoring_escalated_sensors' => $monitoring_escalated_sensors,
+        ],
+        'library' => 'monitoring/monitoring',
+      ],
     );
 
     return $output;

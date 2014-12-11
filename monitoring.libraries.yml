@@ -1,0 +1,6 @@
+monitoring:
+  css:
+    theme:
+      monitoring.css: {}
+  js:
+    monitoring.js: {}
