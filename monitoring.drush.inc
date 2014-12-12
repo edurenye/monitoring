@@ -32,7 +32,7 @@ define('MONITORING_DRUSH_SENSOR_STATUS_OK', 0);
  * Implements hook_drush_command().
  *
  * Provides commands:
- * - monitoring-info
+ * - monitoring-sensor-config
  * - monitoring-run
  * - monitoring-enable
  * - monitoring-disable
@@ -41,15 +41,15 @@ define('MONITORING_DRUSH_SENSOR_STATUS_OK', 0);
 function monitoring_drush_command() {
   $items = array();
 
-  $items['monitoring-info'] = array(
-    'callback' => 'monitoring_drush_info',
+  $items['monitoring-sensor-config'] = array(
+    'callback' => 'monitoring_drush_sensor_config',
     'description' => 'Displays information about available sensors. If a sensor name provided as argument a detailed sensor config is provided.',
     'arguments' => array(
       'sensor_name' => 'Specific sensor name for which we want to display info.'
     ),
     'examples' => array(
-      'drush monitoring-info' => 'Prints sensor config for all available sensors.',
-      'drush monitoring-info node_new' => 'Prints info of the node_new sensor.',
+      'drush monitoring-sensor-config' => 'Prints sensor config for all available sensors.',
+      'drush monitoring-sensor-config node_new' => 'Prints info of the node_new sensor.',
     ),
     'drupal dependencies' => array('monitoring'),
   );
@@ -64,7 +64,7 @@ function monitoring_drush_command() {
       'verbose' => 'Display verbose information.',
       'force' => 'If the sensor execution should be forced in case cached result is available.',
       'output' => 'The output format. Currently "table" and "json" available. Defaults to "table".',
-      'expand' => 'Relevant only for the json output. Currently "sensor_info" value supported.',
+      'expand' => 'Relevant only for the json output. Currently "sensor" value supported.',
       'show-exec-time' => 'Relevant for the table output listing all results. Will expand the table with execution time info.'
     ),
     'examples' => array(
@@ -124,19 +124,19 @@ function monitoring_drush_command() {
  * @param string $sensor_name
  *   Sensor name for which to print info.
  */
-function monitoring_drush_info($sensor_name = NULL) {
+function monitoring_drush_sensor_config($sensor_name = NULL) {
   if (empty($sensor_name)) {
-    monitoring_drush_info_all();
+    monitoring_drush_sensor_config_all();
   }
   else {
-    monitoring_drush_info_single($sensor_name);
+    monitoring_drush_sensor_config_single($sensor_name);
   }
 }
 
 /**
  * Provides info about available sensors.
  */
-function monitoring_drush_info_all() {
+function monitoring_drush_sensor_config_all() {
   $sensors_config_all = monitoring_sensor_manager()->getAllSensorConfig();
 
   $rows[] = array(dt('Label'), dt('Name'), dt('Category'), dt('Enabled'));
@@ -160,7 +160,7 @@ function monitoring_drush_info_all() {
  * @param string $sensor_name
  *   Sensor name for which to print info.
  */
-function monitoring_drush_info_single($sensor_name) {
+function monitoring_drush_sensor_config_single($sensor_name) {
   $sensor_config = NULL;
   try {
     $sensor_config = monitoring_sensor_manager()->getSensorConfigByName($sensor_name);
@@ -259,9 +259,10 @@ function monitoring_drush_run($sensor_name = NULL) {
 function monitoring_drush_result_output_json(array $results, $expand = NULL) {
   $json_output = array();
   foreach ($results as $result) {
-    $json_output[$result->getSensorId()] = $result->toArray();
-    if ($expand == 'sensor_info') {
-      $json_output[$result->getSensorId()]['sensor_info'] = $result->getSensorConfig()->toArray();
+    $sensor_name = $result->getSensorName();
+    $json_output[$sensor_name] = $result->toArray();
+    if ($expand == 'sensor') {
+      $json_output[$sensor_name]['sensor'] = $result->getSensorConfig()->toArray();
     }
   }
   drush_print(Json::encode($json_output));

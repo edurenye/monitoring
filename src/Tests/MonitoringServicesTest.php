@@ -53,7 +53,7 @@ class MonitoringServicesTest extends RESTTestBase {
     // Enable REST API for monitoring resources.
     $config = \Drupal::config('rest.settings');
     $settings = array(
-      'monitoring-sensor-info' => array(
+      'monitoring-sensor' => array(
         'GET' => array(
           'supported_formats' => array($this->defaultFormat),
           'supported_auth' => $this->defaultAuth,
@@ -70,7 +70,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $config->save();
     $this->rebuildCache();
 
-    $this->servicesAccount = $this->drupalCreateUser(array('restful get monitoring-sensor-info', 'restful get monitoring-sensor-result'));
+    $this->servicesAccount = $this->drupalCreateUser(array('restful get monitoring-sensor', 'restful get monitoring-sensor-result'));
   }
 
   /**
@@ -79,7 +79,7 @@ class MonitoringServicesTest extends RESTTestBase {
   public function testSensorConfig() {
     $this->drupalLogin($this->servicesAccount);
 
-    $response_data = $this->doRequest('monitoring-sensor-info');
+    $response_data = $this->doRequest('monitoring-sensor');
     $this->assertResponse(200);
 
     foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
@@ -92,7 +92,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['caching_time'], $sensor_config->getCachingTime());
       $this->assertEqual($response_data[$sensor_name]['time_interval'], $sensor_config->getTimeIntervalValue());
       $this->assertEqual($response_data[$sensor_name]['enabled'], $sensor_config->isEnabled());
-      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
       if ($sensor_config->isDefiningThresholds()) {
         $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getSetting('thresholds'));
@@ -100,11 +100,11 @@ class MonitoringServicesTest extends RESTTestBase {
     }
 
     $sensor_name = 'sensor_that_does_not_exist';
-    $this->doRequest('monitoring-sensor-info/' . $sensor_name);
+    $this->doRequest('monitoring-sensor/' . $sensor_name);
     $this->assertResponse(404);
 
     $sensor_name = 'dblog_event_severity_error';
-    $response_data = $this->doRequest('monitoring-sensor-info/' . $sensor_name);
+    $response_data = $this->doRequest('monitoring-sensor/' . $sensor_name);
     $this->assertResponse(200);
     $sensor_config = SensorConfig::load($sensor_name);
     $this->assertEqual($response_data['sensor'], $sensor_config->id());
@@ -116,7 +116,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['caching_time'], $sensor_config->getCachingTime());
     $this->assertEqual($response_data['time_interval'], $sensor_config->getTimeIntervalValue());
     $this->assertEqual($response_data['enabled'], $sensor_config->isEnabled());
-    $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor-info/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     if ($sensor_config->isDefiningThresholds()) {
       $this->assertEqual($response_data['thresholds'], $sensor_config->getSetting('thresholds'));
@@ -130,10 +130,10 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->drupalLogin($this->servicesAccount);
 
     // Test request for sensor results with expanded sensor config.
-    $response_data = $this->doRequest('monitoring-sensor-result', array('expand' => 'sensor_info'));
+    $response_data = $this->doRequest('monitoring-sensor-result', array('expand' => 'sensor'));
     $this->assertResponse(200);
     foreach (monitoring_sensor_manager()->getEnabledSensorConfig() as $sensor_name => $sensor_config) {
-      $this->assertTrue(isset($response_data[$sensor_name]['sensor_info']));
+      $this->assertTrue(isset($response_data[$sensor_name]['sensor']));
       $this->assertSensorResult($response_data[$sensor_name], $sensor_config);
     }
 
@@ -159,17 +159,17 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertResponse(404);
 
     $sensor_name = 'dblog_event_severity_error';
-    $response_data = $this->doRequest('monitoring-sensor-result/' . $sensor_name, array('expand' => 'sensor_info'));
+    $response_data = $this->doRequest('monitoring-sensor-result/' . $sensor_name, array('expand' => 'sensor'));
     $this->assertResponse(200);
-    // The response must contain the sensor_info.
-    $this->assertTrue(isset($response_data['sensor_info']));
+    // The response must contain the sensor.
+    $this->assertTrue(isset($response_data['sensor']));
     $this->assertSensorResult($response_data, SensorConfig::load($sensor_name));
 
     // Try a request without expanding the sensor config and check that it is not
     // present.
     $response_data = $this->doRequest('monitoring-sensor-result/' . $sensor_name);
     $this->assertResponse(200);
-    $this->assertTrue(!isset($response_data['sensor_info']));
+    $this->assertTrue(!isset($response_data['sensor']));
   }
 
   /**

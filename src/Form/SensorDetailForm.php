@@ -79,7 +79,7 @@ class SensorDetailForm extends EntityForm {
     }
 
     if ($sensor_config->getDescription()) {
-      $form['sensor_info']['description'] = array(
+      $form['sensor_config']['description'] = array(
         '#type' => 'item',
         '#title' => $this->t('Description'),
         '#markup' => $sensor_config->getDescription(),
@@ -87,7 +87,7 @@ class SensorDetailForm extends EntityForm {
     }
 
     if ($sensor_config->getCategory()) {
-      $form['sensor_info']['category'] = array(
+      $form['sensor_config']['category'] = array(
         '#type' => 'item',
         '#title' => $this->t('Category'),
         '#markup' => $sensor_config->getCategory(),
@@ -128,7 +128,7 @@ class SensorDetailForm extends EntityForm {
       $form['sensor_result']['force_run'] = array(
         '#type' => 'submit',
         '#value' => $this->t('Run now'),
-	'#access' => \Drupal::currentUser()->hasPermission('monitoring force run'),
+        '#access' => \Drupal::currentUser()->hasPermission('monitoring force run'),
       );
     }
     elseif ($sensor_config->getCachingTime()) {

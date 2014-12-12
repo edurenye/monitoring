@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
  * Provides a resource for monitoring sensors.
  *
  * @RestResource(
- *   id = "monitoring-sensor-info",
+ *   id = "monitoring-sensor",
  *   label = @Translation("Monitoring sensor config")
  * )
  */
@@ -101,14 +101,14 @@ class MonitoringSensorConfigResource extends ResourceBase {
         throw new NotFoundHttpException($e->getMessage(), $e);
       }
       $response = $sensor_config->getDefinition();
-      $response['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor-info/' . $sensor_name);
+      $response['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor/' . $sensor_name);
       return new ResourceResponse($response);
     }
 
     $list = array();
     foreach ($this->sensorManager->getAllSensorConfig() as $sensor_name => $sensor_config) {
       $list[$sensor_name] = $sensor_config->getDefinition();
-      $list[$sensor_name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor-info/' . $sensor_name);
+      $list[$sensor_name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor/' . $sensor_name);
     }
     return new ResourceResponse($list);
   }

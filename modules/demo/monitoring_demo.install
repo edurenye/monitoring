@@ -19,7 +19,7 @@ function monitoring_demo_install() {
 
   // Enable REST API for monitoring resources.
   $settings = array(
-    'monitoring-sensor-info' => array(
+    'monitoring-sensor' => array(
       'GET' => array(
         'supported_formats' => array('hal_json'),
         'supported_auth' => array('cookie'),

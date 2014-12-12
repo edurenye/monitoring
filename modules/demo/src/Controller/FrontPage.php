@@ -61,8 +61,8 @@ class FrontPage extends ControllerBase {
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(
-            t('Drush integration - open up your console and type in # drush monitoring-info or # drush monitoring-run. See the drush help for more info and commands.'),
-            t('REST resource for both the info about sensors and running the sensors via the service. Open up your REST client and visit /monitoring-sensor-info/{sensor_name} and /monitoring-sensor-result/{sensor_name}'),
+            t('Drush integration - open up your console and type in # drush monitoring-sensor-config or # drush monitoring-run. See the drush help for more info and commands.'),
+            t('REST resource for both the info about sensors and running the sensors via the service. Open up your REST client and visit /monitoring-sensor/{sensor_name} and /monitoring-sensor-result/{sensor_name}'),
           )
         ),
       ),

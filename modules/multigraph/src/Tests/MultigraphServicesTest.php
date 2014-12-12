@@ -92,7 +92,7 @@ class MultigraphServicesTest extends RESTTestBase {
 
     // Test response for non-existing multigraph.
     $name = 'multigraph_that_does_not_exist';
-    $this->doRequest('monitoring-sensor-info/' . $name);
+    $this->doRequest('monitoring-sensor/' . $name);
     $this->assertResponse(404);
 
     // Test the predefined multigraph.

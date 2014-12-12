@@ -67,7 +67,7 @@ class SensorManager extends DefaultPluginManager {
   public function createInstance($plugin_id, array $configuration = array()) {
     // Configuration contains SensorConfig object. Extracting
     // it to use for sensor object creation.
-    $sensor_config = $configuration['sensor_info'];
+    $sensor_config = $configuration['sensor_config'];
     $definition = $this->getDefinition($plugin_id);
     // SensorPlugin class from the sensor definition.
     /** @var SensorPluginInterface $class */

@@ -147,7 +147,7 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    * {@inheritdoc}
    */
   public function getPlugin() {
-    $configuration = array('sensor_info' => $this);
+    $configuration = array('sensor_config' => $this);
     $plugin = monitoring_sensor_manager()->createInstance($this->plugin_id, $configuration);
     return $plugin;
   }

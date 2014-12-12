@@ -47,7 +47,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
   public function testAPI() {
 
     // == Test sensor config. == //
-    $sensor_config = SensorConfig::load('test_sensor_info');
+    $sensor_config = SensorConfig::load('test_sensor_config');
 
     $this->assertEqual($sensor_config->getLabel(), 'Test sensor config');
     $this->assertEqual($sensor_config->getDescription(), 'To test correct sensor config hook implementation precedence.');
