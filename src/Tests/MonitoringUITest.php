@@ -62,7 +62,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // Tests the fields 'Sensor Plugin' & 'Entity Type' appear.
     $this->drupalGet('admin/config/system/monitoring/sensors/user_new');
-    $this->assertOptionSelected('edit-settings-old-entity-type', 'user');
+    $this->assertOptionSelected('edit-settings-entity-type', 'user');
     $this->assertText('Sensor Plugin');
     $this->assertText('Entity Aggregator');
   }
@@ -193,6 +193,13 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring');
     $this->assertText('0 druplicons');
     $this->assertNoText('0 druplicons in');
+
+    // Update the time interval field with an invalid value.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+      'settings[aggregation][time_interval_field]' => 'invalid-field',
+    ), t('Save'));
+    // Assert the error message.
+    $this->assertText('The specified time interval field invalid-field does not exist or is not type timestamp.');
   }
 
   /**

@@ -7,15 +7,16 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
-use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\TypedData;
 use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\monitoring\Result\SensorResultInterface;
+use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -156,29 +157,20 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
-    $conditions = array(array('field' => '', 'value' => ''));
     $settings = $this->sensorConfig->getSettings();
-
-    if (isset($this->sensorConfig->settings['entity_type'])) {
-      $form['old_entity_type'] = array(
-        '#type' => 'select',
-        '#default_value' => $this->getEntityType(),
-        '#maxlength' => 255,
-        '#options' => $this->entityManager->getEntityTypeLabels(),
-        '#title' => t('Entity Type'),
-      );
-      if (isset($settings['conditions'])) {
-        $conditions = $settings['conditions'];
-      }
+    $conditions = array(array('field' => '', 'value' => ''));
+    if (isset($settings['conditions'])) {
+      $conditions = $settings['conditions'];
     }
-    else {
-      $form['entity_type'] = array(
-        '#type' => 'select',
-        '#default_value' => $this->getEntityType(),
-        '#options' => $this->entityManager->getEntityTypeLabels(),
-        '#title' => t('Entity Type'),
-        '#required' => TRUE,
-      );
+    $form['entity_type'] = array(
+      '#type' => 'select',
+      '#default_value' => $this->getEntityType(),
+      '#maxlength' => 255,
+      '#options' => $this->entityManager->getEntityTypeLabels(),
+      '#title' => t('Entity Type'),
+    );
+    if (!isset($settings['entity_type'])) {
+      $form['entity_type']['#required'] = TRUE;
     }
 
     /*    if (isset($form_state['values']['settings']['conditions']['table'])) {
@@ -259,5 +251,26 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       $form_state->setValue(array('settings', 'conditions', 'table'), array(array('field' => '', 'value' => '')));
     }
   }
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::validateConfigurationForm($form, $form_state);
 
+    $field_name = $form_state->getValue(array('settings', 'aggregation', 'time_interval_field'));
+    if (!empty($field_name)) {
+      // @todo instead of validate, switch to a form select.
+      $entity_type = $form_state->getValue(array('settings', 'entity_type'));
+      $entity_info = $this->entityManager->getFieldStorageDefinitions($entity_type);
+      $data_type = NULL;
+      if (!empty($entity_info[$field_name])) {
+        $data_type = $entity_info[$field_name]->getPropertyDefinition('value')->getDataType();
+
+      }
+      if ($data_type != 'timestamp') {
+        $form_state->setErrorByName('settings][aggregation][time_interval_field',
+          t('The specified time interval field %name does not exist or is not type timestamp.', array('%name' => $field_name)));
+      }
+    }
+  }
 }
