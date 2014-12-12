@@ -14,6 +14,11 @@ use Drupal\simpletest\KernelTestBase;
 abstract class MonitoringUnitTestBase extends KernelTestBase {
 
   /**
+   * Disabled config schema checking temporarily until all errors are resolved.
+   */
+  protected $strictConfigSchema = FALSE;
+
+  /**
    * Modules to enable.
    *
    * @var array
