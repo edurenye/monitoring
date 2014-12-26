@@ -31,12 +31,60 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    module_load_include('inc', 'system', 'system.admin');
+    // Run the sensor to current setting and display the update button if
+    // sensor result is critical.
+    $configured_modules = array_filter($this->sensorConfig->getSetting('modules', NULL));
+
+    // If the sensor is not configured, select enabled modules.
+    if (!$configured_modules) {
+      $enabled_modules = Drupal::moduleHandler()->getModuleList();
+      // Reduce to the module name only.
+      $configured_modules = array_combine(array_keys($enabled_modules), array_keys($enabled_modules));
+    }
+    // Otherwise test run the sensor.
+    else {
+      // Run on a temporary sensor config id with some changes.
+      /** @var Drupal\monitoring\Entity\SensorConfig $run_config */
+      $run_config = $this->sensorConfig->createDuplicate();
+      // Avoid name clashes in SensorManager / caching.
+      $run_config->id = $this->sensorConfig->id() . '_temp';
+      // Force enabling the sensor for running.
+      $run_config->status = TRUE;
+      // Force no additional allowed to make differences visible in message.
+      $run_config->settings['allow_additional'] = FALSE;
+
+      /** @var Drupal\monitoring\Result\SensorResult $result */
+      $result = \Drupal::service('monitoring.sensor_runner')
+        ->runSensors(array($run_config->id() => $run_config), TRUE)[$run_config->id()];
+
+      if($result->isCritical()) {
+        $message = $result->getMessage();
+
+        // Display message and button to update selection.
+        $form['update_modules']['message'] = array(
+          '#type' => 'item',
+          '#title' => t('Test run message'),
+          '#markup' => $message,
+        );
+
+        $form['update_modules']['update'] = array(
+          '#type' => 'submit',
+          '#value' => t('Update module selection'),
+          '#limit_validation_errors' => array(),
+          '#submit' => array(array($this, 'updateModuleListSubmit')),
+          '#ajax' => array(
+            'callback' => '::updateSelectedPluginType',
+            'wrapper' => 'monitoring-sensor-plugin',
+            'method' => 'replace',
+          ),
+        );
+      }
+    }
 
     $form['allow_additional'] = array(
       '#type' => 'checkbox',
       '#title' => t('Allow additional modules to be enabled'),
-      '#description' => t('If checked the additional modules being enabled will not be considered as an error state.'),
+      '#description' => t('If checked additionally enabled modules will not be considered a critical state.'),
       '#default_value' => $this->sensorConfig->getSetting('allow_additional'),
     );
 
@@ -46,15 +94,6 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     $modules = system_rebuild_module_data();
 
     uasort($modules, 'system_sort_modules_by_info_name');
-
-    $default_value = array_filter($this->sensorConfig->getSetting('modules', NULL));
-    // array_filter is needed to get rid off default empty setting.
-    // See monitoring.sensor_config.monitoring_enabled_modules.yml
-    if (empty($default_value)) {
-      $enabled_modules = Drupal::moduleHandler()->getModuleList();
-      // Reduce to the module name only.
-      $default_value = array_combine(array_keys($enabled_modules), array_keys($enabled_modules));
-    }
 
     $visible_modules = array();
     $visible_default_value = array();
@@ -73,14 +112,14 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
       }
       if (!empty($module_data->info['hidden'])) {
         $hidden_modules[$module] = $module_data->info['name'] . ' (' . $module . ')';
-        if (!empty($default_value[$module])) {
-          $hidden_default_value[$module] = $default_value[$module];
+        if (!empty($configured_modules[$module])) {
+          $hidden_default_value[$module] = $configured_modules[$module];
         }
       }
       else {
         $visible_modules[$module] = $module_data->info['name'] . ' (' . $module . ')';
-        if (!empty($default_value[$module])) {
-          $visible_default_value[$module] = $default_value[$module];
+        if (!empty($configured_modules[$module])) {
+          $visible_default_value[$module] = $configured_modules[$module];
         }
       }
     }
@@ -192,4 +231,25 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     $result->setValue($delta);
   }
 
+  /**
+   * Updates the module selection and override user input.
+   */
+  public function updateModuleListSubmit(array &$form, FormStateInterface $form_state) {
+
+    // Get the installed module list.
+    $enabled_modules = Drupal::moduleHandler()->getModuleList();
+
+    // Reduce to the module name only.
+    $default_value = array_combine(array_keys($enabled_modules), array_keys($enabled_modules));
+
+    // Override the current input values to the default configuration.
+    $user_input = $form_state->getUserInput();
+    $user_input['settings']['modules'] = $default_value;
+    $form_state->setUserInput($user_input);
+    $entity = $form_state->getFormObject()->getEntity();
+    $entity->settings['modules'] = $default_value;
+    $form_state->setRebuild(TRUE);
+
+    drupal_set_message(t('Module list updateed, Save to confirm.'));
+  }
 }

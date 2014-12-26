@@ -432,6 +432,13 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
 
+    // Visit settings page of the disabled sensor. We run the sensor to check
+    // for deltas. This led to fatal errors with a disabled sensor.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
+
+    // Enable the sensor.
+    monitoring_sensor_manager()->enableSensor('monitoring_enabled_modules');
+
     // Test submitting the defaults and enabling the sensor.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
       'status' => TRUE,
@@ -459,37 +466,39 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual($result->getMessage(), '2 modules delta, expected 0, Following modules are expected to be installed: Book (book), Contact (contact)');
     $this->assertEqual($result->getValue(), 2);
 
+    // Reset modules selection with the update selection (ajax) button.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
+    $this->drupalPostAjaxForm(NULL, array(), array('op' => t('Update module selection')));
+    $this->drupalPostForm(NULL, array(), t('Save'));
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), '0 modules delta');
+
     // The default setting is not to allow additional modules. Enable comment
     // and the sensor should escalate to CRITICAL.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
-      // Do not require contact and book as they are not installed.
-      'settings[modules][contact]' => FALSE,
-      'settings[modules][book]' => FALSE,
-    ), t('Save'));
-    // Reset the sensor config so that it reflects changes done via POST.
-    monitoring_sensor_manager()->resetCache();
     \Drupal::service('module_installer')->install(array('help'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Help (help)');
     $this->assertEqual($result->getValue(), 1);
-
-    // Allow additional, the sensor should not escalate.
-    // @todo - for unknown reason doing a post request will not save the setting
-    //   at the d.o testbot. This is especially strange because code above works
-    //   fine. For the moment using the new manager saveSettings() method and
-    //   later on we can sort this out in https://drupal.org/node/2183895.
-    /*
+    // Allow additional, the sensor should not escalate anymore.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
-      // Do not require contact and book as they are not installed.
-      $form_key . '[allow_additional]' => TRUE,
+      'settings[allow_additional]' => 1,
     ), t('Save'));
-    */
+    // This properly saves and is visible if we reload.
+    // $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
+    // For some strange reason, the sensor config does not reflect the new
+    // situation even if we reset the cache.
+    // monitoring_sensor_manager()->resetCache();
+    // @todo Check caches and why this workaround is needed.
+    // Additionally directly save the updated config.
     $sensor_config = SensorConfig::load('monitoring_enabled_modules');
     $sensor_config->settings['allow_additional'] = TRUE;
     $sensor_config->save();
+
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), '0 modules delta');
   }
 
   /**

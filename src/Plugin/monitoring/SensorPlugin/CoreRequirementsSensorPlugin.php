@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\String;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
