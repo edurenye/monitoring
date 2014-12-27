@@ -11,6 +11,11 @@ namespace Drupal\monitoring\Tests;
  */
 class MonitoringCaptchaTest extends MonitoringTestBase {
 
+ /**
+  * Disabled config schema checking temporarily until all errors are resolved.
+  */
+ protected $strictConfigSchema = FALSE;
+
   public static $modules = array('captcha');
 
   public static function getInfo() {

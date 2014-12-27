@@ -12,12 +12,6 @@ use Drupal\simpletest\KernelTestBase;
  * Base class for all monitoring tests.
  */
 abstract class MonitoringUnitTestBase extends KernelTestBase {
-
-  /**
-   * Disabled config schema checking temporarily until all errors are resolved.
-   */
-  protected $strictConfigSchema = FALSE;
-
   /**
    * Modules to enable.
    *

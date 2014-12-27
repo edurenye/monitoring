@@ -14,11 +14,6 @@ use Drupal\simpletest\WebTestBase;
 abstract class MonitoringTestBase extends WebTestBase {
 
   /**
-   * Disabled config schema checking temporarily until all errors are resolved.
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Modules to enable.
    *
    * @var array

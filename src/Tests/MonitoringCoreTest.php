@@ -761,7 +761,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $sensor_config->settings['conditions'] = array(
       'test' => array('field' => 'term_reference.target_id', 'value' => $term1->id()),
     );
-    $sensor_config->settings['table'] = 'node';
+    $sensor_config->settings['entity_type'] = 'node';
     $sensor_config->save();
     $result = $this->runSensor('db_aggregate_test');
     // There should be three nodes with that reference.

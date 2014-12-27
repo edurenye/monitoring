@@ -161,8 +161,10 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     $hidden_modules = $form_state->getValue(array(
       'settings', 'extended', 'modules_hidden'));
     $modules = array_merge(array_filter($modules), array_filter($hidden_modules));
-    unset($sensor_config->settings['extended']);
     $sensor_config->settings['modules'] = $modules;
+
+    unset($sensor_config->settings['extended']);
+    unset($sensor_config->settings['update_modules']);
 
     return $form_state;
   }

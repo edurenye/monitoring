@@ -13,7 +13,6 @@ settings:
     type: 'falls'
     warning: 2
     critical: 1
-  table: 'watchdog'
   time_interval_field: 'created'
   time_interval_value: 86400
   conditions:

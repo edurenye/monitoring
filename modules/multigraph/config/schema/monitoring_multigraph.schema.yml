@@ -1,4 +1,4 @@
-monitoring_multigraph.*:
+monitoring_multigraph.multigraph.*:
   type: config_entity
   label: 'Monitoring Multigraph'
   mapping:

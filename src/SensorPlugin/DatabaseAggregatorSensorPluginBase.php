@@ -113,13 +113,13 @@ abstract class DatabaseAggregatorSensorPluginBase extends ThresholdsSensorPlugin
 
        $sensor_config->settings['time_interval_value'] = $interval_value;
        // Remove UI structure originated settings leftover.
-       unset($sensor_config->settings['aggregation']);
      }
-    else {
-      // For consistency, empty the field + value setting if no field defined.
-      unset($sensor_config->settings['time_interval_field']);
-      unset($sensor_config->settings['time_interval_value']);
-    }
+     else {
+       // For consistency, empty the field + value setting if no field defined.
+       unset($sensor_config->settings['time_interval_field']);
+       unset($sensor_config->settings['time_interval_value']);
+     }
+    unset($sensor_config->settings['aggregation']);
     return $form_state;
   }
 
