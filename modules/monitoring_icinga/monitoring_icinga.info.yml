@@ -1,8 +1,0 @@
-name: Monitoring Icinga
-type: module
-description: Monitoring Icinga integration.
-package: Monitoring
-core: 8.x
-
-dependencies:
- - monitoring
