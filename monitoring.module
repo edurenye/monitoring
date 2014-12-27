@@ -170,35 +170,6 @@ function monitoring_sensor_action_title($action, SensorConfig $sensor_config) {
 }
 
 /**
- * Saves sensor settings.
- *
- * @param string $sensor_name
- *   Sensor name.
- * @param array $values
- *   Settings to be saved.
- */
-function monitoring_sensor_settings_save($sensor_name, $values) {
-  \Drupal::config('monitoring.settings')->set($sensor_name, $values)->save();
-  // After settings save reset the cache.
-  monitoring_sensor_manager()->resetCache();
-  // Changed settings might affect the sensor result.
-  \Drupal::service('monitoring.sensor_runner')->resetCache(array($sensor_name));
-}
-
-/**
- * Gets sensor settings.
- *
- * @param string $sensor_name
- *   Sensor name.
- *
- * @return array
- *   Sensor saved settings.
- */
-function monitoring_sensor_settings_get($sensor_name) {
-  return (array)\Drupal::config('monitoring.settings')->get($sensor_name);
-}
-
-/**
  * Saves the sensor result.
  *
  * @param SensorResultInterface $result
