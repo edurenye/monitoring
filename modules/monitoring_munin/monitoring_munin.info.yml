@@ -1,8 +1,0 @@
-name: Monitoring Munin
-type: module
-description: Monitoring Munin integration.
-package: Monitoring
-core: 8.x
-
-dependencies:
- - monitoring
