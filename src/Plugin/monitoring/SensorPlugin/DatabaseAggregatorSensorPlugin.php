@@ -55,7 +55,14 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    return "Query:\n{$this->queryString}\n\nArguments:\n" . var_export($this->queryArguments, TRUE);
+
+    $verbose = array();
+    $verbose[] = "<pre>";
+    $verbose[] = "Query:\n{$this->queryString}";
+    $verbose[] = "Arguments:\n" . var_export($this->queryArguments, TRUE);
+    $verbose[] = "</pre>";
+
+    return implode("\n", $verbose);
   }
 
   /**

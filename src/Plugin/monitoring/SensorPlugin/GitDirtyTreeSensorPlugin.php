@@ -59,9 +59,14 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    $output = 'CMD: ' . $this->buildCMD();;
-    $output .= "\n\n" . $this->cmdOutput;
-    return $output;
+
+    $output = array();
+    $output[] = "<pre>";
+    $output[] = 'CMD: ' . $this->buildCMD();
+    $output[] = '';
+    $output[] = $this->cmdOutput;
+    $output[] = "<pre>";
+    return implode("\n", $output);
   }
 
   /**

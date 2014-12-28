@@ -162,6 +162,17 @@ monitoring.settings.payment_turnover:
   type: monitoring.settings.aggregator_base
   label: 'Payment turnover sensor settings'
 
+monitoring.settings.view_display_aggregator:
+  type: monitoring.settings_base
+  label: 'View display aggregator sensor settings'
+  mapping:
+    view:
+      type: string
+      label: 'View'
+    display:
+      type: string
+      label: 'Display'
+
 monitoring.settings.dblog_404:
   type: monitoring.settings.database_aggregator
   label: '404 settings'
