@@ -477,6 +477,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // The default setting is not to allow additional modules. Enable comment
     // and the sensor should escalate to CRITICAL.
     \Drupal::service('module_installer')->install(array('help'));
+    // The container is rebuilt and needs to be reassigned to avoid static
+    // config cache issues. See https://www.drupal.org/node/2398867
+    $this->container = \Drupal::getContainer();
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Help (help)');
@@ -485,17 +488,6 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
       'settings[allow_additional]' => 1,
     ), t('Save'));
-    // This properly saves and is visible if we reload.
-    // $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
-    // For some strange reason, the sensor config does not reflect the new
-    // situation even if we reset the cache.
-    // monitoring_sensor_manager()->resetCache();
-    // @todo Check caches and why this workaround is needed.
-    // Additionally directly save the updated config.
-    $sensor_config = SensorConfig::load('monitoring_enabled_modules');
-    $sensor_config->settings['allow_additional'] = TRUE;
-    $sensor_config->save();
-
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), '0 modules delta');
