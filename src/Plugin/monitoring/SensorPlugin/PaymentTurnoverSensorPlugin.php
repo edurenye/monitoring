@@ -19,6 +19,7 @@ use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
  *   id = "payment_turnover",
  *   label = @Translation("Payment Turnover"),
  *   description = @Translation("Monitors how much money was transferred for payments with effective date."),
+ *   provider = "payment",
  *   addable = TRUE
  * )
  */

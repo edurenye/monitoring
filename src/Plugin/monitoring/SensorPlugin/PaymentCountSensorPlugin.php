@@ -16,6 +16,7 @@ use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
  *   id = "payment_count",
  *   label = @Translation("Payment Count"),
  *   description = @Translation("Monitors the number of successful transactions for payments with effective date."),
+ *   provider = "payment",
  *   addable = TRUE
  * )
  */
