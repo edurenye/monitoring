@@ -9,13 +9,13 @@ result_logging: TRUE
 caching_time: 3600
 settings:
   entity_type: 'node'
-  thresholds:
-    type: 'falls'
-    warning: 2
-    critical: 1
   time_interval_field: 'created'
   time_interval_value: 86400
   conditions:
     -
       field: 'type'
       value: 'page'
+thresholds:
+  type: 'falls'
+  warning: 2
+  critical: 1

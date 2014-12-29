@@ -185,6 +185,11 @@ class SensorResult implements SensorResultInterface {
       elseif ($this->getExpectedValue() !== NULL) {
         $this->assessComparison();
       }
+      elseif ($this->getSensorConfig()->isNumeric()) {
+        // Numeric sensors that do not have thresholds or an expected value
+        // default to OK.
+        $this->setStatus(SensorResultInterface::STATUS_OK);
+      }
     }
 
     if ($this->getSensorConfig()->getValueType() == 'bool') {

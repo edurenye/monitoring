@@ -7,7 +7,6 @@
 namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Form\SensorForm;
 
 /**
@@ -24,7 +23,7 @@ use Drupal\monitoring\Form\SensorForm;
  *
  * Adds time interval to sensor settings form.
  */
-abstract class DatabaseAggregatorSensorPluginBase extends ThresholdsSensorPluginBase {
+abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
 
   /**
    * Gets conditions to be used in the select query.

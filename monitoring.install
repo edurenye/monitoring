@@ -31,9 +31,6 @@ function monitoring_install() {
         'status' => TRUE,
         'caching_time' => 600,
         'settings' => array(
-          'thresholds' => array(
-            'type' => 'falls',
-          ),
           'entity_type' => 'node',
           'conditions' => array(
             array('field' => 'type', 'value' => $node_type->type),
@@ -51,8 +48,8 @@ function monitoring_install() {
   if (\Drupal::moduleHandler()->moduleExists('search_api')) {
     foreach (Index::loadMultiple() as $index) {
       $sensor = SensorConfig::create(array(
-        'id' => 'search_api_' . $index->machine_name,
-        'label' => String::format('Search index queue size of @index', array('@index' => $index->name)),
+        'id' => 'search_api_' . $index->id(),
+        'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
         'plugin_id' => 'search_api_unindexed',
         'value_label' => 'Unindexed items',
         'category' => 'Search API',
@@ -98,17 +95,17 @@ function monitoring_install() {
       'caching_time' => $caching_time,
       'status' => TRUE,
       'settings' => array(
-        'thresholds' => array(
-          'type' => 'exceeds',
-          'warning' => $warning_threshold,
-          'critical' => $critical_threshold,
-        ),
         'table' => 'watchdog',
         'conditions' => array(
           array('field' => 'severity', 'value' => $level),
         ),
         'time_interval_field' => 'timestamp',
         'time_interval_value' => 86400,
+      ),
+      'thresholds' => array(
+        'type' => 'exceeds',
+        'warning' => $warning_threshold,
+        'critical' => $critical_threshold,
       ),
     ));
     $sensor->save();
@@ -127,11 +124,6 @@ function monitoring_install() {
       'caching_time' => 3600,
       'status' => TRUE,
       'settings' => array(
-        'thresholds' => array(
-          'type' => 'exceeds',
-          'warning' => 5,
-          'critical' => 20,
-        ),
         'table' => 'watchdog',
         'conditions' => array(
           array('field' => 'type', 'value' => 'image'),
@@ -139,6 +131,11 @@ function monitoring_install() {
         ),
         'time_interval_field' => 'timestamp',
         'time_interval_value' => 60 * 60 * 24,
+      ),
+      'thresholds' => array(
+        'type' => 'exceeds',
+        'warning' => 5,
+        'critical' => 20,
       ),
       'dependencies' => array('module' => 'image'),
     ));

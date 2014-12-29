@@ -76,10 +76,7 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
    *
    * Sensors with unknown status can either be set based on an expected value or
    * thresholds. If the value does not match the expected value, the status
-   * is set to critical. Sensors that support thresholds should either subclass
-   * \Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase or implement
-   * \Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginInterface and provide
-   * their own configuration form.
+   * is set to critical. All numeric sensors have support for thresholds.
    *
    * The default sensor message will include information about the sensor value,
    * expected value, thresholds, the configured time interval and additional

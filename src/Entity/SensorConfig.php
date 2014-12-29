@@ -123,6 +123,15 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
   public $status = TRUE;
 
   /**
+   * The sensor thresholds.
+   *
+   * @var array
+   */
+  public $thresholds = array(
+    'type' => 'none',
+  );
+
+  /**
    * {@inheritdoc}
    */
   public function getLabel() {
@@ -211,8 +220,8 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    * {@inheritdoc}
    */
   public function getThresholdsType() {
-    if (!empty($this->settings['thresholds']['type'])) {
-      return $this->settings['thresholds']['type'];
+    if (!empty($this->thresholds['type'])) {
+      return $this->thresholds['type'];
     }
 
     return 'none';
@@ -222,8 +231,8 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    * {@inheritdoc}
    */
   public function getThresholdValue($key) {
-    if (isset($this->settings['thresholds'][$key]) && $this->settings['thresholds'][$key] !== '') {
-      return $this->settings['thresholds'][$key];
+    if (isset($this->thresholds[$key]) && $this->thresholds[$key] !== '') {
+      return $this->thresholds[$key];
     }
   }
 
@@ -232,6 +241,13 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    */
   public function getSettings() {
     return $this->settings;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getThresholds() {
+    return $this->thresholds;
   }
 
   /**
@@ -266,7 +282,7 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    * {@inheritdoc}
    */
   public function isDefiningThresholds() {
-    return in_array('Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginInterface', class_implements($this->getSensorClass()));
+    return $this->isNumeric() && $this->getThresholdsType() != 'none';
   }
 
   /**
@@ -286,7 +302,7 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
     );
 
     if ($this->isDefiningThresholds()) {
-      $config['thresholds'] = $this->getSetting('thresholds');
+      $config['thresholds'] = $this->getThresholds();
     }
 
     return $config;

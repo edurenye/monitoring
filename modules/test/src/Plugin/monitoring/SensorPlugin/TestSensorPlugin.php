@@ -9,7 +9,7 @@ namespace Drupal\monitoring_test\Plugin\monitoring\SensorPlugin;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 
 /**
  * Test sensor to report status as provided by external arguments.
@@ -22,7 +22,7 @@ use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
  * )
  *
  */
-class TestSensorPlugin extends ThresholdsSensorPluginBase implements ExtendedInfoSensorPluginInterface {
+class TestSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   protected $testSensorResultData;
 

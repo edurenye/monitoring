@@ -47,6 +47,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
       'id' => 'payment_count',
       'plugin_id' => 'payment_count',
       'value_label' => 'transactions',
+      'value_type' => 'number',
       'caching_time' => 3600,
       'settings' => array(
         'time_interval_value' => 86400
@@ -62,6 +63,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
       'plugin_id' => 'payment_turnover',
       'caching_time' => 3600,
       'value_label' => 'JPY',
+      'value_type' => 'number',
       'settings' => array(
         'time_interval_value' => 86400
       )

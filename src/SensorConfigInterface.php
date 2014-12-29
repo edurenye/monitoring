@@ -128,6 +128,14 @@ interface SensorConfigInterface extends ConfigEntityInterface {
   public function getSettings();
 
   /**
+   * Gets thresholds.
+   *
+   * @return array
+   *   Thresholds as an array.
+   */
+  public function getThresholds();
+
+  /**
    * Gets the time interval value.
    *
    * @return int

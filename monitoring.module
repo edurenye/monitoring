@@ -534,7 +534,7 @@ function monitoring_value_label_callback_commerce_currency(SensorResultInterface
  * Ajax callback for threshold sensors settings form.
  */
 function monitoring_sensor_thresholds_ajax($form, FormStateInterface $form_state) {
-  return $form['settings']['thresholds'];
+  return $form['thresholds'];
 }
 
 /*
@@ -553,9 +553,6 @@ function monitoring_node_type_insert(NodeTypeInterface $type) {
     'status' => FALSE,
     'caching_time' => 600,
     'settings' => array(
-      'thresholds' => array(
-        'type' => 'falls',
-      ),
       'entity_type' => 'node',
       'conditions' => array(
         array('field' => 'type', 'value' => $type->id()),

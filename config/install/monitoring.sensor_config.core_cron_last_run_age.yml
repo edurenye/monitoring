@@ -5,8 +5,8 @@ plugin_id: cron_last_run_time
 value_type: time_interval
 category: 'Cron'
 status: TRUE
-settings:
-  thresholds:
-    type: exceeds
-    warning: 86400
-    critical: 259200
+settings: { }
+thresholds:
+  type: exceeds
+  warning: 86400
+  critical: 259200

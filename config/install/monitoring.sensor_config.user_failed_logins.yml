@@ -16,9 +16,9 @@ settings:
     -
       field: 'message'
       value: 'Login attempt failed for %user.'
-  thresholds:
-    type: exceeds
-    warning: 50
-    critical: 120
   time_interval_field: 'timestamp'
   time_interval_value: '86400'
+thresholds:
+  type: exceeds
+  warning: 50
+  critical: 120

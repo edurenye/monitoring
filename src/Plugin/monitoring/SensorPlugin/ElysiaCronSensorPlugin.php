@@ -7,7 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 
 /**
  * Monitors elysia cron channels for last execution.
@@ -21,7 +21,7 @@ use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
  * )
  *
  */
-class ElysiaCronSensorPlugin extends ThresholdsSensorPluginBase {
+class ElysiaCronSensorPlugin extends SensorPluginBase {
 
   /**
    * {@inheritdoc}

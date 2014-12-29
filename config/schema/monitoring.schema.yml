@@ -45,14 +45,6 @@ monitoring.sensor_config.*:
     settings:
       type: monitoring.settings.[%parent.plugin_id]
       label: 'Settings'
-
-# Base type for settings with common settings.
-monitoring.settings_base:
-  type: mapping
-  mapping:
-    result_logging:
-      type: boolean
-      label: Result logging
     thresholds:
       type: mapping
       label: 'Threshold'
@@ -78,6 +70,14 @@ monitoring.settings_base:
         critical_high:
           type: integer
           label: 'Critical'
+
+# Base type for settings with common settings.
+monitoring.settings_base:
+  type: mapping
+  mapping:
+    result_logging:
+      type: boolean
+      label: Result logging
 
 # Base settings for database and entity aggregators.
 monitoring.settings.aggregator_base:
@@ -216,17 +216,4 @@ monitoring.settings.state_value:
 monitoring.settings.cron_last_run_time:
   type: monitoring.settings_base
   label: 'Cron last run time sensor settings'
-  mapping:
-    thresholds:
-      type: mapping
-      label: 'Threshold'
-      mapping:
-        type:
-          type: string
-          label: 'Type'
-        warning:
-          type: integer
-          label: 'Warning'
-        critical:
-          type: integer
-          label: 'Critical'
+  mapping: { }

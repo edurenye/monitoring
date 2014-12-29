@@ -423,7 +423,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $data = array();
     $sensor_config = SensorConfig::load($sensor_name);
     foreach ($thresholds as $key => $value) {
-      $form_field_name = 'settings' . '[thresholds][' . $key . ']';
+      $form_field_name = 'thresholds[' . $key . ']';
       $data[$form_field_name] = $value;
     }
     $this->drupalPostForm('admin/config/system/monitoring/sensors/' . $sensor_config->id(), $data, t('Save'));
@@ -444,7 +444,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/config/system/monitoring/sensors/' . $sensor_name);
     $this->assertTitle(t('@label settings (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
     foreach ($thresholds as $key => $value) {
-      $form_field_name = 'settings' . '[thresholds][' . $key . ']';
+      $form_field_name = 'thresholds[' . $key . ']';
       $this->assertFieldByName($form_field_name, $value);
     }
   }

@@ -7,7 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\search_api\Entity\Index;
 
 /**
@@ -27,7 +27,7 @@ use Drupal\search_api\Entity\Index;
  *
  * @see search_api_index_status()
  */
-class SearchApiUnindexedSensorPlugin extends ThresholdsSensorPluginBase {
+class SearchApiUnindexedSensorPlugin extends SensorPluginBase {
 
   /**
    * {@inheritdoc}

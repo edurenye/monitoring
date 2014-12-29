@@ -14,12 +14,12 @@ settings:
     -
       field: 'type'
       value: 'page not found'
-  thresholds:
-    type: exceeds
-    warning: '20'
-    critical: '100'
   time_interval_field: 'timestamp'
   time_interval_value: '86400'
+thresholds:
+  type: exceeds
+  warning: '20'
+  critical: '100'
 dependencies:
   module:
     - dblog

@@ -90,7 +90,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('base://monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
       if ($sensor_config->isDefiningThresholds()) {
-        $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getSetting('thresholds'));
+        $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getThresholds());
       }
     }
 
@@ -114,7 +114,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['uri'], Url::fromUri('base://monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     if ($sensor_config->isDefiningThresholds()) {
-      $this->assertEqual($response_data['thresholds'], $sensor_config->getSetting('thresholds'));
+      $this->assertEqual($response_data['thresholds'], $sensor_config->getThresholds());
     }
   }
 

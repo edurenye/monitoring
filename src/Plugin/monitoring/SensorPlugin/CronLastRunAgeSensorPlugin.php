@@ -6,9 +6,8 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\monitoring\SensorPlugin\ThresholdsSensorPluginBase;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 
 /**
  * Monitors the last cron run time.
@@ -22,7 +21,7 @@ use Drupal;
  *
  * Based on the drupal core system state cron_last.
  */
-class CronLastRunAgeSensorPlugin extends ThresholdsSensorPluginBase {
+class CronLastRunAgeSensorPlugin extends SensorPluginBase {
 
   /**
    * {@inheritdoc}
