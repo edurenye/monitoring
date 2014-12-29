@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Tests;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -46,4 +47,63 @@ abstract class MonitoringTestBase extends WebTestBase {
     return monitoring_sensor_run($sensor_name, TRUE, TRUE);
   }
 
+  /**
+   * Install modules and fix test container.
+   *
+   * @param string[] $module_list
+   *   An array of module names.
+   * @param bool $enable_dependencies
+   *   (optional) If TRUE, dependencies will automatically be installed in the
+   *   correct order. This incurs a significant performance cost, so use FALSE
+   *   if you know $module_list is already complete.
+   *
+   * @return bool
+   *   FALSE if one or more dependencies are missing, TRUE otherwise.
+   *
+   * @see uninstallModules()
+   * @see \Drupal\Core\Extension\ModuleInstallerInterface::install()
+   */
+  protected function installModules(array $module_list, $enable_dependencies = TRUE) {
+    /** @var ModuleInstallerInterface $module_handler */
+    $module_handler = \Drupal::service('module_installer');
+
+    // Install the modules requested.
+    $return = $module_handler->install($module_list, $enable_dependencies);
+
+    // The container is rebuilt, thus reassign it.
+    $this->container = \Drupal::getContainer();
+
+    return $return;
+  }
+
+
+
+  /**
+   * Uninstall modules and fix test container.
+   *
+   * @param string[] $module_list
+   *   The modules to uninstall.
+   * @param bool $uninstall_dependents
+   *   (optional) If TRUE, dependent modules will automatically be uninstalled
+   *   in the correct order. This incurs a significant performance cost, so use
+   *   FALSE if you know $module_list is already complete.
+   *
+   * @return bool
+   *   FALSE if one or more dependencies are missing, TRUE otherwise.
+   *
+   * @see installModules()
+   * @see \Drupal\Core\Extension\ModuleInstallerInterface::uninstall()
+   */
+  protected function uninstallModules(array $module_list, $uninstall_dependents = TRUE) {
+    /** @var ModuleInstallerInterface $module_handler */
+    $module_handler = \Drupal::service('module_installer');
+
+    // Install the modules requested.
+    $return = $module_handler->uninstall($module_list, $uninstall_dependents);
+
+    // The container is rebuilt, thus reassign it.
+    $this->container = \Drupal::getContainer();
+
+    return $return;
+  }
 }

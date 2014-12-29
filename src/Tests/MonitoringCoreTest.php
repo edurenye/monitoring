@@ -335,10 +335,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
    */
   public function testSensorDisappearedSensors() {
 
-    $module_handler = \Drupal::service('module_installer');
-
     // Install the comment module and the comment_new sensor.
-    $module_handler->install(array('comment'));
+    $this->installModules(array('comment'));
     monitoring_sensor_manager()->enableSensor('comment_new');
 
     // Run the disappeared sensor - it should not report any problems.
@@ -359,7 +357,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       )));
 
     // Uninstall the comment module so that the comment_new sensor goes away.
-    $module_handler->uninstall(array('comment'));
+    $this->uninstallModules(array('comment'));
 
     // The comment_new sensor has gone away and therefore we should have the
     // critical status.
@@ -371,7 +369,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Install the comment module to test the correct procedure of removing
     // sensors.
-    $module_handler->install(array('comment'));
+    $this->installModules(array('comment'));
     monitoring_sensor_manager()->enableSensor('comment_new');
 
     // Now we should be back to normal.
@@ -382,7 +380,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Do the correct procedure to remove a sensor - first disable the sensor
     // and then uninstall the comment module.
     monitoring_sensor_manager()->disableSensor('comment_new');
-    $module_handler->uninstall(array('comment'));
+    $this->uninstallModules(array('comment'));
 
     // The sensor should not report any problem this time.
     $result = $this->runSensor('monitoring_disappeared_sensors');
@@ -396,7 +394,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
     // Install comment module and the comment_new sensor.
-    $module_handler->install(array('comment'));
+    $this->installModules(array('comment'));
     monitoring_sensor_manager()->enableSensor('comment_new');
 
     // We should have the message that no sensors are missing.
@@ -410,10 +408,10 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertNoText(t('This action will clear the missing sensors and the critical sensor status will go away.'));
 
     // Install comment module and the comment_new sensor.
-    $module_handler->install(array('comment'));
+    $this->installModules(array('comment'));
     monitoring_sensor_manager()->enableSensor('comment_new');
     // Now disable the comment module to have the comment_new sensor disappear.
-    $module_handler->uninstall(array('comment'));
+    $this->uninstallModules(array('comment'));
     // Run the monitoring_disappeared_sensors sensor to get the status message
     // that should be found in the settings form.
     $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
@@ -478,7 +476,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // The default setting is not to allow additional modules. Enable comment
     // and the sensor should escalate to CRITICAL.
-    \Drupal::service('module_installer')->install(array('help'));
+    $this->installModules(array('help'));
     // The container is rebuilt and needs to be reassigned to avoid static
     // config cache issues. See https://www.drupal.org/node/2398867
     $this->container = \Drupal::getContainer();
@@ -508,7 +506,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Install additional module. As the setting "allow_additional" is not
     // enabled by default this should result in sensor escalation to critical.
-    \Drupal::service('module_installer')->install(array('contact'));
+    $this->installModules(array('contact'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Contact (contact)');
@@ -525,7 +523,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // should escalate to critical.
     $sensor_config->settings['modules']['contact'] = 'contact';
     $sensor_config->save();
-    \Drupal::service('module_installer')->uninstall(array('contact'));
+    $this->uninstallModules(array('contact'));
     $result = $this->runSensor('monitoring_enabled_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are expected to be installed: Contact (contact)');
