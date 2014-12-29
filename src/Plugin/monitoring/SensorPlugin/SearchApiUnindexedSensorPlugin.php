@@ -13,6 +13,8 @@ use Drupal\search_api\Entity\Index;
 /**
  * Monitors unindexed items for a search api index.
  *
+ * Sensors are created automatically for each index.
+ *
  * @SensorPlugin(
  *   id = "search_api_unindexed",
  *   label = @Translation("Unindexed Search Items"),

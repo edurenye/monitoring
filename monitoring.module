@@ -617,6 +617,7 @@ function monitoring_search_api_index_insert(IndexInterface $index) {
     'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
     'plugin_id' => 'search_api_unindexed',
     'value_label' => 'Unindexed items',
+    'value_type' => 'number',
     'category' => 'Search API',
     'caching_time' => 900,
     'status' => TRUE,

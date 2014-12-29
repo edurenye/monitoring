@@ -7,7 +7,7 @@ hidden: TRUE
 
 dependencies:
 # Uncomment once the search API is available for D8.
-# - search_api_db
+ - search_api_db
  - monitoring
  - rest
  - hal
