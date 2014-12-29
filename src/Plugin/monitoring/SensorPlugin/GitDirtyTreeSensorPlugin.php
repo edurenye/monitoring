@@ -40,11 +40,26 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    $this->cmdOutput = trim(shell_exec($this->buildCMD()));
+    // For security reasons, some hostings disable exec() related functions.
+    // Since they fail silently, we challenge exec() and check if the result
+    // matches the expectations.
+    if (exec('echo "enabled"') != 'enabled') {
+      $result->addStatusMessage('The function exec() is disabled. You need to enable it.');
+      $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      return;
+    }
+
+    $exit_code = 0;
+    exec($this->buildCMD(), $this->cmdOutput, $exit_code);
+    if ($exit_code > 0) {
+      $result->addStatusMessage('Non-zero exit code ' . $exit_code);
+      $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+    }
+
     $result->setExpectedValue(0);
 
     if (!empty($this->cmdOutput)) {
-      $result->setValue(count(explode("\n", $this->cmdOutput)));
+      $result->setValue(count($this->cmdOutput));
       $result->addStatusMessage('Files in unexpected state');
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
     }
@@ -64,7 +79,7 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
     $output[] = "<pre>";
     $output[] = 'CMD: ' . $this->buildCMD();
     $output[] = '';
-    $output[] = $this->cmdOutput;
+    $output = array_merge($output, $this->cmdOutput);
     $output[] = "<pre>";
     return implode("\n", $output);
   }

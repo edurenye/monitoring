@@ -37,7 +37,6 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * Tests individual sensors.
    */
   public function testSensors() {
-
     // ======= CronLastRunAgeSensorPlugin tests ======= //
 
     $time_shift = (60 * 60 * 24 + 1);
@@ -256,26 +255,29 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // ======= GitDirtyTreeSensorPlugin tests ======= //
 
-    // Enable the sensor and set cmd to output something
+    // Enable the sensor and set cmd to output something.
+    // The command creates a line for every file in unexpected state.
     $sensor_config = SensorConfig::load('monitoring_git_dirty_tree');
     $sensor_config->status = TRUE;
     $sensor_config->settings['cmd'] = 'echo "dummy output\nanother dummy output"';
     $sensor_config->save();
-    $result = monitoring_sensor_run('monitoring_git_dirty_tree', TRUE, TRUE);
+    $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isCritical());
     // The verbose output should contain the cmd output.
     $this->assertTrue(strpos($result->getVerboseOutput(), 'dummy output') !== FALSE);
     // Two lines of cmd output.
     $this->assertEqual($result->getValue(), 2);
+    // If exec() is disabed on an environment, make it visible in output.
+    $this->assertEqual($result->getMessage(), 'Value 2, expected 0, Files in unexpected state');
 
     // Now echo empty string.
-    $sensor_config->settings['cmd'] = 'echo ""';
+    $sensor_config->settings['cmd'] = 'true';
     $sensor_config->save();
 
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isOk());
     // The message should say that it is ok.
-    $this->assertTrue(strpos($result->getMessage(), 'Git repository clean') !== FALSE);
+    $this->assertEqual($result->getMessage(), 'Value 0, Git repository clean');
 
     // ======= Active sessions count tests ======= //
     // Create and login a user to have data in the sessions table.
