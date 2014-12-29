@@ -334,6 +334,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/non_existing_sensor');
     $this->assertResponse(404);
   }
+
   /**
    * Tests the sensor detail page for actual and expected values.
    */
