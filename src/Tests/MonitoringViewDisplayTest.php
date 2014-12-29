@@ -35,7 +35,7 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
-    // Add sensor type views display aggregator
+    // Add sensor type views display aggregator.
     $this->drupalGet('admin/config/system/monitoring/sensors/add');
     $this->drupalPostForm(NULL, array(
       'label' => 'All users',
@@ -46,7 +46,7 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
       'caching_time' => 0,
       'plugin_id' => 'view_display_aggregator',
     ), t('Select sensor'));
-    // Select view
+    // Select view and display and save.
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
       'settings[view]' => 'user_admin_people',
@@ -55,6 +55,11 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
       'settings[display]' => 'default',
     ), t('Save'));
     $this->assertText('Sensor settings saved.');
+
+    // Edit and check selection.
+    $this->drupalGet('admin/config/system/monitoring/sensors/view_user_count');
+    $this->assertOptionSelected('edit-settings-view', 'user_admin_people');
+    $this->assertOptionSelected('edit-settings-display', 'default');
 
     // Call sensor and verify status and message.
     $result = $this->runSensor('view_user_count');

@@ -8,8 +8,8 @@ namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
+use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\views\Views;
 
 /**
@@ -23,7 +23,7 @@ use Drupal\views\Views;
  *   addable = TRUE
  * )
  */
-class ViewDisplayAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
+class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -76,6 +76,9 @@ class ViewDisplayAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBa
       '#title' => t('View'),
       '#default_value' => $this->sensorConfig->getSetting('view'),
       '#required' => TRUE,
+      '#limit_validation_errors' => array(array('settings', 'view')),
+      '#submit' => array('::submitSelectPlugin'),
+      '#executes_submit_callback' => TRUE,
       '#ajax' => array(
         'callback' => '::updateSelectedPluginType',
         'wrapper' => 'monitoring-sensor-plugin',
@@ -86,31 +89,19 @@ class ViewDisplayAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBa
       '#type' => 'submit',
       '#value' => t('Select view'),
       '#limit_validation_errors' => array(array('settings', 'view')),
-      '#submit' => array(array($this, 'submitSelectView')),
+      '#submit' => array('::submitSelectPlugin'),
       '#attributes' => array('class' => array('js-hide')),
     );
 
-    // Display selection.
-    $form['display'] = array(
-      '#type' => 'select',
-      '#title' => t('Display'),
-      '#required' => TRUE,
-    );
-
-    // After changing the views value in form.
-    if ($view = $form_state->getValue(array('settings', 'view'))) {
-      $display_labels = $this->getDisplayOptions($view);
-      $form['display']['#options'] = $display_labels;
-    }
-    // When editing the sensor.
-    elseif (!$this->sensorConfig->isNew()) {
-      $form['display']['#options'] = $this->getDisplayOptions($this->sensorConfig->getSetting('view'));
-      $form['display']['#default_value'] = $this->sensorConfig->getSetting('display');
-    }
-    // When creating the sensor, do not show display selection until a view is
-    // selected.
-    else {
-      $form['display']['#access'] = FALSE;
+    // Show display selection if a view is selected.
+    if ($view = $this->sensorConfig->getSetting('view')) {
+      $form['display'] = array(
+        '#type' => 'select',
+        '#title' => t('Display'),
+        '#required' => TRUE,
+        '#options' => $this->getDisplayOptions($view),
+        '#default_value' => $this->sensorConfig->getSetting('display'),
+      );
     }
 
     return $form;
@@ -129,13 +120,6 @@ class ViewDisplayAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBa
       $options[$view->id()] = $view->label();
     }
     return $options;
-  }
-
-  /**
-   * Handles submit call when view is selected.
-   */
-  public function submitSelectView(array $form, FormStateInterface $form_state) {
-    $form_state->setRebuild();
   }
 
   /**
