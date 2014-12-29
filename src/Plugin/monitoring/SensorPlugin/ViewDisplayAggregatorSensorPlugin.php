@@ -45,7 +45,7 @@ class ViewDisplayAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBa
     $verbose[] = "Query:\n$query";
     $verbose[] = "Arguments:\n" . var_export($arguments, TRUE);
     $verbose[] = "</pre>";
-    // @todo Pagers and exposed filters are output, but broken.
+    // @todo Pagers and exposed filters are output, but broken. See https://www.drupal.org/node/2399437
     $verbose[] = drupal_render($preview);
 
     return implode("\n", $verbose);
