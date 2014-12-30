@@ -10,12 +10,11 @@ namespace Drupal\monitoring;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormInterface;
-use Drupal\monitoring\Sensor\SensorManager;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Defines a class to build a listing of monitoring entities.
+ * Defines a class to build a listing of sensor config entities.
  *
  * @see \Drupal\monitoring\Entity\SensorConfig
  */
@@ -25,9 +24,9 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['category'] = t('Category');
-    $header['label'] = t('Label');
-    $header['description'] = t('Description');
+    $header['category'] = $this->t('Category');
+    $header['label'] = $this->t('Label');
+    $header['description'] = $this->t('Description');
     return $header + parent::buildHeader();
   }
 

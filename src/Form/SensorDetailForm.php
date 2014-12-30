@@ -213,7 +213,7 @@ class SensorDetailForm extends EntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->sensorRunner->resetCache(array($this->entity->id()));
-    drupal_set_message(t('Sensor force run executed.'));
+    drupal_set_message($this->t('Sensor force run executed.'));
   }
 
   /**
