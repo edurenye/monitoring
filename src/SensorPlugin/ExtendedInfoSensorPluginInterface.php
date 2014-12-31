@@ -21,8 +21,8 @@ interface ExtendedInfoSensorPluginInterface {
    * @param SensorResultInterface $result
    *   Sensor result.
    *
-   * @return string
-   *   Sensor call verbose info.
+   * @return array
+   *   Sensor call verbose info as render array.
    */
   function resultVerbose(SensorResultInterface $result);
 

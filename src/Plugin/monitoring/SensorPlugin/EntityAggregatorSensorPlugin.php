@@ -189,7 +189,13 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 
-    $output[] = String::format('Aggregate field @field', array('@field' => $this->aggregateField));
+    $output['field'] = array(
+      '#type' => 'item',
+      '#title' => t('Aggregate field'),
+      '#markup' => $this->aggregateField,
+    );
+
+    // @todo show query.
 
     // Fetch the last 10 matching entries, unaggregated.
     $entity_ids = $this->getEntityQueryVerbose()->execute();
@@ -211,15 +217,14 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       $rendered_items[$id] = drupal_render($entity_link);
     }
     if (count($rendered_items) > 0) {
-      $item_list = array(
+      $output['entities'] = array(
         '#title' => 'Entities',
         '#theme' => 'item_list',
         '#items' => $rendered_items,
       );
-      $output[] = drupal_render($item_list);
     }
 
-    return implode("\n", $output);
+    return $output;
   }
 
   /**

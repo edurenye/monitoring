@@ -61,11 +61,11 @@ class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    $verbose = parent::resultVerbose($result);
+    $output = parent::resultVerbose($result);
 
     // If non found, no reason to query file_managed table.
     if ($result->getValue() == 0) {
-      return $verbose;
+      return $output;
     }
 
     // In case we were not able to retrieve this info from the watchdog
@@ -90,8 +90,12 @@ class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
       $message = t('File @file record not found in the file_managed table.', array('@file' => $result->getMessage()));
     }
 
-    $verbose .=  ' ' . $message;
+    $output['message'] = array(
+      '#type' => 'item',
+      '#title' => t('Message'),
+      '#markup' => $message,
+    );
 
-    return $verbose;
+    return $output;
   }
 }

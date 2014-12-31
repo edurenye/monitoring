@@ -29,25 +29,42 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
+    $output = [];
+
     $view_executable = Views::getView($this->sensorConfig->getSetting('view'));
-    $view_executable->build($this->sensorConfig->getSetting('display'));
+    $display_id = $this->sensorConfig->getSetting('display');
+    $view_executable->setDisplay($display_id);
+    $view_executable->initDisplay();
+    $view_executable->setAjaxEnabled(TRUE);
+
+    // Force ajax mode for the view.
+    $display = $view_executable->displayHandlers->get($display_id);
+    $display->setOption('use_ajax', TRUE);
+
+    // Get the preview of the view for current display.
+    $preview = $view_executable->preview($display_id);
 
     // Get the query and arguments of the view.
     $query = $view_executable->getQuery()->query();
     $arguments = $query->arguments();
 
-    // Get the preview of the view for current display.
-    $preview = $view_executable->preview($this->sensorConfig->getSetting('display'));
+    $output['query'] = array(
+      '#type' => 'item',
+      '#title' => t('Query'),
+      '#markup' => '<pre>' . $query . '</pre>',
+    );
+    $output['arguments'] = array(
+      '#type' => 'item',
+      '#title' => t('Arguments'),
+      '#markup' => '<pre>' . var_export($arguments, TRUE) . '</pre>',
+    );
+    $output['view'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('View preview'),
+    );
+    $output['view']['preview'] = $preview;
 
-    $verbose = array();
-    $verbose[] = "<pre>";
-    $verbose[] = "Query:\n$query";
-    $verbose[] = "Arguments:\n" . var_export($arguments, TRUE);
-    $verbose[] = "</pre>";
-    // @todo Pagers and exposed filters are output, but broken. See https://www.drupal.org/node/2399437
-    $verbose[] = drupal_render($preview);
-
-    return implode("\n", $verbose);
+    return $output;
   }
 
   /**

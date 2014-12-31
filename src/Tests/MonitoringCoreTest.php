@@ -283,9 +283,12 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual(6, $result->getValue());
     $this->assertTrue(strpos($result->getMessage(), $file->getFileUri()) !== FALSE);
     $this->assertTrue($result->isWarning());
-    $this->assertTrue(strpos($result->getVerboseOutput(), 'monitoring_test') !== FALSE);
-    $this->assertTrue(strpos($result->getVerboseOutput(), 'test_object') !== FALSE);
-    $this->assertTrue(strpos($result->getVerboseOutput(), '123456789') !== FALSE);
+    $verbose_output = $result->getVerboseOutput();
+    $this->assertTrue(strpos(drupal_render($verbose_output), 'monitoring_test') !== FALSE);
+    $verbose_output = $result->getVerboseOutput();
+    $this->assertTrue(strpos(drupal_render($verbose_output), 'test_object') !== FALSE);
+    $verbose_output = $result->getVerboseOutput();
+    $this->assertTrue(strpos(drupal_render($verbose_output), '123456789') !== FALSE);
   }
 
   /**
@@ -359,7 +362,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isCritical());
     // The verbose output should contain the cmd output.
-    $this->assertTrue(strpos($result->getVerboseOutput(), 'dummy output') !== FALSE);
+    $verbose_output = $result->getVerboseOutput();
+    $this->assertTrue(strpos(drupal_render($verbose_output), 'dummy output') !== FALSE);
     // Two lines of cmd output.
     $this->assertEqual($result->getValue(), 2);
     // If exec() is disabed on an environment, make it visible in output.

@@ -68,7 +68,13 @@ class TestSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPlu
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    return 'call debug';
+    $output = [];
+    $output['test'] = array(
+      '#type' => 'item',
+      '#title' => t('Test'),
+      '#markup' => 'call debug',
+    );
+    return $output;
   }
 }
 

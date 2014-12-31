@@ -29,7 +29,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   use DependencyTrait;
 
   /**
-   * The fetched object from the query result.
+   * The query string of the executed query.
    *
    * @var object
    */
@@ -49,19 +49,32 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    */
   protected $executedQuery;
 
+  /**
+   * The fetched object from the query result.
+   *
+   * @var mixed
+   */
   protected $fetchedObject;
 
   /**
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    $verbose = array();
-    $verbose[] = "<pre>";
-    $verbose[] = "Query:\n{$this->queryString}";
-    $verbose[] = "Arguments:\n" . var_export($this->queryArguments, TRUE);
-    $verbose[] = "</pre>";
+    $output = [];
 
-    return implode("\n", $verbose);
+    $output['query'] = array(
+      '#type' => 'item',
+      '#title' => t('Query'),
+      '#markup' => $this->queryString,
+    );
+    $output['arguments'] = array(
+      '#type' => 'item',
+      '#title' => t('Arguments'),
+      '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
+    );
+    // @todo show results.
+
+    return $output;
   }
 
   /**

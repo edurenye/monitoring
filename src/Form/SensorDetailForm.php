@@ -165,10 +165,7 @@ class SensorDetailForm extends EntityForm {
         );
       }
       elseif ($verbose_output = $result->getVerboseOutput()) {
-        $form['sensor_result']['verbose']['output'] = array(
-          '#type' => 'markup',
-          '#markup' => $verbose_output,
-        );
+        $form['sensor_result']['verbose']['output'] = $verbose_output;
       }
       else {
         $form['sensor_result']['verbose']['output'] = array(

@@ -268,8 +268,8 @@ interface SensorResultInterface {
   /**
    * Set the verbose output.
    *
-   * @param string $verbose_output
-   *   The verbose output as a string.
+   * @param array $verbose_output
+   *   The verbose output as a render array.
    */
   public function setVerboseOutput($verbose_output);
 
@@ -279,8 +279,8 @@ interface SensorResultInterface {
    * Verbose output is not persisted and is only available if the sensor result
    * is not cached.
    *
-   * @return string
-   *   The verbose output as a string.
+   * @return array
+   *   The verbose output as a render array.
    */
   public function getVerboseOutput();
 

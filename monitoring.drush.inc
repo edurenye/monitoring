@@ -300,8 +300,9 @@ function monitoring_drush_result_output_table_single(SensorResultInterface $resu
   $rows[] = array(dt('Result age'), \Drupal::service('date.formatter')->formatInterval(time() - $result->getTimestamp()));
 
   // Add the verbose output if requested.
-  if ($result->getVerboseOutput()) {
-    $rows[] = array(dt('Verbose output'), $result->getVerboseOutput());
+  if ($verbose_output = $result->getVerboseOutput()) {
+    // @todo Improve plaintext rendering for tables(view sensor).
+    $rows[] = array(dt('Verbose output'), strip_tags(\Drupal::service('renderer')->renderRoot($verbose_output)));
   }
 
   drush_print_table($rows);

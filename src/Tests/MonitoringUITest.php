@@ -329,7 +329,8 @@ class MonitoringUITest extends MonitoringTestBase {
     // Test the verbose output.
     $this->drupalPostForm(NULL, array(), t('Run now'));
     // Check that the verbose output is displayed.
-    $this->assertText('Aggregate field nid');
+    $this->assertText('Aggregate field');
+    $this->assertText('nid');
 
     // Check the if the sensor message includes value type.
     $this->drupalGet('admin/reports/monitoring/sensors/core_cron_safe_threshold');
