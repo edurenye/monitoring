@@ -106,7 +106,7 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    *
    * @var string
    */
-  public $value_type;
+  public $value_type = 'number';
 
   /**
    * The sensor caching time.

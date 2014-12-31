@@ -78,17 +78,17 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->assertFieldByName('status', TRUE);
 
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
+    $this->drupalPostForm(NULL, array(
       'label' => 'UI created Sensor',
-      'description' => 'Sensor created to test UI',
       'id' => 'ui_test_sensor',
-      'value_label' => 'Test Value',
-      'caching_time' => 100,
       'plugin_id' => 'entity_aggregator',
     ), t('Select sensor'));
 
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
+      'description' => 'Sensor created to test UI',
+      'value_label' => 'Test Value',
+      'caching_time' => 100,
       'settings[aggregation][time_interval_value]' => 86400,
       'settings[entity_type]' => 'field_storage_config',
       'settings[conditions][0][field]' => 'type',
@@ -105,22 +105,20 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalPostForm(NULL, array(), t('Delete'));
     $this->assertText('Sensor UI created Sensor has been deleted.');
 
-    $this->drupalGet('admin/config/system/monitoring/sensors/add');
-
     $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
       'label' => 'UI created Sensor config',
-      'description' => 'Sensor created to test UI',
       'id' => 'ui_test_sensor_config',
-      'value_label' => 'Test Value',
-      'caching_time' => 100,
       'plugin_id' => 'config_value',
-      'value_type' => 'bool',
     ), t('Select sensor'));
 
     $this->assertText('Expected value');
 
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
+      'description' => 'Sensor created to test UI',
+      'value_label' => 'Test Value',
+      'caching_time' => 100,
+      'value_type' => 'bool',
       'settings[key]' => 'threshold.autorun',
       'settings[config]' => 'system.cron',
     ), t('Save'));

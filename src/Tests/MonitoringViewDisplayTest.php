@@ -39,16 +39,16 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     $this->drupalGet('admin/config/system/monitoring/sensors/add');
     $this->drupalPostForm(NULL, array(
       'label' => 'All users',
-      'description' => 'Count all users through the users view.',
       'id' => 'view_user_count',
-      'value_label' => 'Users',
-      'value_type' => 'number',
-      'caching_time' => 0,
       'plugin_id' => 'view_display_aggregator',
     ), t('Select sensor'));
     // Select view and display and save.
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
+      'description' => 'Count all users through the users view.',
+      'value_type' => 'number',
+      'value_label' => 'Users',
+      'caching_time' => 0,
       'settings[view]' => 'user_admin_people',
     ), t('Select view'));
     $this->drupalPostForm(NULL, array(

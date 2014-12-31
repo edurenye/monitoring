@@ -73,7 +73,7 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
           '#limit_validation_errors' => array(),
           '#submit' => array(array($this, 'updateModuleListSubmit')),
           '#ajax' => array(
-            'callback' => '::updateSelectedPluginType',
+            'callback' => '::ajaxReplacePluginSpecificForm',
             'wrapper' => 'monitoring-sensor-plugin',
             'method' => 'replace',
           ),

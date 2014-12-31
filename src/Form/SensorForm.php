@@ -29,16 +29,8 @@ class SensorForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $form['#tree'] = TRUE;
 
     $sensor_config = $this->entity;
-
-    $form['category'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Category'),
-      '#maxlength' => 255,
-      '#default_value' => $sensor_config->getCategory(),
-    );
 
     $form['label'] = array(
       '#type' => 'textfield',
@@ -61,27 +53,11 @@ class SensorForm extends EntityForm {
       ),
     );
 
-    $form['description'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Description'),
-      '#maxlength' => 255,
-      '#default_value' => $sensor_config->getDescription(),
-    );
-
-    $form['value_label'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Value Label'),
-      '#maxlength' => 255,
-      '#default_value' => $sensor_config->getValueLabel(),
-      '#description' => $this->t("The value label represents the units of the sensor value."),
-    );
-
-    $form['caching_time'] = array(
-      '#type' => 'number',
-      '#title' => $this->t('Cache Time'),
-      '#maxlength' => 10,
-      '#default_value' => $sensor_config->getCachingTime(),
-      '#description' => $this->t("The caching time for the sensor in seconds. Empty to disable caching."),
+    $form['status'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enabled'),
+      '#description' => $this->t('Check to have the sensor trigger.'),
+      '#default_value' => $sensor_config->status(),
     );
 
     if ($sensor_config->isNew()) {
@@ -101,13 +77,13 @@ class SensorForm extends EntityForm {
         '#required' => TRUE,
         '#executes_submit_callback' => TRUE,
         '#ajax' => array(
-          'callback' => '::updateSelectedPluginType',
+          'callback' => '::ajaxReplacePluginSpecificForm',
           'wrapper' => 'monitoring-sensor-plugin',
           'method' => 'replace',
         ),
       );
 
-      $form['update'] = array(
+      $form['select_plugin'] = array(
         '#type' => 'submit',
         '#value' => $this->t('Select sensor'),
         '#limit_validation_errors' => array(array('plugin_id')),
@@ -121,68 +97,101 @@ class SensorForm extends EntityForm {
       $form['old_plugin_id'] = array(
         '#type' => 'item',
         '#title' => $this->t('Sensor Plugin'),
-        '#maxlength' => 255,
-        '#markup' => monitoring_sensor_manager()->getDefinition($sensor_config->plugin_id)['label']->render(),
+        '#markup' => (string) monitoring_sensor_manager()->getDefinition($sensor_config->plugin_id)['label'],
       );
     }
 
-    $value_types = [];
-    foreach (monitoring_value_types() as $value_type => $info) {
-      $value_types[$value_type] = $info['label'];
-    }
-
-    $form['value_type'] = array(
-      '#type' => 'select',
-      '#title' => $this->t('Expected value type'),
-      '#options' => $value_types,
-      '#default_value' => $sensor_config->getValueType(),
-    );
-
-    // If sensor provides settings form, automatically provide settings to
-    // enable the sensor.
-    $form['status'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
-      '#description' => $this->t('Check to have the sensor trigger.'),
-      '#default_value' => $sensor_config->status(),
+    $form['plugin_container'] = array(
+      '#type' => 'container',
+      '#prefix' => '<div id="monitoring-sensor-plugin">',
+      '#suffix' => '</div>',
     );
 
     if (isset($sensor_config->plugin_id) && $plugin = $sensor_config->getPlugin()) {
-      $form['settings'] = array(
+      $form['plugin_container']['settings'] = array(
         '#type' => 'details',
         '#open' => TRUE,
         '#title' => $this->t('Sensor plugin settings'),
-        '#prefix' => '<div id="monitoring-sensor-plugin">',
-        '#suffix' => '</div>',
+        '#tree' => TRUE,
       );
-      $form['settings'] += (array) $plugin->buildConfigurationForm($form['settings'], $form_state);
-    }
-    else {
-      // Placeholder for ajax settings.
-      $form['settings'] = array(
-        '#type' => 'container',
-        '#prefix' => '<div id="monitoring-sensor-plugin">',
-        '#suffix' => '</div>',
-      );
-    }
-    $settings = $sensor_config->getSettings();
-    foreach ($settings as $key => $value) {
-      if (!isset($form['settings'][$key])) {
-        $form['settings'][$key] = array(
-          '#type' => 'value',
-          '#value' => $value
-        );
+      $form['plugin_container']['settings'] += (array) $plugin->buildConfigurationForm($form['plugin_container']['settings'], $form_state);
+
+      $settings = $sensor_config->getSettings();
+      foreach ($settings as $key => $value) {
+        if (!isset($form['plugin_container']['settings'][$key])) {
+          $form['plugin_container']['settings'][$key] = array(
+            '#type' => 'value',
+            '#value' => $value
+          );
+        }
       }
-    }
+      $form['plugin_container']['category'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Category'),
+        '#maxlength' => 255,
+        '#default_value' => $sensor_config->getCategory(),
+      );
 
-    if ($this->entity->isNumeric()) {
-      $form += $this->thresholdsForm($form_state);
-    }
+      $form['plugin_container']['description'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Description'),
+        '#maxlength' => 255,
+        '#default_value' => $sensor_config->getDescription(),
+      );
 
-    $form['actions']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => $this->t('Save'),
-    );
+
+      $form['plugin_container']['caching_time'] = array(
+        '#type' => 'number',
+        '#title' => $this->t('Cache Time'),
+        '#maxlength' => 10,
+        '#default_value' => $sensor_config->getCachingTime(),
+        '#description' => $this->t("The caching time for the sensor. Empty to disable caching."),
+        '#field_suffix' => $this->t('seconds'),
+      );
+
+      $value_types = [];
+      foreach (monitoring_value_types() as $value_type => $info) {
+        $value_types[$value_type] = $info['label'];
+      }
+
+      $form['plugin_container']['value_type'] = array(
+        '#type' => 'select',
+        '#title' => $this->t('Expected value type'),
+        '#options' => $value_types,
+        '#default_value' => $sensor_config->getValueType(),
+        '#limit_validation_errors' => array(array('value_type')),
+        '#submit' => array('::submitSelectPlugin'),
+        '#required' => TRUE,
+        '#executes_submit_callback' => TRUE,
+        '#ajax' => array(
+          'callback' => '::ajaxReplacePluginSpecificForm',
+          'wrapper' => 'monitoring-sensor-plugin',
+          'method' => 'replace',
+        ),
+      );
+
+      $form['plugin_container']['value_label'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Value Label'),
+        '#maxlength' => 255,
+        '#default_value' => $sensor_config->getValueLabel(),
+        '#description' => $this->t("The value label represents the units of the sensor value."),
+      );
+
+      if ($this->entity->isNumeric()) {
+        $form['plugin_container']['thresholds'] = array(
+          '#type' => 'details',
+          '#title' => $this->t('Sensor thresholds'),
+          '#description' => $this->t('Here you can set limit values that switch the sensor to a given status.'),
+          '#prefix' => '<div id="monitoring-sensor-thresholds">',
+          '#suffix' => '</div>',
+          '#open' => TRUE,
+          '#tree' => TRUE,
+        );
+        $form['plugin_container']['thresholds'] += $this->thresholdsForm($form_state);
+      }
+
+    }
 
     return $form;
   }
@@ -190,8 +199,8 @@ class SensorForm extends EntityForm {
   /**
    * Handles switching the configuration type selector.
    */
-  public function updateSelectedPluginType($form, FormStateInterface $form_state) {
-    return $form['settings'];
+  public function ajaxReplacePluginSpecificForm($form, FormStateInterface $form_state) {
+    return $form['plugin_container'];
   }
 
   /**
@@ -200,6 +209,13 @@ class SensorForm extends EntityForm {
   public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
     $this->entity = $this->buildEntity($form, $form_state);
     $form_state->setRebuild();
+  }
+
+  /**
+   * Ajax callback for threshold sensors settings form.
+   */
+  function ajaxReplaceThresholdsForm($form, FormStateInterface $form_state) {
+    return $form['plugin_container']['thresholds'];
   }
 
   /**
@@ -245,7 +261,7 @@ class SensorForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     parent::save($form, $form_state);
 
-    $form_state->setRedirectUrl(new Url('monitoring.sensors_overview_settings'));
+    $form_state->setRedirect('monitoring.sensors_overview_settings');
     drupal_set_message($this->t('Sensor settings saved.'));
   }
 
@@ -266,22 +282,13 @@ class SensorForm extends EntityForm {
    */
   protected function thresholdsForm(FormStateInterface $form_state) {
 
-    $form['thresholds'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('Sensor thresholds'),
-      '#description' => $this->t('Here you can set limit values that switch the sensor to a given status.'),
-      '#prefix' => '<div id="monitoring-sensor-thresholds">',
-      '#suffix' => '</div>',
-      '#tree' => TRUE,
-    );
-
     $type = $form_state->getValue(array('thresholds', 'type'));
 
     if (empty($type)) {
       $type = $this->entity->getThresholdsType();
     }
 
-    $form['thresholds']['type'] = array(
+    $form['type'] = array(
       '#type' => 'select',
       '#title' => $this->t('Threshold type'),
       '#options' => array(
@@ -293,20 +300,20 @@ class SensorForm extends EntityForm {
       ),
       '#default_value' => $type,
       '#ajax' => array(
-        'callback' => 'monitoring_sensor_thresholds_ajax',
+        'callback' => '::ajaxReplaceThresholdsForm',
         'wrapper' => 'monitoring-sensor-thresholds',
       ),
     );
 
     switch ($type) {
       case 'exceeds':
-        $form['thresholds']['#description'] = t('The sensor will be set to the corresponding status if the value exceeds the limits.');
-        $form['thresholds']['warning'] = array(
+        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value exceeds the limits.');
+        $form['warning'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning'),
           '#default_value' => $this->entity->getThresholdValue('warning'),
         );
-        $form['thresholds']['critical'] = array(
+        $form['critical'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical'),
           '#default_value' => $this->entity->getThresholdValue('critical'),
@@ -314,13 +321,13 @@ class SensorForm extends EntityForm {
         break;
 
       case 'falls':
-        $form['thresholds']['#description'] = $this->t('The sensor will be set to the corresponding status if the value falls below the limits.');
-        $form['thresholds']['warning'] = array(
+        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value falls below the limits.');
+        $form['warning'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning'),
           '#default_value' => $this->entity->getThresholdValue('warning'),
         );
-        $form['thresholds']['critical'] = array(
+        $form['critical'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical'),
           '#default_value' => $this->entity->getThresholdValue('critical'),
@@ -328,23 +335,23 @@ class SensorForm extends EntityForm {
         break;
 
       case 'inner_interval':
-        $form['thresholds']['#description'] = $this->t('The sensor will be set to the corresponding status if the value is within the limits.');
-        $form['thresholds']['warning_low'] = array(
+        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value is within the limits.');
+        $form['warning_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning low'),
           '#default_value' => $this->entity->getThresholdValue('warning_low'),
         );
-        $form['thresholds']['warning_high'] = array(
+        $form['warning_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning high'),
           '#default_value' => $this->entity->getThresholdValue('warning_high'),
         );
-        $form['thresholds']['critical_low'] = array(
+        $form['critical_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical low'),
           '#default_value' => $this->entity->getThresholdValue('critical_low'),
         );
-        $form['thresholds']['critical_high'] = array(
+        $form['critical_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical high'),
           '#default_value' => $this->entity->getThresholdValue('critical_high'),
@@ -352,23 +359,23 @@ class SensorForm extends EntityForm {
         break;
 
       case 'outer_interval':
-        $form['thresholds']['#description'] = $this->t('The sensor will be set to the corresponding status if the value is outside of the limits.');
-        $form['thresholds']['warning_low'] = array(
+        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value is outside of the limits.');
+        $form['warning_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning low'),
           '#default_value' => $this->entity->getThresholdValue('warning_low'),
         );
-        $form['thresholds']['warning_high'] = array(
+        $form['warning_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning high'),
           '#default_value' => $this->entity->getThresholdValue('warning_high'),
         );
-        $form['thresholds']['critical_low'] = array(
+        $form['critical_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical low'),
           '#default_value' => $this->entity->getThresholdValue('critical_low'),
         );
-        $form['thresholds']['critical_high'] = array(
+        $form['critical_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical high'),
           '#default_value' => $this->entity->getThresholdValue('critical_high'),
@@ -390,7 +397,7 @@ class SensorForm extends EntityForm {
    *   The validation message.
    */
   protected function setThresholdFormError($threshold_key, FormStateInterface $form_state, $message) {
-    $form_state->setErrorByName('[thresholds][' . $threshold_key, $message);
+    $form_state->setErrorByName('plugin_container[thresholds][' . $threshold_key, $message);
   }
 
   /**

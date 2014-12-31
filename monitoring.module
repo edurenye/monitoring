@@ -534,13 +534,6 @@ function monitoring_value_label_callback_commerce_currency(SensorResultInterface
   return $result->getValue();
 }
 
-/**
- * Ajax callback for threshold sensors settings form.
- */
-function monitoring_sensor_thresholds_ajax($form, FormStateInterface $form_state) {
-  return $form['thresholds'];
-}
-
 /*
  * Implements hook_node_type_insert().
  *

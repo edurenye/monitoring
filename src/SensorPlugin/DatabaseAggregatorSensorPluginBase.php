@@ -67,6 +67,9 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
     $form['aggregation'] = array(
       '#type' => 'fieldset',
       '#title' => 'Time Aggregation',
+      // Give the aggregation settings a high weight, so that they show up
+      // after other configuration by default.
+      '#weight' => 50,
     );
 
     $form['aggregation']['time_interval_field'] = array(

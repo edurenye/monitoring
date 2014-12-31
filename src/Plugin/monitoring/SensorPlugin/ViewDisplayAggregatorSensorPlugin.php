@@ -80,7 +80,7 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
       '#submit' => array('::submitSelectPlugin'),
       '#executes_submit_callback' => TRUE,
       '#ajax' => array(
-        'callback' => '::updateSelectedPluginType',
+        'callback' => '::ajaxReplacePluginSpecificForm',
         'wrapper' => 'monitoring-sensor-plugin',
         'method' => 'replace',
       ),
