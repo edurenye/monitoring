@@ -151,49 +151,66 @@ class MonitoringUITest extends MonitoringTestBase {
   }
 
   /**
-   * Tests the time interval settings UI of the database aggregator sensor.
+   * Tests the entity aggregator sensors.
+   *
+   * Tests the entity aggregator with time interval settings and verbosity.
+   *
+   * @todo add tests for DB aggregator.
    */
   public function testAggregateSensorTimeIntervalConfig() {
-    $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
+    $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports', 'monitoring reports'));
     $this->drupalLogin($account);
+
+    // Create some nodes.
+    $node1 = $this->drupalCreateNode(array('type' => 'page'));
+    $node2 = $this->drupalCreateNode(array('type' => 'page'));
 
     // Visit the overview and make sure the sensor is displayed.
     $this->drupalGet('admin/reports/monitoring');
-    $this->assertText('0 druplicons in 1 day');
+    $this->assertText('2 druplicons in 1 day');
 
-    $this->drupalGet('admin/config/system/monitoring/sensors/db_aggregate_test');
+    // Visit the sensor edit form.
+    $this->drupalGet('admin/config/system/monitoring/sensors/entity_aggregate_test');
     // Test for the default value.
     $this->assertFieldByName('settings[aggregation][time_interval_field]', 'created');
     $this->assertFieldByName('settings[aggregation][time_interval_value]', 86400);
 
+    // Visit the sensor detail page with verbose output.
+    $this->drupalGet('admin/reports/monitoring/sensors/entity_aggregate_test');
+    $this->drupalPostForm(NULL, array(), 'Run now');
+    // The node labels should appear in verbose output.
+    $this->assertText('Entities');
+    $this->assertLink($node1->id() . ': ' . $node1->getTitle());
+    $this->assertLink($node2->id() . ': ' . $node2->getTitle());
+
     // Check the sensor overview to verify that the sensor result is
     // calculated and the sensor message is displayed.
     $this->drupalGet('admin/reports/monitoring');
-    $this->assertText('0 druplicons in 1 day');
+    $this->assertText('2 druplicons in 1 day');
 
     // Update the time interval and set value to no restriction.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/entity_aggregate_test', array(
       'settings[aggregation][time_interval_value]' => 0,
     ), t('Save'));
 
     // Visit the overview and make sure that no time interval is displayed.
     $this->drupalGet('admin/reports/monitoring');
-    $this->assertText('0 druplicons');
-    $this->assertNoText('0 druplicons in');
+    $this->assertText('2 druplicons');
+    $this->assertNoText('2 druplicons in');
 
     // Update the time interval and empty interval field.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/entity_aggregate_test', array(
       'settings[aggregation][time_interval_field]' => '',
       'settings[aggregation][time_interval_value]' => 86400,
     ), t('Save'));
     // Visit the overview and make sure that no time interval is displayed
     // which also make sures no change in time interval applies.
     $this->drupalGet('admin/reports/monitoring');
-    $this->assertText('0 druplicons');
-    $this->assertNoText('0 druplicons in');
+    $this->assertText('2 druplicons');
+    $this->assertNoText('2 druplicons in');
 
     // Update the time interval field with an invalid value.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/db_aggregate_test', array(
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/entity_aggregate_test', array(
       'settings[aggregation][time_interval_field]' => 'invalid-field',
     ), t('Save'));
     // Assert the error message.
@@ -261,14 +278,14 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalCreateNode(array('promote' => NODE_PROMOTED));
 
-    $sensor_config = SensorConfig::load('db_aggregate_test');
-    $this->drupalGet('admin/reports/monitoring/sensors/db_aggregate_test');
+    $sensor_config = SensorConfig::load('entity_aggregate_test');
+    $this->drupalGet('admin/reports/monitoring/sensors/entity_aggregate_test');
     $this->assertTitle(t('@label (@category) | Drupal', array('@label' => $sensor_config->getLabel(), '@category' => $sensor_config->getCategory())));
 
     // Make sure that all relevant information is displayed.
     // @todo: Assert position/order.
     // Cannot use $this->runSensor() as the cache needs to remain.
-    $result = monitoring_sensor_run('db_aggregate_test');
+    $result = monitoring_sensor_run('entity_aggregate_test');
     $this->assertText(t('Description'));
     $this->assertText($sensor_config->getDescription());
     $this->assertText(t('Status'));
@@ -307,7 +324,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertEqual(trim((string) $rows[1]->td[1]), 'WARNING');
 
     // Refresh the page, this not run the sensor again.
-    $this->drupalGet('admin/reports/monitoring/sensors/db_aggregate_test');
+    $this->drupalGet('admin/reports/monitoring/sensors/entity_aggregate_test');
     $this->assertText('OK');
     $this->assertText('2 druplicons in 1 day');
     $this->assertText(t('Verbose output is not available for cached sensor results. Click force run to see verbose output.'));

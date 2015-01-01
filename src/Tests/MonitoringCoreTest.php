@@ -12,6 +12,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\SensorConfigInterface;
+use Drupal\monitoring\SensorPlugin\SensorPluginInterface;
 
 /**
  * Tests for the core pieces of monitoring.
@@ -531,10 +532,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Tests the watchdog entries aggregator.
+   * Tests the database aggregator.
    */
-  public function testGenericDBAggregate() {
-
+  public function testDatabaseAggregator() {
     // Aggregate by watchdog type.
     $sensor_config = SensorConfig::load('watchdog_aggregate_test');
     $sensor_config->settings['conditions'] = array(
@@ -563,10 +563,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
       array('field' => 'severity', 'value' => RfcLogLevel::CRITICAL),
     );
     $sensor_config->save();
-    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
-    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
-    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
-    \Drupal::logger($this->randomMachineName())->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())
+      ->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())
+      ->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())
+      ->critical($this->randomMachineName());
+    \Drupal::logger($this->randomMachineName())
+      ->critical($this->randomMachineName());
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertEqual($result->getValue(), 4);
 
@@ -617,15 +621,20 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getValue(), 3);
+  }
 
-    // Test with different db table.
+  /**
+   * Tests the entity aggregator.
+   */
+  public function testEntityAggregator() {
+    // Create content types and nodes.
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
-    $sensor_config = SensorConfig::load('db_aggregate_test');
-    $this->drupalCreateNode(array('type' => $type1->type));
+    $sensor_config = SensorConfig::load('entity_aggregate_test');
+    $node1 = $this->drupalCreateNode(array('type' => $type1->type));
+    $node2 = $this->drupalCreateNode(array('type' => $type2->type));
     $this->drupalCreateNode(array('type' => $type2->type));
-    $this->drupalCreateNode(array('type' => $type2->type));
-    // Create one node that should not meet the time_interval condition.
+    // One node should not meet the time_interval condition.
     $node = $this->drupalCreateNode(array('type' => $type2->type));
     db_update('node_field_data')
       ->fields(array('created' => REQUEST_TIME - ($sensor_config->getTimeIntervalValue() + 10)))
@@ -633,12 +642,12 @@ class MonitoringCoreTest extends MonitoringTestBase {
       ->execute();
 
     // Test for the node type1.
-    $sensor_config = SensorConfig::load('db_aggregate_test');
+    $sensor_config = SensorConfig::load('entity_aggregate_test');
     $sensor_config->settings['conditions'] = array(
       'test' => array('field' => 'type', 'value' => $type1->type),
     );
     $sensor_config->save();
-    $result = $this->runSensor('db_aggregate_test');
+    $result = $this->runSensor('entity_aggregate_test');
     $this->assertEqual($result->getValue(), '1');
 
     // Test for node type2.
@@ -646,7 +655,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'test' => array('field' => 'type', 'value' => $type2->type),
     );
     $sensor_config->save();
-    $result = $this->runSensor('db_aggregate_test');
+    $result = $this->runSensor('entity_aggregate_test');
     // There should be two nodes with node type2 and created in last 24 hours.
     $this->assertEqual($result->getValue(), 2);
 
@@ -755,7 +764,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     );
     $sensor_config->settings['entity_type'] = 'node';
     $sensor_config->save();
-    $result = $this->runSensor('db_aggregate_test');
+    $result = $this->runSensor('entity_aggregate_test');
     // There should be three nodes with that reference.
     $this->assertEqual($result->getValue(), 3);
 
@@ -769,7 +778,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       ),
     );
     $sensor_config->save();
-    $result = $this->runSensor('db_aggregate_test');
+    $result = $this->runSensor('entity_aggregate_test');
     // There should be one nodes with those references.
     $this->assertEqual($result->getValue(), 1);
   }

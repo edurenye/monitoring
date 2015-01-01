@@ -52,11 +52,11 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   protected $entityManager;
 
   /**
-   * Local variable to store \Drupal::entityQueryAggregate.
+   * Local variable to store the query factory.
    *
    * @var \Drupal\Core\Entity\Query\QueryFactory
    */
-  protected $entityQueryAggregate;
+  protected $entityQueryFactory;
 
   /**
    * Builds the entity aggregate query.
@@ -67,14 +67,22 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   protected function getEntityQueryAggregate() {
     $entity_info = $this->entityManager->getDefinition($this->getEntityType(), TRUE);
 
-    $query = $this->entityQueryAggregate->getAggregate($this->getEntityType());
+    // Get aggregate query for the entity type.
+    $query = $this->entityQueryFactory->getAggregate($this->getEntityType());
     $this->aggregateField = $entity_info->getKey('id');
+
+    // Add aggregation.
     $query->aggregate($this->aggregateField, 'COUNT');
 
+    // Add conditions.
     foreach ($this->getConditions() as $condition) {
+      if (empty($condition['field'])) {
+        continue;
+      }
       $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
     }
 
+    // Apply time interval on field.
     if ($this->getTimeIntervalField() && $this->getTimeIntervalValue()) {
       $query->condition($this->getTimeIntervalField(), REQUEST_TIME - $this->getTimeIntervalValue(), '>');
     }
@@ -83,12 +91,55 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   }
 
   /**
+   * Builds the entity query for verbose output.
+   *
+   * Similar to the aggregate query, but without aggregation.
+   *
+   * @see getEntityQueryAggregate()
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
+   */
+  protected function getEntityQueryVerbose() {
+    $entity_info = $this->entityManager->getDefinition($this->getEntityType(), TRUE);
+
+    // Get query for the entity type.
+    $query = $this->entityQueryFactory->get($this->getEntityType());
+
+    // Add conditions.
+    foreach ($this->getConditions() as $condition) {
+      if (empty($condition['field'])) {
+        continue;
+      }
+      $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
+    }
+
+    // Apply time interval on field.
+    if ($this->getTimeIntervalField() && $this->getTimeIntervalValue()) {
+      $query->condition($this->getTimeIntervalField(), REQUEST_TIME - $this->getTimeIntervalValue(), '>');
+    }
+
+    // Order by most recent or id.
+    if ($this->getTimeIntervalField()) {
+      $query->sort($this->getTimeIntervalField(), 'DESC');
+    }
+    else {
+      $query->sort($entity_info->getKey('id'), 'DESC');
+    }
+
+    // Limit to 10 entities.
+    $query->range(0, 10);
+
+    return $query;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $entity_query) {
+  public function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition, EntityManagerInterface $entityManager, QueryFactory $query_factory) {
     parent::__construct($sensor_config, $plugin_id, $plugin_definition);
     $this->entityManager = $entityManager;
-    $this->entityQueryAggregate = $entity_query;
+    $this->entityQueryFactory = $query_factory;
   }
 
   /**
@@ -136,7 +187,39 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    return String::format('Aggregate field @field', array('@field' => $this->aggregateField));
+    $output = [];
+
+    $output[] = String::format('Aggregate field @field', array('@field' => $this->aggregateField));
+
+    // Fetch the last 10 matching entries, unaggregated.
+    $entity_ids = $this->getEntityQueryVerbose()->execute();
+
+    // Load entities.
+    $entity_type = $this->getEntityType();
+    $entities = \Drupal::entityManager()
+      ->getStorage($entity_type)
+      ->loadMultiple($entity_ids);
+
+    // Render entities.
+    $rendered_items = array();
+    foreach ($entities as $id => $entity) {
+      $entity_link = array(
+        '#type' => 'link',
+        '#title' => $entity->id() . ': ' . $entity->label(),
+        '#url' => $entity->urlInfo(),
+      );
+      $rendered_items[$id] = drupal_render($entity_link);
+    }
+    if (count($rendered_items) > 0) {
+      $item_list = array(
+        '#title' => 'Entities',
+        '#theme' => 'item_list',
+        '#items' => $rendered_items,
+      );
+      $output[] = drupal_render($item_list);
+    }
+
+    return implode("\n", $output);
   }
 
   /**

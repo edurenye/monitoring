@@ -128,7 +128,7 @@ class SensorDetailForm extends EntityForm {
       $form['sensor_result']['force_run'] = array(
         '#type' => 'submit',
         '#value' => $this->t('Run now'),
-        '#access' => \Drupal::currentUser()->hasPermission('monitoring force run'),
+        '#access' => \Drupal::currentUser()->hasPermission('administer monitoring') || \Drupal::currentUser()->hasPermission('monitoring force run'),
       );
     }
     elseif ($sensor_config->getCachingTime()) {
@@ -141,7 +141,7 @@ class SensorDetailForm extends EntityForm {
       $form['sensor_result']['force_run'] = array(
         '#type' => 'submit',
         '#value' => $this->t('Run again'),
-        '#access' => \Drupal::currentUser()->hasPermission('monitoring force run'),
+        '#access' => \Drupal::currentUser()->hasPermission('administer monitoring') || \Drupal::currentUser()->hasPermission('monitoring force run'),
       );
     }
     else {
@@ -156,7 +156,7 @@ class SensorDetailForm extends EntityForm {
       $form['sensor_result']['verbose'] = array(
         '#type' => 'fieldset',
         '#title' => $this->t('Verbose'),
-        '#access' => \Drupal::currentUser()->hasPermission('monitoring verbose'),
+        '#access' => \Drupal::currentUser()->hasPermission('administer monitoring') || \Drupal::currentUser()->hasPermission('monitoring verbose'),
       );
       if ($result->isCached()) {
         $form['sensor_result']['verbose']['output'] = array(
