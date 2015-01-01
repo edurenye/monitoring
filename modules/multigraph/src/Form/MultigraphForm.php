@@ -9,6 +9,7 @@ namespace Drupal\monitoring_multigraph\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Multigraph settings form controller.
@@ -24,16 +25,18 @@ class MultigraphForm extends EntityForm {
     /** @var \Drupal\monitoring_multigraph\MultigraphInterface $multigraph */
     $multigraph = $this->entity;
 
-    // Find sensors that can be included.
+    // Find sensors that can be added.
     $sensor_ids = \Drupal::entityQuery('monitoring_sensor_config')
       ->condition('status', TRUE)
       ->execute();
+    // Remove already added sensors.
     $sensor_ids = array_diff($sensor_ids, array_keys($multigraph->getSensorsRaw()));
     ksort($sensor_ids);
     /** @var \Drupal\monitoring\Entity\SensorConfig[] $sensors */
     $sensors = \Drupal::entityManager()
       ->getStorage('monitoring_sensor_config')
       ->loadMultiple($sensor_ids);
+    uasort($sensors, "\Drupal\monitoring\Entity\SensorConfig::sort");
 
     $form['label'] = array(
       '#type' => 'textfield',
@@ -75,7 +78,7 @@ class MultigraphForm extends EntityForm {
     $sensors_options = array();
     foreach ($sensors as $sensor) {
       if ($sensor->isNumeric()) {
-        $sensors_options[$sensor->id()] = $sensor->getLabel();
+        $sensors_options[$sensor->id()] = $sensor->getCategory() . ': ' . $sensor->getLabel();
       }
     }
 
