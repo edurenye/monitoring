@@ -23,27 +23,6 @@ class MultigraphWebTest extends WebTestBase {
   protected $adminUser;
 
   /**
-   * String that is appended to values for testing.
-   *
-   * @var string
-   */
-  protected $appendString = ' (test)';
-
-  /**
-   * Label of pre-installed multigraph.
-   *
-   * @var string
-   */
-  protected $preinstalledMultigraphLabel = 'Watchdog severe entries';
-
-  /**
-   * Description of pre-installed multigraph.
-   *
-   * @var string
-   */
-  protected $preinstalledMultigraphDescription = 'Watchdog entries with severity Warning or higher';
-
-  /**
    * Modules to enable.
    *
    * @var string[]
@@ -114,8 +93,8 @@ class MultigraphWebTest extends WebTestBase {
     // Go to multigraph overview and test editing pre-installed multigraph.
     $this->drupalGet('admin/config/system/monitoring/multigraphs');
     // Check label, description and sensors (before editing).
-    $this->assertText($this->preinstalledMultigraphLabel);
-    $this->assertText($this->preinstalledMultigraphDescription);
+    $this->assertText('Watchdog severe entries');
+    $this->assertText('Watchdog entries with severity Warning or higher');
     $this->assertText('404, Alert, Critical, Emergency, Error');
 
     // Edit.
@@ -124,8 +103,8 @@ class MultigraphWebTest extends WebTestBase {
 
     // Change label, description and add a sensor.
     $values = array(
-      'label' => $this->preinstalledMultigraphLabel . $this->appendString,
-      'description' => $this->preinstalledMultigraphDescription . $this->appendString,
+      'label' => 'Watchdog severe entries (test)',
+      'description' => 'Watchdog entries with severity Warning or higher (test)',
       'sensor_add[sensor_add_select]' => 'user_successful_logins',
     );
     $this->drupalPostForm(NULL, $values, t('Add'));
@@ -149,8 +128,8 @@ class MultigraphWebTest extends WebTestBase {
 
     // Go back to multigraph overview and check changed values.
     $this->drupalGet('admin/config/system/monitoring/multigraphs');
-    $this->assertText($this->preinstalledMultigraphLabel . $this->appendString);
-    $this->assertText($this->preinstalledMultigraphDescription . $this->appendString);
+    $this->assertText('Watchdog severe entries (test)');
+    $this->assertText('Watchdog entries with severity Warning or higher (test)');
     $this->assertText('Successful user logins, Error, Critical, Emergency, Alert');
   }
 
@@ -161,16 +140,16 @@ class MultigraphWebTest extends WebTestBase {
     // Go to multigraph overview and check for pre-installed multigraph.
     $this->drupalGet('admin/config/system/monitoring/multigraphs');
     // Check label and description (before deleting).
-    $this->assertText($this->preinstalledMultigraphLabel);
-    $this->assertText($this->preinstalledMultigraphDescription);
+    $this->assertText('Watchdog severe entries');
+    $this->assertText('Watchdog entries with severity Warning or higher');
 
     // Delete.
     $this->drupalPostForm('admin/config/system/monitoring/multigraphs/watchdog_severe_entries/delete', array(), t('Delete'));
-    $this->assertText('The ' . $this->preinstalledMultigraphLabel . $this->appendString . ' multigraph has been deleted');
+    $this->assertText('The Watchdog severe entries (test) multigraph has been deleted');
 
     // Go back to multigraph overview and check that multigraph is deleted.
     $this->drupalGet('admin/config/system/monitoring/multigraphs');
-    $this->assertNoText($this->preinstalledMultigraphLabel);
-    $this->assertNoText($this->preinstalledMultigraphDescription);
+    $this->assertNoText('Watchdog severe entries');
+    $this->assertNoText('Watchdog entries with severity Warning or higher');
   }
 }
