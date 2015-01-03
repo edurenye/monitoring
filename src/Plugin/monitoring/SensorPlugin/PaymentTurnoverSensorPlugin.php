@@ -29,7 +29,6 @@ class PaymentTurnoverSensorPlugin extends DatabaseAggregatorSensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $sensor_result) {
-
     // Joins payment_status and payment_line_item to filter on configured time
     // and currency code.
     $statement = db_select('payment_status', 'ps');

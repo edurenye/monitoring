@@ -29,7 +29,6 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-
     $view_executable = Views::getView($this->sensorConfig->getSetting('view'));
     $view_executable->build($this->sensorConfig->getSetting('display'));
 
@@ -55,7 +54,6 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-
     $view_executable = Views::getView($this->sensorConfig->getSetting('view'));
     // Execute the view query and get the total rows.
     $view_executable->preview($this->sensorConfig->getSetting('display'));

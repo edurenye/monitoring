@@ -18,11 +18,6 @@ use Drupal\monitoring\Entity\SensorConfig;
  */
 class MonitoringApiTest extends MonitoringUnitTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
   public static $modules = array('dblog');
 
   public static function getInfo() {

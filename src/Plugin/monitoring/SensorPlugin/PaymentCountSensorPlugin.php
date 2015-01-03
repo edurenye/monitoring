@@ -26,7 +26,6 @@ class PaymentCountSensorPlugin extends DatabaseAggregatorSensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $sensor_result) {
-
     // Counts the payments from payment_status created within the configured
     // time interval.
     $statement = db_select('payment_status', 'ps')

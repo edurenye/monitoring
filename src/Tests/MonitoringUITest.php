@@ -14,11 +14,6 @@ use Drupal\monitoring\Entity\SensorConfig;
  */
 class MonitoringUITest extends MonitoringTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
   public static $modules = array('dblog', 'node', 'views');
 
   /**
@@ -50,10 +45,10 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // The separate threshold settings tests have been split into separate
     // methods for better separation.
-    $this->checkExceedsThresholdSettings();
-    $this->checkFallsThresholdSettings();
-    $this->checkInnerThresholdSettings();
-    $this->checkOuterThresholdSettings();
+    $this->doTestExceedsThresholdSettings();
+    $this->doTestFallsThresholdSettings();
+    $this->doTestInnerThresholdSettings();
+    $this->doTestOuterThresholdSettings();
 
     // Test that trying to access the sensors settings page of a non-existing
     // sensor results in a page not found response.
@@ -468,7 +463,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests exceeds threshold settings UI and validation.
    */
-  protected function checkExceedsThresholdSettings() {
+  protected function doTestExceedsThresholdSettings() {
     // Test with valid values.
     $thresholds = array(
       'critical' => 11,
@@ -520,7 +515,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests falls threshold settings UI and validation.
    */
-  protected function checkFallsThresholdSettings() {
+  protected function doTestFallsThresholdSettings() {
     // Test with valid values.
     $thresholds = array(
       'critical' => 6,
@@ -567,7 +562,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests inner threshold settings UI and validation.
    */
-  protected function checkInnerThresholdSettings() {
+  protected function doTestInnerThresholdSettings() {
     // Test with valid values.
     $thresholds = array(
       'critical_low' => 5,
@@ -644,7 +639,7 @@ class MonitoringUITest extends MonitoringTestBase {
   /**
    * Tests outer threshold settings UI and validation.
    */
-  protected function checkOuterThresholdSettings() {
+  protected function doTestOuterThresholdSettings() {
     // Test with valid values.
     $thresholds = array(
       'critical_low' => 5,

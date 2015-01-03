@@ -29,7 +29,9 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Tests the view display sensor.
+   *
+   * @see ViewDisplayAggregatorSensorPlugin
    */
   public function testViewDisplaySensor() {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
@@ -73,7 +75,6 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     $result = $this->runSensor('view_user_count');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), '3 users');
-
   }
 
 }

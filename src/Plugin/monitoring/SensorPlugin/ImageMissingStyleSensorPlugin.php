@@ -61,7 +61,6 @@ class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-
     $verbose = parent::resultVerbose($result);
 
     // If non found, no reason to query file_managed table.

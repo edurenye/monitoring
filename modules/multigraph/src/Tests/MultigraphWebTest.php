@@ -46,7 +46,7 @@ class MultigraphWebTest extends WebTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var string[]
    */
   public static $modules = array(
     'dblog',
@@ -72,7 +72,7 @@ class MultigraphWebTest extends WebTestBase {
   }
 
   /**
-   * Create multigraph.
+   * Tests multigraph creation.
    */
   public function doTestMultigraphAdd() {
     // Add a few sensors.
@@ -106,7 +106,9 @@ class MultigraphWebTest extends WebTestBase {
   }
 
   /**
-   * Edit multigraph (tests all changeable input fields).
+   * Tests multigraph editing.
+   *
+   * Tests all changeable input fields.
    */
   public function doTestMultigraphEdit() {
     // Go to multigraph overview and test editing pre-installed multigraph.
@@ -153,7 +155,7 @@ class MultigraphWebTest extends WebTestBase {
   }
 
   /**
-   * Delete multigraph.
+   * Tests multigraph deletion.
    */
   public function doTestMultigraphDelete() {
     // Go to multigraph overview and check for pre-installed multigraph.

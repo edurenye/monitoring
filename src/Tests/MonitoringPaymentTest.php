@@ -43,6 +43,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
     $payment = Generate::createPayment(4, $payment_method);
     $payment->save();
 
+    // Create total payment count sensor.
     $sensor_config = SensorConfig::create(array(
       'id' => 'payment_count',
       'plugin_id' => 'payment_count',
@@ -58,6 +59,7 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), '1 transactions in 1 day');
 
+    // Create turnover sensor for JPY.
     $sensor_config = SensorConfig::create(array(
       'id' => 'payment_turnover',
       'plugin_id' => 'payment_turnover',

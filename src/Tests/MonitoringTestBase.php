@@ -10,15 +10,10 @@ use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\simpletest\WebTestBase;
 
 /**
- * Base class for all monitoring tests.
+ * Base class for all monitoring web tests.
  */
 abstract class MonitoringTestBase extends WebTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
   public static $modules = array('monitoring', 'monitoring_test');
 
   /**

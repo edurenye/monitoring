@@ -9,14 +9,10 @@ namespace Drupal\monitoring\Tests;
 use Drupal\simpletest\KernelTestBase;
 
 /**
- * Base class for all monitoring tests.
+ * Base class for all monitoring unit tests.
  */
 abstract class MonitoringUnitTestBase extends KernelTestBase {
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
+
   public static $modules = array('monitoring', 'monitoring_test', 'field', 'system', 'user');
 
   /**

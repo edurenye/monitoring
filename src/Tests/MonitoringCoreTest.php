@@ -19,11 +19,6 @@ use Drupal\monitoring\SensorPlugin\SensorPluginInterface;
  */
 class MonitoringCoreTest extends MonitoringTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
   public static $modules = array('dblog', 'image', 'node', 'taxonomy');
 
   public static function getInfo() {
@@ -38,49 +33,94 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * Tests individual sensors.
    */
   public function testSensors() {
-    // ======= CronLastRunAgeSensorPlugin tests ======= //
+    $this->doTestCronLastRunAgeSensorPlugin();
+    $this->doTestConfigValueSensorPluginCronSafeThreshold();
+    $this->doTestStateValueSensorPluginMaintenanceMode();
+    $this->doTestQueueSizeSensorPlugin();
+    $this->doTestCoreRequirementsSensorPlugin();
+    $this->doTestDblog404SensorPlugin();
+    $this->doTestImageMissingStyleSensorPlugin();
+    $this->doTestDatabaseAggregatorSensorPluginDblog();
+    $this->doTestUserFailedLoginsSensorPlugin();
+    $this->doTestDatabaseAggregatorSensorPluginUserLogout();
+    $this->doTestGitDirtyTreeSensorPlugin();
+    $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
+    $this->doTestSensorSimpleDatabaseAggregatorNodeType();
+    $this->doTestConfigValueSensorPluginDefaultTheme();
+  }
 
+  /**
+   * Tests cron last run age sensor.
+   *
+   * @see CronLastRunAgeSensorPlugin.
+   */
+  protected function doTestCronLastRunAgeSensorPlugin() {
+    // Fake cron run 1d+1s ago.
     $time_shift = (60 * 60 * 24 + 1);
     \Drupal::state()->set('system.cron_last', REQUEST_TIME - $time_shift);
     $result = $this->runSensor('core_cron_last_run_age');
     $this->assertTrue($result->isWarning());
     $this->assertEqual($result->getValue(), $time_shift);
 
+    // Fake cron run from 3d+1s ago.
     $time_shift = (60 * 60 * 24 * 3 + 1);
     \Drupal::state()->set('system.cron_last', REQUEST_TIME - $time_shift);
     $result = $this->runSensor('core_cron_last_run_age');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getValue(), $time_shift);
 
+    // Run cron and check sensor.
     \Drupal::service('cron')->run();
-
     $result = $this->runSensor('core_cron_last_run_age');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getValue(), 0);
+  }
 
-    // ======= Cron safe threshold (poormanscron) tests ======= //
-
+  /**
+   * Tests cron safe threshold (poormanscron) sensor.
+   *
+   * @see ConfigValueSensorPlugin
+   */
+  protected function doTestConfigValueSensorPluginCronSafeThreshold() {
+    // Run sensor, all is OK.
     $result = $this->runSensor('core_cron_safe_threshold');
     $this->assertTrue($result->isOk());
+
+    // Enable cron safe threshold and run sensor.
     \Drupal::config('system.cron')->set('threshold.autorun', 3600)->save();
     $result = $this->runSensor('core_cron_safe_threshold');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');
+  }
 
-    // ======= Maintenance mode tests ======= //
-
+  /**
+   * Tests maintenance mode sensor.
+   *
+   * @see StateValueSensorPlugin
+   */
+  protected function doTestStateValueSensorPluginMaintenanceMode() {
+    // Run sensor, all is OK.
     $result = $this->runSensor('core_maintenance_mode');
     $this->assertTrue($result->isOk());
+
+    // Enable maintenance mode and run sensor.
     \Drupal::state()->set('system.maintenance_mode', TRUE);
     $result = $this->runSensor('core_maintenance_mode');
     $this->assertTrue($result->isCritical());
+
     // Switch back to being online as being in maintenance mode would break
     // tests dealing with UI.
     \Drupal::state()->set('system.maintenance_mode', FALSE);
     $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');
+  }
 
-    // ======= SensorQueue tests ======= //
-
+  /**
+   * Tests queue size sensors.
+   *
+   * @see QueueSizeSensorPlugin
+   */
+  protected function doTestQueueSizeSensorPlugin() {
+    // Create queue sensor.
     $sensor_config = SensorConfig::create(array(
       'id' => 'core_queue_monitoring_test',
       'plugin_id' => 'queue_size',
@@ -89,14 +129,21 @@ class MonitoringCoreTest extends MonitoringTestBase {
       )
     ));
     $sensor_config->save();
+
+    // Create queue with some items and run sensor.
     $queue = \Drupal::queue('monitoring_test');
     $queue->createItem(array());
     $queue->createItem(array());
     $result = $this->runSensor('core_queue_monitoring_test');
     $this->assertEqual($result->getValue(), 2);
+  }
 
-    // ======= CoreRequirementsSensorPlugin tests ======= //
-
+  /**
+   * Tests requirements sensors.
+   *
+   * @see CoreRequirementsSensorPlugin
+   */
+  protected function doTestCoreRequirementsSensorPlugin() {
     // @todo - This should not be necessary after sensor requirements are updated.
     $sensor_config = SensorConfig::create(array(
       'id' => 'core_requirements_monitoring_test',
@@ -165,33 +212,55 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $result = $this->runSensor('core_requirements_monitoring_test');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), 'requirement3, requirement3 description');
+  }
 
-    // ======= Watchdog 404 in last 24 hours tests ======= //
-
+  /**
+   * Tests dblog 404 errors sensor.
+   *
+   * Logged through watchdog.
+   *
+   * @see Dblog404SensorPlugin
+   */
+  protected function doTestDblog404SensorPlugin() {
+    // Fake some not found errors
     \Drupal::logger('page not found')->notice('not/found');
+
+    // Run sensor and test the output.
     $result = $this->runSensor('dblog_404');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), '1 watchdog events in 1 day, not/found');
     $this->assertEqual($result->getValue(), 1);
 
+    // Fake more 404s.
     for ($i = 1; $i <= 20; $i++) {
       \Drupal::logger('page not found')->notice('not/found');
     }
 
+    // Run sensor and check the aggregate value.
     $result = $this->runSensor('dblog_404');
     $this->assertEqual($result->getValue(), 21);
     $this->assertTrue($result->isWarning());
 
+    // Fake more 404s.
     for ($i = 0; $i <= 100; $i++) {
       \Drupal::logger('page not found')->notice('not/found/another');
     }
 
+    // Run sensor and check the aggregate value.
     $result = $this->runSensor('dblog_404');
     $this->assertEqual($result->getValue(), 101);
     $this->assertTrue($result->isCritical());
+  }
 
-    // ======= ImageMissingStyleSensorPlugin tests ======= //
-
+  /**
+   * Tests dblog missing image style sensor.
+   *
+   * Logged through watchdog.
+   *
+   * @see ImageMissingStyleSensorPlugin
+   */
+  protected function doTestImageMissingStyleSensorPlugin() {
+    // Fake some image style derivative errors.
     $file = file_save_data($this->randomMachineName());
     /** @var FileUsageInterface $usage */
     $usage = \Drupal::service('file.usage');
@@ -209,6 +278,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
         '%derivative_path' => 'hash://styles/preview/5678.jpeg',
       ));
 
+    // Run sensor and test the output.
     $result = $this->runSensor('dblog_image_missing_style');
     $this->assertEqual(6, $result->getValue());
     $this->assertTrue(strpos($result->getMessage(), $file->getFileUri()) !== FALSE);
@@ -216,9 +286,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue(strpos($result->getVerboseOutput(), 'monitoring_test') !== FALSE);
     $this->assertTrue(strpos($result->getVerboseOutput(), 'test_object') !== FALSE);
     $this->assertTrue(strpos($result->getVerboseOutput(), '123456789') !== FALSE);
+  }
 
-    // ======= Watchdog sensor tests ======= //
-
+  /**
+   * Tests dblog watchdog sensor.
+   *
+   * @see DatabaseAggregatorSensorPlugin
+   */
+  protected function doTestDatabaseAggregatorSensorPluginDblog() {
     // Create watchdog entry with severity alert.
     // The testbot reported random fails with an unexpected watchdog record.
     // ALERT: "Missing filter plugin: %filter." with %filter = "filter_null"
@@ -232,30 +307,49 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $severities = monitoring_event_severities();
     $result = $this->runSensor('dblog_event_severity_' . $severities[RfcLogLevel::ALERT]);
     $this->assertEqual($result->getValue(), 1);
+  }
 
-    // ======= UserFailedLoginsSensorPlugin tests ======= //
-
+  /**
+   * Tests failed user logins sensor.
+   *
+   * @see UserFailedLoginsSensorPlugin
+   */
+  protected function doTestUserFailedLoginsSensorPlugin() {
+    // Fake some login failed dblog records.
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user2'));
 
+    // Run sensor and test the output.
     $result = $this->runSensor('user_failed_logins');
     $this->assertEqual($result->getValue(), 3);
     $this->assertTrue(strpos($result->getMessage(), 'user1: 2') !== FALSE);
     $this->assertTrue(strpos($result->getMessage(), 'user2: 1') !== FALSE);
+  }
 
-    // ======= SensorPlugin user_session_logouts tests ======= //
-
+  /**
+   * Tests user logouts through db aggregator sensor.
+   *
+   * @see DatabaseAggregatorSensorPlugin
+   */
+  protected function doTestDatabaseAggregatorSensorPluginUserLogout() {
+    // Fake some logout dblog records.
     \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Session closed for %name.', array('%user' => 'user2'));
 
+    // Run sensor and test the output.
     $result = $this->runSensor('user_session_logouts');
     $this->assertEqual($result->getValue(), 3);
     $this->assertEqual($result->getMessage(), '3 logouts in 1 day');
+  }
 
-    // ======= GitDirtyTreeSensorPlugin tests ======= //
-
+  /**
+   * Tests git sensor.
+   *
+   * @see GitDirtyTreeSensorPlugin
+   */
+  protected function doTestGitDirtyTreeSensorPlugin() {
     // Enable the sensor and set cmd to output something.
     // The command creates a line for every file in unexpected state.
     $sensor_config = SensorConfig::load('monitoring_git_dirty_tree');
@@ -279,8 +373,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isOk());
     // The message should say that it is ok.
     $this->assertEqual($result->getMessage(), 'Value 0, Git repository clean');
+  }
 
-    // ======= Active sessions count tests ======= //
+  /**
+   * Tests active session count through db aggregator sensor.
+   *
+   * @see DatabaseAggregatorSensorPlugin
+   */
+  protected function doTestDatabaseAggregatorSensorPluginActiveSessions() {
     // Create and login a user to have data in the sessions table.
     $test_user = $this->drupalCreateUser();
     $this->drupalLogin($test_user);
@@ -288,15 +388,21 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertEqual($result->getValue(), 1);
     $result = $this->runSensor('user_sessions_all');
     $this->assertEqual($result->getValue(), 1);
+
     // Logout the user to see if sensors responded to the change.
     $this->drupalLogout();
     $result = $this->runSensor('user_sessions_authenticated');
     $this->assertEqual($result->getValue(), 0);
     $result = $this->runSensor('user_sessions_all');
     $this->assertEqual($result->getValue(), 0);
+  }
 
-    // ======= node sensors tests ======= //
-
+  /**
+   * Tests the node count per content type sensor.
+   *
+   * @see SensorSimpleDatabaseAggregator
+   */
+  protected function doTestSensorSimpleDatabaseAggregatorNodeType() {
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
     $this->drupalCreateNode(array('type' => $type1->type));
@@ -305,19 +411,30 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Make sure that sensors for the new node types are available.
     monitoring_sensor_manager()->resetCache();
+
+    // Run sensor for type1.
     $result = $this->runSensor('node_new_' . $type1->type);
     $this->assertEqual($result->getValue(), 2);
     // Test for the SensorSimpleDatabaseAggregator custom message.
     $this->assertEqual($result->getMessage(), String::format('@count @unit in @time_interval', array(
       '@count' => $result->getValue(),
       '@unit' => strtolower($result->getSensorConfig()->getValueLabel()),
-      '@time_interval' => \Drupal::service('date.formatter')->formatInterval($result->getSensorConfig()
-        ->getTimeIntervalValue()),
+      '@time_interval' => \Drupal::service('date.formatter')
+        ->formatInterval($result->getSensorConfig()
+          ->getTimeIntervalValue()),
     )));
 
+    // Run sensor for all types.
     $result = $this->runSensor('node_new_all');
     $this->assertEqual($result->getValue(), 3);
+  }
 
+  /**
+   * Tests the default theme sensor.
+   *
+   * @see ConfigValueSensorPlugin
+   */
+  protected function doTestConfigValueSensorPluginDefaultTheme() {
     \Drupal::config('system.theme')->set('default', 'bartik')->save();
     $result = $this->runSensor('core_theme_default');
     $this->assertTrue($result->isOk());
@@ -329,13 +446,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Tests for DisappearedSensorsSensorPlugin.
+   * Tests for disappearing sensors.
    *
    * We provide a separate test method for the DisappearedSensorsSensorPlugin as we
    * need to enable and disable additional modules.
+   *
+   * @see DisappearedSensorsSensorPlugin
    */
   public function testSensorDisappearedSensors() {
-
     // Install the comment module and the comment_new sensor.
     $this->installModules(array('comment'));
     monitoring_sensor_manager()->enableSensor('comment_new');
@@ -392,6 +510,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       String::format('@count new sensor/s removed: @names', array('@count' => 1, '@names' => 'comment_new')));
 
     // === Test the UI === //
+    // @todo move to UI tests.
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
     // Install comment module and the comment_new sensor.
@@ -428,6 +547,10 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
   /**
    * Tests the UI/settings of the enabled modules sensor.
+   *
+   * // @todo move to UI tests.
+   *
+   * @see EnabledModulesSensorPlugin
    */
   public function testSensorInstalledModulesUI() {
     $account = $this->drupalCreateUser(array('administer monitoring'));
@@ -495,9 +618,11 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Test cases for EnabledModulesSensorPlugin sensor.
+   * Tests enabled modules sensor.
    *
    * We use separate test method as we need to enable/disable modules.
+   *
+   * @see EnabledModulesSensorPlugin
    */
   public function testSensorInstalledModulesAPI() {
     // The initial run of the sensor will acknowledge all installed modules as
@@ -532,7 +657,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
   }
 
   /**
-   * Tests the database aggregator.
+   * Tests the database aggregator sensor.
+   *
+   * @see DatabaseAggregatorSensorPlugin
    */
   public function testDatabaseAggregator() {
     // Aggregate by watchdog type.
@@ -625,6 +752,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
   /**
    * Tests the entity aggregator.
+   *
+   * @see EntityAggregatorSensorPlugin
    */
   public function testEntityAggregator() {
     // Create content types and nodes.

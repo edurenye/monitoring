@@ -13,15 +13,10 @@ use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\rest\Tests\RESTTestBase;
 
 /**
- * Tests for cron sensor.
+ * Tests for monitoring services.
  */
 class MonitoringServicesTest extends RESTTestBase {
 
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
   public static $modules = array('dblog', 'hal', 'rest', 'monitoring');
 
   /**

@@ -55,7 +55,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-
     $verbose = array();
     $verbose[] = "<pre>";
     $verbose[] = "Query:\n{$this->queryString}";
@@ -103,7 +102,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-
     $query = $this->getAggregateQuery();
 
     $this->queryArguments = $query->getArguments();

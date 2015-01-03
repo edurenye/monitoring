@@ -36,7 +36,7 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Tests the captcha failed attempts sensor.
    */
   public function testCaptchaSensor() {
 
