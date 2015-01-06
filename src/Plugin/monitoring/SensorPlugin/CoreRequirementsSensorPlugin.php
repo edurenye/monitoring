@@ -9,6 +9,7 @@ namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
+use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
 
@@ -24,7 +25,7 @@ use Drupal\Core\Entity\DependencyTrait;
  *
  * @todo Shorten sensor message and add improved verbose output.
  */
-class CoreRequirementsSensorPlugin extends SensorPluginBase {
+class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   use DependencyTrait;
 
@@ -38,11 +39,94 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase {
   /**
    * {@inheritdoc}
    */
+  public function resultVerbose(SensorResultInterface $result) {
+    $output = [];
+
+    $requirements = $this->getRequirements($this->sensorConfig->getSetting('module'));
+    $excluded_keys = $this->sensorConfig->getSetting('exclude_keys');
+    if (empty($excluded_keys)) {
+      $excluded_keys = array();
+    }
+
+    $rows = [];
+    foreach ($requirements as $key => $value) {
+      // Make sure all keys are present.
+      $value += array(
+        'severity' => NULL,
+      );
+
+      // Map column key.
+      $row['key'] = $key;
+
+      // Map column excluded.
+      if (in_array($key, $excluded_keys)) {
+        $row['excluded'] = 'Yes';
+      }
+      else {
+        $row['excluded'] = '';
+      }
+
+      // Map column severity.
+      $severity = $value['severity'];
+      if ($severity == REQUIREMENT_ERROR) {
+        $severity  = 'Error';
+      }
+      elseif ($severity == REQUIREMENT_WARNING) {
+        $severity  = 'Warning';
+      }
+      else {
+        $severity  = 'OK';
+      }
+      $row['severity'] = $severity;
+
+      // Map column message with title and description.
+      $title = '';
+      if (isset($value['title'])) {
+        $title .= $value['title'];
+      }
+      if (isset($value['value'])) {
+        $title .= $value['value'];
+      }
+      $description = '';
+      if (isset($value['description'])) {
+        $description = $value['description'];
+      }
+      $message = array(
+        '#type' => 'item',
+        '#title' => $title,
+        '#markup' => $description,
+      );
+      $row['message'] = drupal_render($message);
+
+      $rows[] = array(
+        'data' => $row,
+      );
+    }
+
+    if (count($rows) > 0) {
+      $header = [];
+      $header['key'] = t('Key');
+      $header['excluded'] = t('Excluded');
+      $header['severity'] = t('Severity');
+      $header['message'] = t('Message');
+
+      $output['requirements'] = array(
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
+      );
+    }
+    return $output;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $result) {
     $requirements = $this->getRequirements($this->sensorConfig->getSetting('module'));
 
     // Ignore requirements that were explicitly excluded.
-    foreach ($this->sensorConfig->getSetting('exclude keys', array()) as $exclude_key) {
+    foreach ($this->sensorConfig->getSetting('exclude_keys', array()) as $exclude_key) {
       if (isset($requirements[$exclude_key])) {
         unset($requirements[$exclude_key]);
       }
@@ -50,6 +134,26 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase {
 
     $this->processRequirements($result, $requirements);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
+
+    $form['exclude_keys'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Keys to be excluded.'),
+      '#description' => t('Seperate the keys by a new line.'),
+    );
+
+    if ($this->sensorConfig->getSetting('exclude_keys')) {
+      $form['exclude_keys']['#default_value']  = implode("\n", $this->sensorConfig->getSetting('exclude_keys'));
+    }
+    return $form;
+  }
+
+
 
   /**
    * Extracts the highest severity from the requirements array.
@@ -152,4 +256,15 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase {
     $this->addDependency('module', $module);
     return $this->dependencies;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $keys = array_filter(explode("\n", $form_state->getValue(array('settings', 'exclude_keys'))));
+    $keys = array_map('trim', $keys);
+    $this->sensorConfig->settings['exclude_keys'] = $keys;
+    return $form_state;
+  }
+
 }

@@ -422,6 +422,33 @@ class MonitoringUITest extends MonitoringTestBase {
   }
 
   /**
+   * Tests the UI of the requirements sensor.
+   */
+  public function testCoreRequirementsSensorUI() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
+
+    // Verify the current keys to exclude.
+    $this->assertText('cron');
+
+    // Change the excluded keys.
+    $this->drupalPostForm(NULL, array(
+      'settings[exclude_keys]' => 'requirement_excluded'
+    ),  t('Save'));
+
+    $this->assertText('Sensor settings saved.');
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
+    // Verify the change in excluded keys
+    $this->assertText('requirement_excluded');
+    $this->assertNoText('cron');
+
+
+   // $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
+  }
+
+  /**
    * Submits a threshold settings form for a given sensor.
    *
    * @param string $sensor_name

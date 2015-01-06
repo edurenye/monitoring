@@ -147,7 +147,7 @@ monitoring.settings.core_requirements:
     module:
       type: string
       label: 'Module name'
-    exclude keys:
+    exclude_keys:
       type: sequence
       label: 'Exclude list'
       sequence:

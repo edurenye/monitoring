@@ -141,6 +141,9 @@ class MonitoringCoreTest extends MonitoringTestBase {
   /**
    * Tests requirements sensors.
    *
+   * The module monitoring_test implements custom requirements injected through
+   * state monitoring_test.requirements.
+   *
    * @see CoreRequirementsSensorPlugin
    */
   protected function doTestCoreRequirementsSensorPlugin() {
@@ -157,7 +160,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), 'Requirements check OK');
 
-    // Set basic requirements saying that all is ok.
+    // Set basic requirements saying that all is OK.
     $requirements = array(
       'requirement1' => array(
         'title' => 'requirement1',
@@ -177,11 +180,11 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Set requirements exclude keys into the sensor settings.
     $sensor_config = SensorConfig::load('core_requirements_monitoring_test');
     $settings = $sensor_config->getSettings();
-    $settings['exclude keys'] = array('requirement_excluded');
+    $settings['exclude_keys'] = array('requirement_excluded');
     $sensor_config->settings = $settings;
     $sensor_config->save();
 
-    // We still should have OK status but with different message.
+    // We still have OK status but with different message.
     $result = $this->runSensor('core_requirements_monitoring_test');
     // We expect OK status as REQUIREMENT_ERROR is set by excluded requirement.
     $this->assertTrue($result->isOk());
@@ -195,7 +198,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     );
     \Drupal::state()->set('monitoring_test.requirements', $requirements);
 
-    // Now the sensor should have escalated to the requirement in warning state.
+    // Now the sensor escalates to the requirement in warning state.
     $result = $this->runSensor('core_requirements_monitoring_test');
     $this->assertTrue($result->isWarning());
     $this->assertEqual($result->getMessage(), 'requirement2, requirement2 description');
@@ -208,10 +211,22 @@ class MonitoringCoreTest extends MonitoringTestBase {
     );
     \Drupal::state()->set('monitoring_test.requirements', $requirements);
 
-    // Now the sensor should have escalated to the requirement in critical state.
+    // Now the sensor escalates to the requirement in critical state.
     $result = $this->runSensor('core_requirements_monitoring_test');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), 'requirement3, requirement3 description');
+
+    // Check verbose message. All output should be part of it.
+
+    $verbose_output = $result->getVerboseOutput();
+    $this->setRawContent(drupal_render($verbose_output));
+    $this->assertText('requirement1');
+    $this->assertText('requirement1 description');
+    $this->assertText('requirement_excluded');
+    $this->assertText('excluded requirement');
+    $this->assertText('requirement that should be excluded from monitoring by the sensor');
+    $this->assertText('requirement2');
+    $this->assertText('requirement2 description');
   }
 
   /**
@@ -284,11 +299,10 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue(strpos($result->getMessage(), $file->getFileUri()) !== FALSE);
     $this->assertTrue($result->isWarning());
     $verbose_output = $result->getVerboseOutput();
-    $this->assertTrue(strpos(drupal_render($verbose_output), 'monitoring_test') !== FALSE);
-    $verbose_output = $result->getVerboseOutput();
-    $this->assertTrue(strpos(drupal_render($verbose_output), 'test_object') !== FALSE);
-    $verbose_output = $result->getVerboseOutput();
-    $this->assertTrue(strpos(drupal_render($verbose_output), '123456789') !== FALSE);
+    $this->setRawContent(drupal_render($verbose_output));
+    $this->assertText('monitoring_test');
+    $this->assertText('test_object');
+    $this->assertText('123456789');
   }
 
   /**
@@ -363,7 +377,8 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isCritical());
     // The verbose output should contain the cmd output.
     $verbose_output = $result->getVerboseOutput();
-    $this->assertTrue(strpos(drupal_render($verbose_output), 'dummy output') !== FALSE);
+    $this->setRawContent(drupal_render($verbose_output));
+    $this->assertText('dummy output');
     // Two lines of cmd output.
     $this->assertEqual($result->getValue(), 2);
     // If exec() is disabed on an environment, make it visible in output.
@@ -924,10 +939,11 @@ class MonitoringCoreTest extends MonitoringTestBase {
    */
   protected function createVocabulary() {
     // Create a vocabulary.
-    $vocabulary = entity_create('taxonomy_vocabulary');
-    $vocabulary->vid = Unicode::strtolower($this->randomMachineName());
-    $vocabulary->name = $this->randomMachineName();
-    $vocabulary->description = $this->randomMachineName();
+    $vocabulary = entity_create('taxonomy_vocabulary', array(
+      'vid' => Unicode::strtolower($this->randomMachineName()),
+      'name' => $this->randomMachineName(),
+      'description' => $this->randomMachineName(),
+    ));
     $vocabulary->save();
     return $vocabulary;
   }

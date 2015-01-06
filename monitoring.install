@@ -165,14 +165,14 @@ function monitoring_install() {
       'settings' => array(
         'module' => $module,
         // List requirements keys which reports will be suppressed.
-        'exclude keys' => array(),
+        'exclude_keys' => array(),
       ),
       'dependencies' => array('module' => $module),
     ));
     // Ignore the cron key for system requirements, as we have a separate
     // sensor for this.
     if ($module == 'system') {
-      $sensor->settings['exclude keys'][] = 'cron';
+      $sensor->settings['exclude_keys'][] = 'cron';
     }
     $sensor->save();
   }
