@@ -9,6 +9,7 @@ namespace Drupal\monitoring;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
@@ -328,7 +329,7 @@ class SensorRunner {
   public function resetCache(array $sensor_names = array()) {
     if (empty($sensor_names)) {
       // No sensor names provided, clear all caches.
-      $this->cache->deleteTags(array('monitoring_sensor_result'));
+      Cache::invalidateTags(array('monitoring_sensor_result'));
     }
     else {
       $cids = array();
