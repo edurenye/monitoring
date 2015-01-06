@@ -10,6 +10,7 @@ test_dependencies:
  - elysia_cron
  - payment
  - captcha
+ - past
 
 simplytest_dependencies:
  - monitoring_demo
