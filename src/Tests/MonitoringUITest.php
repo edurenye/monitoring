@@ -89,7 +89,14 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[conditions][0][field]' => 'type',
       'settings[conditions][0][value]' => 'message',
     ), t('Save'));
-    $this->assertText('Sensor settings saved.');
+
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'UI created Sensor')));
+
+    // Test details page by clicking the link in confirmation message.
+    $this->assertLink(t('UI created Sensor'));
+    $this->clickLink(t('UI created Sensor'));
+    $this->assertText('Result');
+
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
@@ -117,7 +124,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[key]' => 'threshold.autorun',
       'settings[config]' => 'system.cron',
     ), t('Save'));
-    $this->assertText('Sensor settings saved.');
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'UI created Sensor config')));
 
     // Go back to the sensor edit page,
     // Check the value type is properly selected.
@@ -245,6 +252,7 @@ class MonitoringUITest extends MonitoringTestBase {
     // Test the action buttons are clickable.
     $this->assertLink(t('Details'));
     $this->assertLink(t('Edit'));
+    $this->assertLink(t('Details'));
 
     // Test the overview table.
     $tbody = $this->xpath('//table[@id="monitoring-sensors-overview"]/tbody');
@@ -336,11 +344,11 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/core_cron_safe_threshold');
     $this->assertText('FALSE');
 
-    // Test that accessing a disabled or nisot-existing sensor results in a page
-    // not found response.
+    // Test that accessing a disabled or nisot-existing sensor results in an
+    // access denied and a page not found response.
     monitoring_sensor_manager()->disableSensor('test_sensor');
     $this->drupalGet('admin/reports/monitoring/sensors/test_sensor');
-    $this->assertResponse(404);
+    $this->assertResponse(403);
 
     $this->drupalGet('admin/reports/monitoring/sensors/non_existing_sensor');
     $this->assertResponse(404);
@@ -350,7 +358,7 @@ class MonitoringUITest extends MonitoringTestBase {
    * Tests the sensor detail page for actual and expected values.
    */
   public function testSensorEditPage() {
-    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
     // Visit the edit page of "core theme default" (config value sensor)
@@ -365,6 +373,8 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('The expected value of state system.maintenance_mode, current value: FALSE');
     // Make sure delete link is not available for this sensor.
     $this->assertNoLink(t('Delete'));
+    // Make sure details page is available for an enabled sensor.
+    $this->assertLink('Details');
 
     // Test the checkbox in edit sensor settings for the bool sensor
     // Cron safe threshold enabled/disabled.
@@ -376,6 +386,20 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalGet('admin/config/system/monitoring/sensors/core_cron_safe_threshold');
     $this->assertFieldChecked('edit-settings-value');
+
+    // Test whether the details page is available.
+    $this->assertLink(t('Details'));
+    $this->clickLink(t('Details'));
+    $this->assertText('Result');
+
+    $this->assertLink(t('Edit'));
+    $this->clickLink(t('Edit'));
+    $this->assertText('Sensor plugin settings');
+
+    // Test detail page is not available for a disabled sensor.
+    $this->drupalGet('admin/config/system/monitoring/sensors/node_new_all');
+    $this->assertNoLink('Details');
+
   }
 
   /**
@@ -438,7 +462,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'settings[exclude_keys]' => 'requirement_excluded'
     ),  t('Save'));
 
-    $this->assertText('Sensor settings saved.');
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Module system')));
     $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
     // Verify the change in excluded keys
     $this->assertText('requirement_excluded');
@@ -498,7 +522,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning' => 6,
     );
     $this->submitThresholdSettings('test_sensor_exceeds', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor exceeds')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_exceeds', $thresholds);
 
     // Make sure that it is possible to save empty thresholds.
@@ -507,7 +531,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning' => '',
     );
     $this->submitThresholdSettings('test_sensor_exceeds', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor exceeds')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_exceeds', $thresholds);
 
     monitoring_sensor_manager()->resetCache();
@@ -550,7 +574,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning' => 11,
     );
     $this->submitThresholdSettings('test_sensor_falls', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor falls')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_falls', $thresholds);
 
     // Make sure that it is possible to save empty thresholds.
@@ -559,7 +583,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning' => '',
     );
     $this->submitThresholdSettings('test_sensor_falls', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor falls')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_falls', $thresholds);
 
     // Test validation.
@@ -599,7 +623,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning_high' => 15,
     );
     $this->submitThresholdSettings('test_sensor_inner', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor inner')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_inner', $thresholds);
 
     // Make sure that it is possible to save empty inner thresholds.
@@ -610,7 +634,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning_high' => '',
     );
     $this->submitThresholdSettings('test_sensor_inner', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor inner')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_inner', $thresholds);
 
     // Test validation.
@@ -676,7 +700,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning_high' => 14,
     );
     $this->submitThresholdSettings('test_sensor_outer', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor outer')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_outer', $thresholds);
 
     // Make sure that it is possible to save empty outer thresholds.
@@ -687,7 +711,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'warning_high' => '',
     );
     $this->submitThresholdSettings('test_sensor_outer', $thresholds);
-    $this->assertText(t('Sensor settings saved.'));
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'Test sensor outer')));
     $this->assertThresholdSettingsUIDefaults('test_sensor_outer', $thresholds);
 
     // Test validation.

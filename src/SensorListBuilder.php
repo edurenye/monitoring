@@ -10,6 +10,7 @@ namespace Drupal\monitoring;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormInterface;
+use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -37,7 +38,19 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
     $row['label'] = $this->getLabel($entity);
     $row['category'] = $entity->getCategory();
     $row['description'] = $entity->getDescription();
-    return $row + parent::buildRow($entity);
+    $url = Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => $entity->id()));
+
+    $row = $row + parent::buildRow($entity);
+
+    // Adds the link to details page if sensor is enabled.
+    $sensor_config = SensorConfig::load($entity->id());
+    if ($sensor_config->isEnabled()) {
+      $row['operations']['data']['#links']['details'] = array(
+        'title' => 'Details',
+        'url' => $url,
+      );
+    }
+    return $row;
   }
 
   /*

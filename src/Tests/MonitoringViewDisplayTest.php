@@ -5,6 +5,7 @@
  */
 
 namespace Drupal\monitoring\Tests;
+use Drupal\Component\Utility\String;
 
 /**
  * Tests the view display sensor.
@@ -56,7 +57,7 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     $this->drupalPostForm(NULL, array(
       'settings[display]' => 'default',
     ), t('Save'));
-    $this->assertText('Sensor settings saved.');
+    $this->assertText(String::format('Sensor @label saved.', array('@label' => 'All users')));
 
     // Edit and check selection.
     $this->drupalGet('admin/config/system/monitoring/sensors/view_user_count');

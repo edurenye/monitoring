@@ -20,7 +20,7 @@ monitoring.detail_form:
     _entity_form: 'monitoring_sensor_config.details'
     _title_callback: '\Drupal\monitoring\Form\SensorDetailForm::formTitle'
   requirements:
-    _permission: 'monitoring reports'
+    _entity_access: 'monitoring_sensor_config.view'
 
 monitoring.force_run_all:
   path: 'monitoring/sensors/force'

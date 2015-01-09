@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Form;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -261,8 +262,15 @@ class SensorForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     parent::save($form, $form_state);
 
+    $sensor_id = $form_state->getValue('id');
     $form_state->setRedirect('monitoring.sensors_overview_settings');
-    drupal_set_message($this->t('Sensor settings saved.'));
+    $url = Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => $sensor_id));
+
+    // Message with the link to sensor details page.
+    drupal_set_message(t('Sensor <a href="@url">@label</a> saved.', array(
+      '@url' => $url->toString(),
+      '@label' => $form_state->getValue('label')
+    )));
   }
 
   /**
