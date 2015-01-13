@@ -36,10 +36,10 @@ use Drupal\monitoring\SensorConfigInterface;
  *     "label" = "label"
  *   },
  *   links = {
- *     "delete-form" = "monitoring.sensor_delete",
- *     "edit-form" = "monitoring.sensor_edit",
- *     "details-form" = "monitoring.detail_form",
- *     "force-run-form" = "monitoring.force_run_sensor"
+ *     "delete-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}/delete",
+ *     "edit-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}",
+ *     "details-form" = "/admin/reports/monitoring/sensors/{monitoring_sensor_config}",
+ *     "force-run-sensor" = "monitoring/sensors/force/{monitoring_sensor_config}"
  *   }
  * )
  */

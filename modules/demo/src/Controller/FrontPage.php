@@ -36,7 +36,7 @@ class FrontPage extends ControllerBase {
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(
-            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => 'enabled_modules')))),
+            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => 'enabled_modules')))),
             t('<a href="@url">Disable</a> Dashboard module and enable Book module.', array('@url' => Url::fromRoute('system.modules_list')->toString())),
             t('Visit the <a href="@url">sensors overview page</a> to see the reported issue.', array('@url' => Url::fromRoute('monitoring.sensor_list')->toString())),
           )

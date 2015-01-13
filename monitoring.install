@@ -21,11 +21,11 @@ function monitoring_install() {
   if (\Drupal::moduleHandler()->moduleExists('node')) {
     foreach (NodeType::loadMultiple() as $node_type) {
       $sensor = SensorConfig::create(array(
-        'id' => 'node_new_' . $node_type->type,
-        'label' => String::format('New @type nodes', array('@type' => $node_type->name)),
-        'description' => String::format('New nodes of type @type', array('@type' => $node_type->name)),
+        'id' => 'node_new_' . $node_type->id(),
+        'label' => String::format('New @type nodes', array('@type' => $node_type->label())),
+        'description' => String::format('New nodes of type @type', array('@type' => $node_type->label())),
         'plugin_id' => 'entity_aggregator',
-        'value_label' => String::format('@type nodes', array('@type' => $node_type->name)),
+        'value_label' => String::format('@type nodes', array('@type' => $node_type->label())),
         'value_type' => 'number',
         'category' => 'Content',
         'status' => TRUE,
@@ -33,7 +33,7 @@ function monitoring_install() {
         'settings' => array(
           'entity_type' => 'node',
           'conditions' => array(
-            array('field' => 'type', 'value' => $node_type->type),
+            array('field' => 'type', 'value' => $node_type->id()),
           ),
           'time_interval_field' => 'created',
           'time_interval_value' => 60 * 60 * 24,

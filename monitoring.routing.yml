@@ -14,7 +14,7 @@ monitoring.sensor_list:
   requirements:
     _permission: 'monitoring reports'
 
-monitoring.detail_form:
+entity.monitoring_sensor_config.details_form:
   path: '/admin/reports/monitoring/sensors/{monitoring_sensor_config}'
   defaults:
     _entity_form: 'monitoring_sensor_config.details'
@@ -29,14 +29,14 @@ monitoring.force_run_all:
   requirements:
     _permission: 'monitoring force run'
 
-monitoring.force_run_sensor:
+entity.monitoring_sensor_config.force_run_sensor:
   path: 'monitoring/sensors/force/{monitoring_sensor_config}'
   defaults:
     _controller: '\Drupal\monitoring\Controller\ForceRunController::forceRunSensor'
   requirements:
     _permission: 'monitoring force run'
 
-monitoring.sensor_delete:
+entity.monitoring_sensor_config.delete_form:
   path: '/admin/config/system/monitoring/sensors/{monitoring_sensor_config}/delete'
   defaults:
     _entity_form: 'monitoring_sensor_config.delete'
@@ -44,7 +44,7 @@ monitoring.sensor_delete:
   requirements:
     _permission: 'administer monitoring'
 
-monitoring.sensor_edit:
+entity.monitoring_sensor_config.edit_form:
   path: '/admin/config/system/monitoring/sensors/{monitoring_sensor_config}'
   defaults:
     _entity_form: 'monitoring_sensor_config.edit'

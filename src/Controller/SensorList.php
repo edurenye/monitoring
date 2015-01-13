@@ -119,7 +119,7 @@ class SensorList extends ControllerBase {
         if ($sensor_config->getCachingTime() && $this->currentUser()->hasPermission('monitoring force run')) {
           $links['force_execution'] = array(
             'title' => t('Force execution'),
-            'url' => $sensor_config->urlInfo('force-run-form')
+            'url' => $sensor_config->urlInfo('force-run-sensor')
           );
         }
         $links['edit'] = array(

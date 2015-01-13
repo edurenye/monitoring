@@ -38,7 +38,7 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
     $row['label'] = $this->getLabel($entity);
     $row['category'] = $entity->getCategory();
     $row['description'] = $entity->getDescription();
-    $url = Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => $entity->id()));
+    $url = Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => $entity->id()));
 
     $row = $row + parent::buildRow($entity);
 

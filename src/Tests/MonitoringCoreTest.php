@@ -424,15 +424,15 @@ class MonitoringCoreTest extends MonitoringTestBase {
   protected function doTestSensorSimpleDatabaseAggregatorNodeType() {
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
-    $this->drupalCreateNode(array('type' => $type1->type));
-    $this->drupalCreateNode(array('type' => $type1->type));
-    $this->drupalCreateNode(array('type' => $type2->type));
+    $this->drupalCreateNode(array('type' => $type1->id()));
+    $this->drupalCreateNode(array('type' => $type1->id()));
+    $this->drupalCreateNode(array('type' => $type2->id()));
 
     // Make sure that sensors for the new node types are available.
     monitoring_sensor_manager()->resetCache();
 
     // Run sensor for type1.
-    $result = $this->runSensor('node_new_' . $type1->type);
+    $result = $this->runSensor('node_new_' . $type1->id());
     $this->assertEqual($result->getValue(), 2);
     // Test for the SensorSimpleDatabaseAggregator custom message.
     $this->assertEqual($result->getMessage(), String::format('@count @unit in @time_interval', array(
@@ -779,11 +779,11 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $type1 = $this->drupalCreateContentType();
     $type2 = $this->drupalCreateContentType();
     $sensor_config = SensorConfig::load('entity_aggregate_test');
-    $node1 = $this->drupalCreateNode(array('type' => $type1->type));
-    $node2 = $this->drupalCreateNode(array('type' => $type2->type));
-    $this->drupalCreateNode(array('type' => $type2->type));
+    $node1 = $this->drupalCreateNode(array('type' => $type1->id()));
+    $node2 = $this->drupalCreateNode(array('type' => $type2->id()));
+    $this->drupalCreateNode(array('type' => $type2->id()));
     // One node should not meet the time_interval condition.
-    $node = $this->drupalCreateNode(array('type' => $type2->type));
+    $node = $this->drupalCreateNode(array('type' => $type2->id()));
     db_update('node_field_data')
       ->fields(array('created' => REQUEST_TIME - ($sensor_config->getTimeIntervalValue() + 10)))
       ->condition('nid', $node->id())
@@ -792,7 +792,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Test for the node type1.
     $sensor_config = SensorConfig::load('entity_aggregate_test');
     $sensor_config->settings['conditions'] = array(
-      'test' => array('field' => 'type', 'value' => $type1->type),
+      'test' => array('field' => 'type', 'value' => $type1->id()),
     );
     $sensor_config->save();
     $result = $this->runSensor('entity_aggregate_test');
@@ -800,7 +800,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
 
     // Test for node type2.
     $sensor_config->settings['conditions'] = array(
-      'test' => array('field' => 'type', 'value' => $type2->type),
+      'test' => array('field' => 'type', 'value' => $type2->id()),
     );
     $sensor_config->save();
     $result = $this->runSensor('entity_aggregate_test');
@@ -830,7 +830,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'label' => 'Term reference',
       'field_name' => 'term_reference',
       'entity_type' => 'node',
-      'bundle' => $type2->type,
+      'bundle' => $type2->id(),
       'settings' => array(),
       'required' => FALSE,
       'widget' => array(
@@ -863,7 +863,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
       'label' => 'Term reference 2',
       'field_name' => 'term_reference2',
       'entity_type' => 'node',
-      'bundle' => $type2->type,
+      'bundle' => $type2->id(),
       'settings' => array(),
       'required' => FALSE,
       'widget' => array(
@@ -883,14 +883,14 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Create node that only references the first term.
     $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
-      'type' => $type2->type,
+      'type' => $type2->id(),
       'term_reference' => array(array('target_id' => $term1->id())),
     ));
 
     // Create node that only references both terms.
     $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
-      'type' => $type2->type,
+      'type' => $type2->id(),
       'term_reference' => array(
         array('target_id' => $term1->id()),
         array('target_id' => $term2->id()),
@@ -900,7 +900,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     // Create a third node that references both terms but in different fields.
     $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
-      'type' => $type2->type,
+      'type' => $type2->id(),
       'term_reference' => array(array('target_id' => $term1->id())),
       'term_reference2' => array(array('target_id' => $term2->id())),
     ));

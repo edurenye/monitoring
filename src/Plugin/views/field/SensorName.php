@@ -36,6 +36,6 @@ class SensorName extends FieldPluginBase {
       $label = t('Disappeared sensor @name', array('@name' => $value));
     }
 
-    return \Drupal::l($label, Url::fromRoute('monitoring.detail_form', array('monitoring_sensor_config' => $value)));
+    return \Drupal::l($label, Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => $value)));
   }
 }
