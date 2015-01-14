@@ -130,6 +130,7 @@ class SensorForm extends EntityForm {
         '#type' => 'textfield',
         '#title' => $this->t('Category'),
         '#maxlength' => 255,
+        '#autocomplete_route_name' => 'monitoring.category_autocomplete',
         '#default_value' => $sensor_config->getCategory(),
       );
 

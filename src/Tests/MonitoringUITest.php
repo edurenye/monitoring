@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Entity\SensorConfig;
 
 /**
@@ -470,6 +471,24 @@ class MonitoringUITest extends MonitoringTestBase {
 
 
    // $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
+  }
+
+  /**
+   * Tests the auto completion of the sensor category field.
+   */
+  public function testAutoComplete() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    // Test with "C", which matches Content and Cron.
+    $categories = $this->drupalGetJSON('/monitoring-category/autocomplete', array('query' => array('q' => 'C')));
+    $this->assertEqual(count($categories), 2, '2 autocomplete suggestions.');
+    $this->assertEqual('Content', $categories[0]['label']);
+    $this->assertEqual('Cron', $categories[1]['label']);
+
+    // Check that a non-matching prefix returns no suggestions.
+    $categories = $this->drupalGetJSON('/monitoring-category/autocomplete', array('query' => array('q' => 'non_existing_category')));
+    $this->assertTrue(empty($categories), 'No autocomplete suggestions for non-existing query string.');
   }
 
   /**
