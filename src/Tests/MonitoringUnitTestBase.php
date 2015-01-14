@@ -23,8 +23,6 @@ abstract class MonitoringUnitTestBase extends KernelTestBase {
 
     $this->installEntitySchema('monitoring_sensor_result');
     $this->installConfig(array('monitoring'));
-
-    require_once drupal_get_path('module', 'monitoring') . '/monitoring.setup.inc';
   }
 
   /**
