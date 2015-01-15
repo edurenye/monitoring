@@ -47,6 +47,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
     $this->doTestSensorSimpleDatabaseAggregatorNodeType();
     $this->doTestConfigValueSensorPluginDefaultTheme();
+    $this->doTestTwigDebugSensor();
   }
 
   /**
@@ -462,6 +463,45 @@ class MonitoringCoreTest extends MonitoringTestBase {
     \Drupal::config('system.theme')->set('default', 'garland')->save();
     $result = $this->runSensor('core_theme_default');
     $this->assertTrue($result->isCritical());
+  }
+
+  /**
+   * Tests the twig debug sensor.
+   *
+   * @see \Drupal\monitoring\Plugin\monitoring\SensorPlugin\TwigDebugSensorPlugin
+   */
+  public function doTestTwigDebugSensor() {
+
+    // Ensure that the sensor does not report an error with the default
+    // configuration.
+    $result = $this->runSensor('twig_debug_mode');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), 'Optimal configuration');
+
+    $twig_config = $this->container->getParameter('twig.config');
+    // Set parameters to the optimal configuration to make sure implicit changes
+    // does not trigger any notices and check sensor message.
+    $twig_config['debug'] = FALSE;
+    $twig_config['cache'] = TRUE;
+    $twig_config['auto_reload'] = NULL;
+    $this->setContainerParameter('twig.config', $twig_config);
+    $this->rebuildContainer();
+
+    $result = $this->runSensor('twig_debug_mode');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), 'Optimal configuration');
+
+    $twig_config = $this->container->getParameter('twig.config');
+    // Change parameters and check sensor message.
+    $twig_config['debug'] = TRUE;
+    $twig_config['cache'] = FALSE;
+    $twig_config['auto_reload'] = TRUE;
+    $this->setContainerParameter('twig.config', $twig_config);
+    $this->rebuildContainer();
+
+    $result = $this->runSensor('twig_debug_mode');
+    $this->assertTrue($result->isWarning());
+    $this->assertEqual($result->getMessage(), 'Twig debug mode is enabled, Twig cache disabled, Automatic recompilation of Twig templates enabled');
   }
 
   /**

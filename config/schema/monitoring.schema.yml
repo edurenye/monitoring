@@ -185,6 +185,10 @@ monitoring.settings.user_failed_logins:
   type: monitoring.settings.database_aggregator
   label: 'Failed user sensor settings'
 
+monitoring.settings.twig_debug_mode:
+  type: monitoring.settings_base
+  label: 'Monitor twig settings'
+
 monitoring.settings.monitoring_enabled_modules:
   type: monitoring.settings_base
   label: 'Enabled modules sensor settings'
