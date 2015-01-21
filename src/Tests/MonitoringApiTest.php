@@ -343,7 +343,6 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     // Set log_calls sensor settings to false - that should prevent logging.
     $sensor->settings['result_logging'] = FALSE;
     $sensor->save();
-    debug(\Drupal::config('monitoring.settings')->get('test_sensor'));
     /** @var SensorRunner $runner */
     $runner = \Drupal::service('monitoring.sensor_runner');
     $runner->runSensors(array(SensorConfig::load('test_sensor')));
@@ -363,7 +362,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     $this->assertEqual($log->sensor_status->value, SensorResultInterface::STATUS_WARNING);
 
     // Set the logging strategy to "Log all events".
-    \Drupal::config('monitoring.settings')->set('sensor_call_logging', 'all')->save();
+    $this->config('monitoring.settings')->set('sensor_call_logging', 'all')->save();
     // Running the sensor with 'result_logging' settings FALSE must record the call.
     $sensor->settings['result_logging'] = FALSE;
     $sensor->save();
@@ -373,7 +372,7 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     $this->assertEqual(count($logs), 3);
 
     // Set the logging strategy to "No logging".
-    \Drupal::config('monitoring.settings')->set('sensor_call_logging', 'none')->save();
+    $this->config('monitoring.settings')->set('sensor_call_logging', 'none')->save();
     // Despite log_calls TRUE we should not log any call.
     $sensor->settings['result_logging'] = TRUE;
     $sensor->save();

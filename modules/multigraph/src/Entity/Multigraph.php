@@ -37,8 +37,8 @@ use Drupal\monitoring_multigraph\MultigraphInterface;
  *     "label" = "label"
  *   },
  *   links = {
- *     "delete-form" = "entity.monitoring_multigraph.delete_form",
- *     "edit-form" = "entity.monitoring_multigraph.edit_form"
+ *     "delete-form" = "/admin/config/system/monitoring/multigraphs/{monitoring_multigraph}/delete",
+ *     "edit-form" = "/admin/config/system/monitoring/multigraphs/{monitoring_multigraph}"
  *   }
  * )
  */

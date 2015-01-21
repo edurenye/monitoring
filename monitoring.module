@@ -389,16 +389,11 @@ function monitoring_modules_installed($modules) {
     }
   }
 
-  $old_state = \Drupal::configFactory()->getOverrideState();
-  \Drupal::configFactory()->setOverrideState(FALSE);
-
   // Loop over all installed modules and in each of them, look for optional
   // configuration to install.
   foreach (\Drupal::moduleHandler()->getModuleList() as $extension) {
     monitoring_install_optional_configuration($modules, $extension);
   }
-
-  \Drupal::configFactory()->setOverrideState($old_state);
 }
 
 /**

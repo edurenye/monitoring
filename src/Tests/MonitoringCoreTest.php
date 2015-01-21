@@ -88,7 +88,7 @@ class MonitoringCoreTest extends MonitoringTestBase {
     $this->assertTrue($result->isOk());
 
     // Enable cron safe threshold and run sensor.
-    \Drupal::config('system.cron')->set('threshold.autorun', 3600)->save();
+   $this->config('system.cron')->set('threshold.autorun', 3600)->save();
     $result = $this->runSensor('core_cron_safe_threshold');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');
@@ -455,12 +455,12 @@ class MonitoringCoreTest extends MonitoringTestBase {
    * @see ConfigValueSensorPlugin
    */
   protected function doTestConfigValueSensorPluginDefaultTheme() {
-    \Drupal::config('system.theme')->set('default', 'bartik')->save();
+    $this->config('system.theme')->set('default', 'bartik')->save();
     $result = $this->runSensor('core_theme_default');
     $this->assertTrue($result->isOk());
     $this->assertEqual($result->getMessage(), 'Value bartik');
 
-    \Drupal::config('system.theme')->set('default', 'garland')->save();
+    $this->config('system.theme')->set('default', 'garland')->save();
     $result = $this->runSensor('core_theme_default');
     $this->assertTrue($result->isCritical());
   }

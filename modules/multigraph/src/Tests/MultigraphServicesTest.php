@@ -44,7 +44,7 @@ class MultigraphServicesTest extends RESTTestBase {
     parent::setUp();
 
     // Enable REST API for monitoring resources.
-    $config = \Drupal::config('rest.settings');
+    $config = $this->config('rest.settings');
     $settings = array(
       'monitoring-multigraph' => array(
         'GET' => array(
