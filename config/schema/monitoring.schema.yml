@@ -181,6 +181,10 @@ monitoring.settings.image_style_missing:
   type: monitoring.settings.database_aggregator
   label: 'Missing images sensor settings'
 
+monitoring.settings.user_integrity:
+  type: monitoring.settings_base
+  label: 'Privileged user integrity'
+
 monitoring.settings.user_failed_logins:
   type: monitoring.settings.database_aggregator
   label: 'Failed user sensor settings'

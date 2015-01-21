@@ -353,6 +353,39 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalGet('admin/reports/monitoring/sensors/non_existing_sensor');
     $this->assertResponse(404);
+
+    // Test user integrity sensor detail page.
+    $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
+    $this->assertText('1 privileged user(s)');
+
+    $test_user = $this->drupalCreateUser(array('administer monitoring'), 'test_user');
+    $test_user->save();
+    $this->drupalLogin($test_user);
+    $this->runSensor('user_integrity');
+    $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
+    $this->assertText('2 privileged user(s), 1 new user(s)');
+    // Run the sensor to check verbose output.
+    $this->drupalPostForm(NULL, array(), t('Run now'));
+    // Check the new user name in verbose output.
+    $this->assertText('test_user');
+    // Reset the user data and run the sensor again.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_integrity', array(), t('Reset user data'));
+    $this->runSensor('user_integrity');
+    $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
+    $this->assertText('2 privileged user(s)');
+
+    // Change user data and run sensor.
+    $test_user->setUsername('changed_name');
+    $test_user->save();
+    $this->runSensor('user_integrity');
+    $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
+    $this->assertText('2 privileged user(s), 1 changed user(s)');
+
+    // Reset user data again and check sensor message.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_integrity', array(), t('Reset user data'));
+    $this->runSensor('user_integrity');
+    $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
+    $this->assertText('2 privileged user(s)');
   }
 
   /**
