@@ -17,46 +17,6 @@ use Drupal\Component\Utility\String;
 /**
  * Implements monitoring_MODULE_monitoring_sensor_info().
  *
- * @todo-Convert below sensors to config entities after these modules are ported in 8.x
- * Module: past_db
- */
-function monitoring_past_db_monitoring_sensor_info() {
-  $info = array();
-  $severities = monitoring_event_severities();
-
-  foreach (past_event_severities() as $severity => $name) {
-    $info['past_db_event_severity_' . $severities[$severity]] = array(
-      'label' => String::format('Severity @severity', array('@severity' => $name)),
-      'description' => String::format('Past events with severity @severity', array('@severity' => $name)),
-      'plugin_id' => 'database_aggregator',
-      'value_label' => 'Events',
-      'services' => array('database'),
-      'settings' => array(
-        'category' => 'Past',
-        // Cache for one hour.
-        'caching_time' => 3600,
-        'table' => 'past_event',
-        'conditions' => array(
-          array('field' => 'severity', 'value' => $severity),
-        ),
-        'time_interval_field' => 'timestamp',
-        'time_interval_value' => 24 * 60 * 60,
-      ),
-    );
-  }
-
-  // Default thresholds for criticals (fatal errors).
-  $info['past_db_event_severity_' . $severities[PAST_SEVERITY_CRITICAL]]['settings']['thresholds'] = array(
-    'type' => 'exceeds',
-    'warning' => 5,
-    'critical' => 1,
-  );
-  return $info;
-}
-
-/**
- * Implements monitoring_MODULE_monitoring_sensor_info().
- *
  * Module: elysia_cron
  */
 function monitoring_elysia_cron_monitoring_sensor_info() {
