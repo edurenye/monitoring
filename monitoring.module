@@ -145,7 +145,7 @@ function monitoring_preprocess_views_view_table(&$vars) {
     }
   }
 
-  _drupal_add_css(drupal_get_path('module', 'monitoring') . '/monitoring.css');
+  $vars['#attached']['library'][] = 'monitoring/monitoring';
 }
 
 /**
