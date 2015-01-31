@@ -71,8 +71,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     $query = $this->entityQueryFactory->getAggregate($this->getEntityType());
     $this->aggregateField = $entity_info->getKey('id');
 
-    // Add aggregation.
-    $query->aggregate($this->aggregateField, 'COUNT');
+    $this->addAggregate($query);
 
     // Add conditions.
     foreach ($this->getConditions() as $condition) {
@@ -95,12 +94,12 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    *
    * Similar to the aggregate query, but without aggregation.
    *
-   * @see getEntityQueryAggregate()
-   *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
+   *
+   * @see getEntityQueryAggregate()
    */
-  protected function getEntityQueryVerbose() {
+  protected function getEntityQuery() {
     $entity_info = $this->entityManager->getDefinition($this->getEntityType(), TRUE);
 
     // Get query for the entity type.
@@ -126,9 +125,6 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     else {
       $query->sort($entity_info->getKey('id'), 'DESC');
     }
-
-    // Limit to 10 entities.
-    $query->range(0, 10);
 
     return $query;
   }
@@ -198,11 +194,13 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     // @todo show query.
 
     // Fetch the last 10 matching entries, unaggregated.
-    $entity_ids = $this->getEntityQueryVerbose()->execute();
+    $entity_ids = $this->getEntityQuery()
+      ->range(0, 10)
+      ->execute();
 
     // Load entities.
     $entity_type = $this->getEntityType();
-    $entities = \Drupal::entityManager()
+    $entities = $this->entityManager
       ->getStorage($entity_type)
       ->loadMultiple($entity_ids);
 
@@ -361,4 +359,12 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       }
     }
   }
+
+  /**
+   * @param $query
+   */
+  protected function addAggregate($query) {
+    $query->aggregate($this->aggregateField, 'COUNT');
+  }
+
 }

@@ -7,7 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
+use Drupal\payment\Entity\Payment;
 
 /**
  * Monitors payment turnover stats.
@@ -23,23 +23,31 @@ use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
  *   addable = TRUE
  * )
  */
-class PaymentTurnoverSensorPlugin extends DatabaseAggregatorSensorPluginBase {
+class PaymentTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $sensor_result) {
-    // Joins payment_status and payment_line_item to filter on configured time
-    // and currency code.
-    $statement = db_select('payment_status', 'ps');
-    $statement->join('payment_line_item', 'pli', 'pli.payment_id = ps.id');
-    $statement
-      ->condition('created', 'NOW() - ' . (int) $this->sensorConfig->getTimeIntervalValue(), '>')
-      ->condition('currency_code', $this->sensorConfig->getValueLabel(), '=')
-      ->addExpression('SUM(pli.amount_total)');
+    // @todo This will not perform for large number of payments.
+    // @todo Use a condition for the currency when available again.
+    $ids = $this->getEntityQuery()->execute();
 
-    $line_items_value = $statement->execute()->fetchField();
-    $sensor_result->setValue($line_items_value);
+    $payments = $this->entityManager
+      ->getStorage($this->getEntityType())
+      ->loadMultiple($ids);
+
+    $turnover = 0;
+    foreach ($payments as $payment) {
+      foreach ($payment->getLineItems() as $line_item) {
+        // @todo Add a form for this setting.
+        debug($line_item->getAmount(), $line_item->getCurrencyCode());
+        if ($line_item->getCurrencyCode() == $this->sensorConfig->getSetting('currency_code')) {
+          $turnover += $line_item->getAmount();
+        }
+      }
+    }
+    $sensor_result->setValue($turnover);
   }
 
 }

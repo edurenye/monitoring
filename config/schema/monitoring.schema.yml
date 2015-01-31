@@ -154,13 +154,13 @@ monitoring.settings.core_requirements:
         - type: string
           label: 'Exclude key'
 
-monitoring.settings.payment_count:
-  type: monitoring.settings.aggregator_base
-  label: 'Payment count sensor settings'
-
 monitoring.settings.payment_turnover:
-  type: monitoring.settings.aggregator_base
+  type: monitoring.settings.entity_aggregator
   label: 'Payment turnover sensor settings'
+  mapping:
+    currency_code:
+      type: string
+      lavel: Currency code
 
 monitoring.settings.view_display_aggregator:
   type: monitoring.settings_base

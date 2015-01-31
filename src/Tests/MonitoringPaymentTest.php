@@ -31,7 +31,6 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('payment');
-    $this->installSchema('payment', array('payment_line_item', 'payment_status'));
   }
 
   /**
@@ -46,12 +45,14 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
     // Create total payment count sensor.
     $sensor_config = SensorConfig::create(array(
       'id' => 'payment_count',
-      'plugin_id' => 'payment_count',
+      'plugin_id' => 'entity_aggregator',
       'value_label' => 'transactions',
       'value_type' => 'number',
       'caching_time' => 3600,
       'settings' => array(
-        'time_interval_value' => 86400
+        'entity_type' => 'payment',
+        'time_interval_value' => 86400,
+        'time_interval_field' => 'created',
       )
     ));
     $sensor_config->save();
@@ -64,16 +65,19 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
       'id' => 'payment_turnover',
       'plugin_id' => 'payment_turnover',
       'caching_time' => 3600,
-      'value_label' => 'JPY',
+      'value_label' => 'Yen',
       'value_type' => 'number',
       'settings' => array(
-        'time_interval_value' => 86400
+        'currency_code' => 'JPY',
+        'entity_type' => 'payment',
+        'time_interval_value' => 86400,
+        'time_interval_field' => 'created',
       )
     ));
     $sensor_config->save();
     $result = $this->runSensor('payment_turnover');
     $this->assertTrue($result->isOk());
-    $this->assertEqual($result->getMessage(), '11 jpy in 1 day');
+    $this->assertEqual($result->getMessage(), '5.5 yen in 1 day');
   }
 
 }
