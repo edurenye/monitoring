@@ -302,7 +302,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
    *
    * @see SensorSimpleDatabaseAggregator
    */
-  protected function testSensorSimpleDatabaseAggregatorNodeType() {
+  protected function testDefaultNodeTypeSensors() {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -335,6 +335,45 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Run sensor for all types.
     $result = $this->runSensor('node_new_all');
     $this->assertEqual($result->getValue(), 3);
+
+    // Verify that hooks do not break when sensors unexpectedly do exist or
+    // don't exist.
+    $sensor = SensorConfig::create(array(
+      'id' => 'node_new_existing',
+      'label' => 'Existing sensor',
+      'plugin_id' => 'entity_aggregator',
+      'settings' => array(
+        'entity_type' => 'node',
+      ),
+    ));
+    $sensor->save();
+
+    $type_existing = NodeType::create(['type' => 'existing', 'label' => 'Existing']);
+    $type_existing->save();
+
+    // Manually delete the sensor and then the node type.
+    $sensor->delete();
+    $type_existing->delete();
+
+    // Rename type when the target sensor already exists.
+    $sensor = SensorConfig::create(array(
+      'id' => 'node_new_existing',
+      'label' => 'Existing sensor',
+      'plugin_id' => 'entity_aggregator',
+      'settings' => array(
+        'entity_type' => 'node',
+      ),
+    ));
+    $sensor->save();
+    $type1->set('name', 'existing');
+    $type1->save();
+
+    // Delete the sensor for $type2 before renaming.
+    $sensor = SensorConfig::load('node_new_' . $type2->id());
+    $sensor->delete();
+
+    $type2->set('name', 'different');
+    $type2->save();
   }
 
   /**

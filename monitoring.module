@@ -535,8 +535,14 @@ function monitoring_value_label_callback_commerce_currency(SensorResultInterface
  * Inserts new node sensor config entities on creation of new node types.
  */
 function monitoring_node_type_insert(NodeTypeInterface $type) {
+
+  // Don't do anything if we are syncing or if the sensor already exists.
+  $config_id = 'node_new_' . $type->id();
+  if ($type->isSyncing() || SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::create(array(
-    'id' => 'node_new_' . $type->id(),
+    'id' => $config_id,
     'label' => String::format('New @type nodes', array('@type' => $type->label())),
     'description' => String::format('New nodes of type @type', array('@type' => $type->label())),
     'plugin_id' => 'entity_aggregator',
@@ -561,8 +567,12 @@ function monitoring_node_type_insert(NodeTypeInterface $type) {
  *
  * Deletes node sensor config entities on deletion of node types.
  */
-function monitoring_node_type_delete(NodeTypeInterface $info) {
-  $config_id = 'node_new_' . $info->id();
+function monitoring_node_type_delete(NodeTypeInterface $type) {
+  // Don't do anything if we are syncing or if the sensor does not exists.
+  $config_id = 'node_new_' . $type->id();
+  if ($type->isSyncing() || !SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::load($config_id);
   $sensor->delete();
 }
@@ -573,10 +583,21 @@ function monitoring_node_type_delete(NodeTypeInterface $info) {
  * Updates node sensor config entities on update of node types.
  */
 function monitoring_node_type_update(NodeTypeInterface $type) {
+  // Don't do anything if we are syncing, the sensor does not exists or if the
+  // type was not renamed.
   $config_id = 'node_new_' . $type->id();
+  $new_config_id = 'node_new_' . $type->original->id();
+  if ($config_id == $new_config_id || $type->isSyncing() || !SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::load($config_id);
-  if ($sensor) {
-    $sensor->id = 'node_new_' . $type->id();
+
+  // If the new sensor already exists, just drop this one.
+  if (SensorConfig::load($new_config_id)) {
+    $sensor->delete();
+  }
+  else {
+    $sensor->id = $new_config_id;
     $sensor->label = String::format(
       'New @type nodes',
       array('@type' => $type->label())
@@ -597,11 +618,17 @@ function monitoring_node_type_update(NodeTypeInterface $type) {
 /*
  * Implements hook_search_api_index_insert().
  *
- * Inserts new search api index  sensor config entities on creation of new search api index.
+ * Inserts new search api index  sensor config entities on creation of new
+ * search api indexes.
  */
 function monitoring_search_api_index_insert(IndexInterface $index) {
+  // Don't do anything if we are syncing or if the sensor already exists.
+  $config_id = 'search_api_' . $index->id();
+  if ($index->isSyncing() || SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::create(array(
-    'id' => 'search_api_' . $index->id(),
+    'id' => $config_id,
     'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
     'plugin_id' => 'search_api_unindexed',
     'value_label' => 'Unindexed items',
@@ -619,10 +646,15 @@ function monitoring_search_api_index_insert(IndexInterface $index) {
 /*
  * Implements hook_search_api_index_delete().
  *
- * Deletes search api index sensor config entities on deletion of search api index.
+ * Deletes search api index sensor config entities on deletion of search api
+ * index.
  */
 function monitoring_search_api_index_delete(IndexInterface $index) {
+  // Don't do anything if we are syncing or if the sensor does not exists.
   $config_id = 'search_api_' . $index->id();
+  if ($index->isSyncing() || !SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::load($config_id);
   $sensor->delete();
 }
@@ -630,12 +662,27 @@ function monitoring_search_api_index_delete(IndexInterface $index) {
 /*
  * Implements hook_search_api_index_update().
  *
- * Updates search api index sensor config entities on updation of search api index.
+ * Updates search api index sensor config entities on updates of search api
+ * index.
  */
 function monitoring_search_api_index_update(IndexInterface $index) {
+  // Don't do anything if we are syncing, the sensor does not exists or the
+  // index has not/ been renamed.
   $config_id = 'search_api_' . $index->id();
+  $new_config_id = 'search_api_' . $index->original->id();
+  if ($config_id == $new_config_id || $index->isSyncing() || !SensorConfig::load($config_id)) {
+    return;
+  }
   $sensor = SensorConfig::load($config_id);
-  $sensor->id = 'search_api_' . $index->id();
-  $sensor->label = String::format('Search index queue size of @index', array('@index' => $index->id()));
-  $sensor->save();
+
+  // If the new sensor already exists, just drop this one.
+  if (SensorConfig::load($new_config_id)) {
+    $sensor->delete();
+  }
+  else {
+    $sensor->id = $new_config_id;
+    $sensor->label = String::format('Search index queue size of @index', array('@index' => $index->id()));
+    $sensor->settings['index_id'] = $index->id();
+    $sensor->save();
+  }
 }

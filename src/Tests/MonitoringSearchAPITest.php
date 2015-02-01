@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api_db\Tests;
 
@@ -93,6 +94,30 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     // Everything should be indexed.
     $result = $this->runSensor('search_api_database_search_index');
     $this->assertEqual($result->getValue(), 0);
+
+    // Verify that hooks do not break when sensors unexpectedly do exist or
+    // don't exist.
+    $sensor = SensorConfig::create(array(
+      'id' => 'search_api_existing',
+      'label' => 'Existing sensor',
+      'plugin_id' => 'search_api_unindexed',
+      'settings' => array(
+        'index_id' => 'existing',
+      ),
+    ));
+    $sensor->save();
+
+    $index_existing = Index::create([
+      'id' => 'existing',
+      'status' => FALSE,
+      'name' => 'Existing',
+      'tracker' => 'default',
+    ]);
+    $index_existing->save();
+
+    // Manually delete the sensor and then the index.
+    $sensor->delete();
+    $index_existing->delete();
   }
 
   /**
