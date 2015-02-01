@@ -9,25 +9,12 @@ use Drupal\Component\Utility\String;
 
 /**
  * Tests the view display sensor.
+ *
+ * @group monitoring
  */
 class MonitoringViewDisplayTest extends MonitoringTestBase {
 
   public static $modules = array('views');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring View Display',
-      'description' => 'Monitoring view display test.',
-      'group' => 'Monitoring',
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
 
   /**
    * Tests the view display sensor.

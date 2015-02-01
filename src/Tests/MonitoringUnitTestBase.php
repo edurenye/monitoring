@@ -37,7 +37,7 @@ abstract class MonitoringUnitTestBase extends KernelTestBase {
   protected function runSensor($sensor_name) {
     // Make sure the sensor is enabled.
     monitoring_sensor_manager()->enableSensor($sensor_name);
-    return monitoring_sensor_run($sensor_name, TRUE);
+    return monitoring_sensor_run($sensor_name, TRUE, TRUE);
   }
 
 }

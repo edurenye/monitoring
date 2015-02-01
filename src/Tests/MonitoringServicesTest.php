@@ -14,6 +14,8 @@ use Drupal\rest\Tests\RESTTestBase;
 
 /**
  * Tests for monitoring services.
+ *
+ * @group monitoring
  */
 class MonitoringServicesTest extends RESTTestBase {
 
@@ -25,14 +27,6 @@ class MonitoringServicesTest extends RESTTestBase {
    * @var AccountInterface
    */
   protected $servicesAccount;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring services',
-      'description' => 'Monitoring services tests.',
-      'group' => 'Monitoring',
-    );
-  }
 
   /**
    * {@inheritdoc}

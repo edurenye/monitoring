@@ -8,6 +8,8 @@ namespace Drupal\monitoring\Tests;
 
 /**
  * Tests the captcha failed attempts sensor.
+ *
+ * @group monitoring
  */
 class MonitoringCaptchaTest extends MonitoringTestBase {
 
@@ -17,14 +19,6 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
  protected $strictConfigSchema = FALSE;
 
   public static $modules = array('captcha');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring Captcha',
-      'description' => 'Monitoring captcha fails test.',
-      'group' => 'Monitoring',
-    );
-  }
 
   /**
    * {@inheritdoc}

@@ -10,7 +10,7 @@ namespace Drupal\monitoring\Tests;
 /**
  * Tests for the past sensors in monitoring.
  *
- * @group past
+ * @group monitoring
  * @requires module past_db
  */
 class MonitoringPastTest extends MonitoringUnitTestBase {
@@ -26,6 +26,8 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
     // Install the past entities and tables.
     $this->installEntitySchema('past_event');
     $this->installSchema('past_db', array('past_event_argument', 'past_event_data'));
+    $this->installSchema('system', ['router']);
+    \Drupal::service('router.builder')->rebuild();
 
     monitoring_modules_installed(array('past_db'));
   }

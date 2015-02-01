@@ -15,18 +15,12 @@ use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Tests for Monitoring API.
+ *
+ * @group monitoring
  */
 class MonitoringApiTest extends MonitoringUnitTestBase {
 
   public static $modules = array('dblog');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring API',
-      'description' => 'Tests the monitoring API',
-      'group' => 'Monitoring',
-    );
-  }
 
   /**
    * {@inheritdoc}

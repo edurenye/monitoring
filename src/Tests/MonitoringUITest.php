@@ -7,26 +7,16 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\String;
-use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Tests for the Monitoring UI.
+ *
+ * @group monitoring
  */
 class MonitoringUITest extends MonitoringTestBase {
 
   public static $modules = array('dblog', 'node', 'views');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring UI',
-      'description' => 'Monitoring UI tests.',
-      'group' => 'Monitoring',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -522,6 +512,120 @@ class MonitoringUITest extends MonitoringTestBase {
     // Check that a non-matching prefix returns no suggestions.
     $categories = $this->drupalGetJSON('/monitoring-category/autocomplete', array('query' => array('q' => 'non_existing_category')));
     $this->assertTrue(empty($categories), 'No autocomplete suggestions for non-existing query string.');
+  }
+
+  /**
+   * Tests the UI/settings of the enabled modules sensor.
+   *
+   * @see EnabledModulesSensorPlugin
+   */
+  public function testSensorInstalledModulesUI() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    // Visit settings page of the disabled sensor. We run the sensor to check
+    // for deltas. This led to fatal errors with a disabled sensor.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
+
+    // Enable the sensor.
+    monitoring_sensor_manager()->enableSensor('monitoring_enabled_modules');
+
+    // Test submitting the defaults and enabling the sensor.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
+      'status' => TRUE,
+    ), t('Save'));
+    // Reset the sensor config so that it reflects changes done via POST.
+    monitoring_sensor_manager()->resetCache();
+    // The sensor should now be OK.
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isOk());
+
+    // Expect the contact and book modules to be installed.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
+      'settings[modules][contact]' => TRUE,
+      'settings[modules][book]' => TRUE,
+    ), t('Save'));
+    // Reset the sensor config so that it reflects changes done via POST.
+    monitoring_sensor_manager()->resetCache();
+    // Make sure the extended / hidden_modules form submit cleanup worked and
+    // they are not stored as a duplicate in settings.
+    $sensor_config = SensorConfig::load('monitoring_enabled_modules');
+    $this->assertTrue(!array_key_exists('extended', $sensor_config->settings), 'Do not persist extended module hidden selections separately.');
+    // The sensor should escalate to CRITICAL.
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isCritical());
+    $this->assertEqual($result->getMessage(), '2 modules delta, expected 0, Following modules are expected to be installed: Book (book), Contact (contact)');
+    $this->assertEqual($result->getValue(), 2);
+
+    // Reset modules selection with the update selection (ajax) button.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_enabled_modules');
+    $this->drupalPostAjaxForm(NULL, array(), array('op' => t('Update module selection')));
+    $this->drupalPostForm(NULL, array(), t('Save'));
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), '0 modules delta');
+
+    // The default setting is not to allow additional modules. Enable comment
+    // and the sensor should escalate to CRITICAL.
+    $this->installModules(array('help'));
+    // The container is rebuilt and needs to be reassigned to avoid static
+    // config cache issues. See https://www.drupal.org/node/2398867
+    $this->container = \Drupal::getContainer();
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isCritical());
+    $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Help (help)');
+    $this->assertEqual($result->getValue(), 1);
+    // Allow additional, the sensor should not escalate anymore.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/monitoring_enabled_modules', array(
+      'settings[allow_additional]' => 1,
+    ), t('Save'));
+    $result = $this->runSensor('monitoring_enabled_modules');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), '0 modules delta');
+  }
+
+  /**
+   * UI Tests for disappearing sensors.
+   *
+   * We provide a separate test method for the DisappearedSensorsSensorPlugin as we
+   * need to enable and disable additional modules.
+   *
+   * @see DisappearedSensorsSensorPlugin
+   */
+  public function testSensorDisappearedSensorsUI() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    // Install comment module and the comment_new sensor.
+    $this->installModules(array('comment'));
+    monitoring_sensor_manager()->enableSensor('comment_new');
+
+    // We should have the message that no sensors are missing.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
+    $this->assertNoText(t('This action will clear the missing sensors and the critical sensor status will go away.'));
+
+    // Disable sensor and the comment module. This is the correct procedure and
+    // therefore there should be no missing sensors.
+    monitoring_sensor_manager()->disableSensor('comment_new');
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
+    $this->assertNoText(t('This action will clear the missing sensors and the critical sensor status will go away.'));
+
+    // Install comment module and the comment_new sensor.
+    $this->installModules(array('comment'));
+    monitoring_sensor_manager()->enableSensor('comment_new');
+    // Now disable the comment module to have the comment_new sensor disappear.
+    $this->uninstallModules(array('comment'));
+    // Run the monitoring_disappeared_sensors sensor to get the status message
+    // that should be found in the settings form.
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
+    $this->assertText('Missing sensor comment_new');
+
+    // Now reset the sensor list - we should get the "no missing sensors"
+    // message.
+    $this->drupalPostForm(NULL, array(), t('Clear missing sensors'));
+    $this->assertText(t('All missing sensors have been cleared.'));
+    $this->drupalGet('admin/config/system/monitoring/sensors/monitoring_disappeared_sensors');
+    $this->assertNoText('Missing sensor comment_new');
   }
 
   /**

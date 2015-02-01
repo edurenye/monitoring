@@ -12,18 +12,12 @@ use Drupal\payment\Payment;
 
 /**
  * Tests for the payment sensor in monitoring.
+ *
+ * @group monitoring
  */
 class MonitoringPaymentTest extends MonitoringUnitTestBase {
 
   public static $modules = array('payment', 'currency');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Monitoring Payment',
-      'description' => 'Monitoring Payment sensors tests.',
-      'group' => 'Monitoring',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -31,6 +25,8 @@ class MonitoringPaymentTest extends MonitoringUnitTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('payment');
+    $this->installSchema('system', ['router']);
+    \Drupal::service('router.builder')->rebuild();
   }
 
   /**
