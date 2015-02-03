@@ -41,7 +41,6 @@ class PaymentTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
     foreach ($payments as $payment) {
       foreach ($payment->getLineItems() as $line_item) {
         // @todo Add a form for this setting.
-        debug($line_item->getAmount(), $line_item->getCurrencyCode());
         if ($line_item->getCurrencyCode() == $this->sensorConfig->getSetting('currency_code')) {
           $turnover += $line_item->getAmount();
         }
