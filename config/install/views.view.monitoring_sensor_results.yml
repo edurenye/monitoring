@@ -397,8 +397,6 @@ display:
           entity_type: monitoring_sensor_result
           plugin_id: string
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
   detail_page_log:
     display_plugin: embed
     id: detail_page_log
@@ -406,8 +404,6 @@ display:
     position: 2
     display_options:
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
       fields:
         timestamp:
           id: timestamp
@@ -622,8 +618,6 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
       path: admin/reports/monitoring/log
       menu:
         type: tab

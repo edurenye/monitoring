@@ -76,7 +76,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['caching_time'], $sensor_config->getCachingTime());
       $this->assertEqual($response_data[$sensor_name]['time_interval'], $sensor_config->getTimeIntervalValue());
       $this->assertEqual($response_data[$sensor_name]['enabled'], $sensor_config->isEnabled());
-      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('user-path:monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('user-path:/monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
       if ($sensor_config->isDefiningThresholds()) {
         $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getThresholds());
@@ -100,7 +100,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['caching_time'], $sensor_config->getCachingTime());
     $this->assertEqual($response_data['time_interval'], $sensor_config->getTimeIntervalValue());
     $this->assertEqual($response_data['enabled'], $sensor_config->isEnabled());
-    $this->assertEqual($response_data['uri'], Url::fromUri('user-path:monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_data['uri'], Url::fromUri('user-path:/monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     if ($sensor_config->isDefiningThresholds()) {
       $this->assertEqual($response_data['thresholds'], $sensor_config->getThresholds());
@@ -168,7 +168,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_result['sensor_name'], $sensor_config->id());
     // Test the uri - the hardcoded endpoint is defined in the
     // monitoring_test.default_services.inc.
-    $this->assertEqual($response_result['uri'], Url::fromUri('user-path:monitoring-sensor-result/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_result['uri'], Url::fromUri('user-path:/monitoring-sensor-result/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
 
     // If the result is cached test also for the result values. In case of
     // result which is not cached we might not get the same values.
@@ -201,7 +201,7 @@ class MonitoringServicesTest extends RESTTestBase {
    *   Decoded json object.
    */
   protected function doRequest($action, $query = array()) {
-    $url = Url::fromUri("user-path:$action", array('absolute' => TRUE, 'query' => $query))->toString();
+    $url = Url::fromUri("user-path:/$action", array('absolute' => TRUE, 'query' => $query))->toString();
     $result = $this->httpRequest($url, 'GET', NULL, $this->defaultMimeType);
     return Json::decode($result);
   }
