@@ -14,6 +14,7 @@ use Drupal\payment\Payment;
  * Tests for the payment sensor in monitoring.
  *
  * @group monitoring
+ * @dependencies payment
  */
 class MonitoringPaymentTest extends MonitoringUnitTestBase {
 

@@ -10,6 +10,7 @@ namespace Drupal\monitoring\Tests;
  * Tests the captcha failed attempts sensor.
  *
  * @group monitoring
+ * @dependencies captcha
  */
 class MonitoringCaptchaTest extends MonitoringTestBase {
 

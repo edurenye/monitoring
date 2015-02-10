@@ -15,6 +15,7 @@ use Drupal\search_api_db\Tests;
  * Tests for search API sensor.
  *
  * @group monitoring
+ * @dependencies search_api
  */
 class MonitoringSearchAPITest extends MonitoringUnitTestBase {
 

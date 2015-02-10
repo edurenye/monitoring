@@ -11,7 +11,7 @@ namespace Drupal\monitoring\Tests;
  * Tests for the past sensors in monitoring.
  *
  * @group monitoring
- * @requires module past_db
+ * @dependencies past_db
  */
 class MonitoringPastTest extends MonitoringUnitTestBase {
 
