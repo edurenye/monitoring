@@ -145,7 +145,7 @@ class SensorRunner {
   /**
    * Run a single given sensor.
    *
-   * @param SensorConfig $sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
    *   Sensor config
    *
    * @return SensorResultInterface
@@ -186,7 +186,7 @@ class SensorRunner {
 
       // Capture verbose output if requested and if we are able to do so.
       if ($this->verbose && $sensor_config->isExtendedInfo()) {
-        /** @var ExtendedInfoSensorPluginInterface $plugin */
+        /** @var \Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface $plugin */
         $result->setVerboseOutput($plugin->resultVerbose($result));
       }
 
@@ -289,7 +289,7 @@ class SensorRunner {
   /**
    * Instantiates sensor result object.
    *
-   * @param SensorConfig $sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
    *   Sensor config.
    *
    * @return \Drupal\monitoring\Result\SensorResultInterface

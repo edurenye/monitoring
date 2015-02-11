@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\monitoring_multigraph\Plugin\rest\resource\MonitoringMultigraphResource.
+ * Contains \Drupal\monitoring_multigraph\Plugin\rest\resource\MonitoringMultigraphResource.
  */
 
 namespace Drupal\monitoring_multigraph\Plugin\rest\resource;

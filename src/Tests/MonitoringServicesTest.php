@@ -24,7 +24,7 @@ class MonitoringServicesTest extends RESTTestBase {
   /**
    * User account created.
    *
-   * @var AccountInterface
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $servicesAccount;
 

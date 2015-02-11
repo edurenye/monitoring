@@ -81,7 +81,7 @@ class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
 
     if (!empty($query_result)) {
       $file = file_load(array_shift($query_result));
-      /** @var Drupal\file\FileUsage\FileUsageInterface $usage */
+      /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
       $usage = \Drupal::service('file.usage');
       $message = t('File managed records: <pre>@file_managed</pre>', array('@file_managed' => var_export($usage->listUsage($file), TRUE)));
     }

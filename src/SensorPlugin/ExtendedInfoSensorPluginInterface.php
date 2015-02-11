@@ -18,7 +18,7 @@ interface ExtendedInfoSensorPluginInterface {
   /**
    * Provide additional info about sensor call.
    *
-   * @param SensorResultInterface $result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $result
    *   Sensor result.
    *
    * @return array

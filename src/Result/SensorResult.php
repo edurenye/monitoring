@@ -69,7 +69,7 @@ class SensorResult implements SensorResultInterface {
    *
    * By default, the sensor status is STATUS_UNKNOWN with empty message.
    *
-   * @param SensorConfig $sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
    *   Sensor config object.
    * @param array $cached_data
    *   Result data obtained from a cache.

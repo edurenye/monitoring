@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\monitoring_multigraph\Tests\MultigraphWebTest
+ * Contains \Drupal\monitoring_multigraph\Tests\MultigraphWebTest
  */
 
 namespace Drupal\monitoring_multigraph\Tests;

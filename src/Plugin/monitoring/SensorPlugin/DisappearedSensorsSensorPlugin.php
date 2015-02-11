@@ -116,7 +116,7 @@ class DisappearedSensorsSensorPlugin extends SensorPluginBase {
   /**
    * Checks for missing sensors.
    *
-   * @param SensorResultInterface $result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $result
    *   The current sensor result object.
    * @param array $available_sensors
    *   The available sensors list.

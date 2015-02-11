@@ -186,7 +186,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     // Fake some image style derivative errors.
     $file = file_save_data($this->randomMachineName());
-    /** @var FileUsageInterface $usage */
+    /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
     $usage = \Drupal::service('file.usage');
     $usage->add($file, 'monitoring_test', 'test_object', 123456789);
     for ($i = 0; $i <= 5; $i++) {
@@ -221,7 +221,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
    * The module monitoring_test implements custom requirements injected through
    * state monitoring_test.requirements.
    *
-   * @see CoreRequirementsSensorPlugin
+   * @see \Drupal\monitoring\Plugin\monitoring\SensorPlugin\CoreRequirementsSensorPlugin
    */
   public function testCoreRequirementsSensorPlugin() {
     $result = $this->runSensor('core_requirements_monitoring_test');

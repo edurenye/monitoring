@@ -50,7 +50,7 @@ class ForceRunController extends ControllerBase {
   /**
    * Force runs all sensors.
    *
-   * @return RedirectResponse
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
    */
   public function forceRunAll() {
     $this->sensorRunner->resetCache();
@@ -61,9 +61,9 @@ class ForceRunController extends ControllerBase {
   /**
    * Force runs a single sensor.
    *
-   * @param SensorConfig $monitoring_sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $monitoring_sensor_config
    *
-   * @return RedirectResponse
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
    */
   public function forceRunSensor(SensorConfig $monitoring_sensor_config) {
 

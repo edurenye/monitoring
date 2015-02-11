@@ -21,7 +21,7 @@ abstract class SensorPluginBase implements SensorPluginInterface {
   /**
    * Current sensor config object.
    *
-   * @var SensorConfig
+   * @var \Drupal\monitoring\Entity\SensorConfig
    */
   protected $sensorConfig;
   protected $services = array();
@@ -43,7 +43,7 @@ abstract class SensorPluginBase implements SensorPluginInterface {
   /**
    * Instantiates a sensor object.
    *
-   * @param SensorConfig $sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
    *   Sensor config object.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.

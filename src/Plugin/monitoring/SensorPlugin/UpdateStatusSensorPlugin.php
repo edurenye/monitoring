@@ -47,7 +47,7 @@ class UpdateStatusSensorPlugin extends SensorPluginBase {
   /**
    * Checks core status and sets sensor status message.
    *
-   * @param SensorResultInterface $result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $result
    * @param array $project_data
    */
   protected function checkCore(SensorResultInterface $result, $project_data) {
@@ -74,7 +74,7 @@ class UpdateStatusSensorPlugin extends SensorPluginBase {
   /**
    * Checks contrib status and sets sensor status message.
    *
-   * @param SensorResultInterface $result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $result
    * @param array $project_data
    */
   protected function checkContrib(SensorResultInterface $result, $project_data) {

@@ -95,7 +95,7 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
    *    threshold configuration of exceeds 20 and a status message "10 for user
    *    administrator".
    *
-   * @param SensorResultInterface $sensor_result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $sensor_result
    *   Sensor result object.
    *
    * @throws \Exception
@@ -150,7 +150,7 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container to pull out services used in the plugin.
-   * @param SensorConfig $sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
    *   The configuration containing information about the sensor instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

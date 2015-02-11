@@ -313,8 +313,8 @@ class SensorConfig extends ConfigEntityBase implements SensorConfigInterface {
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
     /**
-     * @var SensorConfig $a
-     * @var SensorConfig $b
+     * @var \Drupal\monitoring\Entity\SensorConfig $a
+     * @var \Drupal\monitoring\Entity\SensorConfig $b
      */
     // Checks whether both labels and categories are equal.
     if ($a->getLabel() == $b->getLabel() && $a->getCategory() == $b->getCategory()) {

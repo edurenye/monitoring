@@ -204,7 +204,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
   /**
    * Sets sensor result status and status messages for the given requirements.
    *
-   * @param SensorResultInterface $result
+   * @param \Drupal\monitoring\Result\SensorResultInterface $result
    *   The result object to update.
    * @param array $requirements
    *   Array of requirements to process.

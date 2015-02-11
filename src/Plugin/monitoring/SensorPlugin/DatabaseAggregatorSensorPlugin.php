@@ -103,7 +103,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   /**
    * Adds the aggregate expression to the select query.
    *
-   * @param SelectInterface $select
+   * @param \Drupal\Core\Database\Query\SelectInterface $select
    *   The database select query.
    */
   protected function addAggregateExpression(SelectInterface $select) {

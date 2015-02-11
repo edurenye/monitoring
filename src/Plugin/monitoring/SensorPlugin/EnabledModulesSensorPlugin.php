@@ -44,7 +44,7 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     // Otherwise test run the sensor.
     else {
       // Run on a temporary sensor config id with some changes.
-      /** @var Drupal\monitoring\Entity\SensorConfig $run_config */
+      /** @var \Drupal\monitoring\Entity\SensorConfig $run_config */
       $run_config = $this->sensorConfig->createDuplicate();
       // Avoid name clashes in SensorManager / caching.
       $run_config->id = $this->sensorConfig->id() . '_temp';
@@ -53,11 +53,11 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
       // Force no additional allowed to make differences visible in message.
       $run_config->settings['allow_additional'] = FALSE;
 
-      /** @var Drupal\monitoring\Result\SensorResult $result */
+      /** @var \Drupal\monitoring\Result\SensorResult $result */
       $result = \Drupal::service('monitoring.sensor_runner')
         ->runSensors(array($run_config->id() => $run_config), TRUE)[$run_config->id()];
 
-      if($result->isCritical()) {
+      if ($result->isCritical()) {
         $message = $result->getMessage();
 
         // Display message and button to update selection.

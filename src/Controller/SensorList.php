@@ -80,12 +80,12 @@ class SensorList extends ControllerBase {
       );
       $ok_row_count = 0;
 
-      /** @var SensorConfigInterface $sensor_config */
+      /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
       foreach ($category_sensor_config as $sensor_name => $sensor_config) {
         if (!isset($results[$sensor_name])) {
           continue;
         }
-        /** @var SensorResultInterface $sensor_result */
+        /** @var \Drupal\monitoring\Result\SensorResultInterface $sensor_result */
         $sensor_result = $results[$sensor_name];
         $called_before = REQUEST_TIME - $sensor_result->getTimestamp();
         if ($called_before > $oldest_sensor_age) {

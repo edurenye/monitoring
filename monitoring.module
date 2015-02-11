@@ -67,7 +67,7 @@ function monitoring_sensor_config_by_categories($enabled = TRUE) {
  * @param bool $verbose
  *   (optional) Set to TRUE to enable verbose execution, defaults to FALSE.
  *
- * @return SensorResultInterface
+ * @return \Drupal\monitoring\Result\SensorResultInterface
  *   A single result object.
  *
  * @throws \Drupal\monitoring\Sensor\NonExistingSensorException
@@ -172,7 +172,7 @@ function monitoring_sensor_action_title($action, SensorConfig $sensor_config) {
 /**
  * Saves the sensor result.
  *
- * @param SensorResultInterface $result
+ * @param \Drupal\monitoring\Result\SensorResultInterface $result
  *   Sensor call result.
  *
  * @return \Drupal\monitoring\Entity\SensorResultEntity

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ * Contains \Drupal\monitoring\SensorConfigInterface.
+ */
+
 namespace Drupal\monitoring;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

@@ -58,7 +58,7 @@ abstract class MonitoringTestBase extends WebTestBase {
    * @see \Drupal\Core\Extension\ModuleInstallerInterface::install()
    */
   protected function installModules(array $module_list, $enable_dependencies = TRUE) {
-    /** @var ModuleInstallerInterface $module_handler */
+    /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_handler */
     $module_handler = \Drupal::service('module_installer');
 
     // Install the modules requested.
@@ -89,7 +89,7 @@ abstract class MonitoringTestBase extends WebTestBase {
    * @see \Drupal\Core\Extension\ModuleInstallerInterface::uninstall()
    */
   protected function uninstallModules(array $module_list, $uninstall_dependents = TRUE) {
-    /** @var ModuleInstallerInterface $module_handler */
+    /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_handler */
     $module_handler = \Drupal::service('module_installer');
 
     // Install the modules requested.

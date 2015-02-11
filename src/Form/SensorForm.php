@@ -226,9 +226,9 @@ class SensorForm extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
-    /** @var SensorConfigInterface $sensor_config */
+    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
-    /** @var SensorPluginInterface $plugin */
+    /** @var \Drupal\monitoring\SensorPlugin\SensorPluginInterface $plugin */
     if ($sensor_config->isNew()) {
       $plugin_id = $form_state->getValue('plugin_id');
       $plugin = monitoring_sensor_manager()->createInstance($plugin_id, array('sensor_config' => $this->entity));
@@ -250,7 +250,7 @@ class SensorForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var SensorConfigInterface $sensor_config */
+    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
     $plugin = $sensor_config->getPlugin();
 
@@ -277,7 +277,7 @@ class SensorForm extends EntityForm {
   /**
    * Settings form page title callback.
    *
-   * @param SensorConfigInterface $monitoring_sensor_config
+   * @param \Drupal\monitoring\SensorConfigInterface $monitoring_sensor_config
    *   The Sensor config.
    *
    * @return string
@@ -400,7 +400,7 @@ class SensorForm extends EntityForm {
    *
    * @param string $threshold_key
    *   Key of the threshold value form element.
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   Drupal form state object.
    * @param string $message
    *   The validation message.

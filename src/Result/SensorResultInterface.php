@@ -233,7 +233,7 @@ interface SensorResultInterface {
   /**
    * Gets sensor config.
    *
-   * @return SensorConfig
+   * @return \Drupal\monitoring\Entity\SensorConfig
    */
   public function getSensorConfig();
 

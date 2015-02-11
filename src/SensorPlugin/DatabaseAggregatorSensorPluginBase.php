@@ -101,26 +101,26 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
-    /** @var SensorForm $sensor_form */
+    /** @var \Drupal\monitoring\Form\SensorForm $sensor_form */
     $sensor_form = $form_state->getFormObject();
-    /** @var SensorConfigInterface $sensor_config */
+    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
     $sensor_config = $sensor_form->getEntity();
 
     // Copy time interval field & value into settings if the field is specified.
-     if ($interval_field = $form_state->getValue(array(
+    if ($interval_field = $form_state->getValue(array(
       'settings', 'aggregation', 'time_interval_field'))) {
-       $sensor_config->settings['time_interval_field'] = $interval_field;
-       $interval_value = $form_state->getValue(array(
-         'settings', 'aggregation', 'time_interval_value'));
+      $sensor_config->settings['time_interval_field'] = $interval_field;
+      $interval_value = $form_state->getValue(array(
+        'settings', 'aggregation', 'time_interval_value'));
 
-       $sensor_config->settings['time_interval_value'] = $interval_value;
-       // Remove UI structure originated settings leftover.
-     }
-     else {
-       // For consistency, empty the field + value setting if no field defined.
-       unset($sensor_config->settings['time_interval_field']);
-       unset($sensor_config->settings['time_interval_value']);
-     }
+      $sensor_config->settings['time_interval_value'] = $interval_value;
+      // Remove UI structure originated settings leftover.
+    }
+    else {
+      // For consistency, empty the field + value setting if no field defined.
+      unset($sensor_config->settings['time_interval_field']);
+      unset($sensor_config->settings['time_interval_value']);
+    }
     unset($sensor_config->settings['aggregation']);
     return $form_state;
   }

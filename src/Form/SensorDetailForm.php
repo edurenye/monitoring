@@ -65,7 +65,7 @@ class SensorDetailForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    /** @var SensorConfigInterface $sensor_config */
+    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
     $sensor_config = $this->entity;
     try {
       $results = $this->sensorRunner->runSensors(array($sensor_config), FALSE, TRUE);
@@ -216,7 +216,7 @@ class SensorDetailForm extends EntityForm {
   /**
    * Detail page title callback.
    *
-   * @param SensorConfig $monitoring_sensor_config
+   * @param \Drupal\monitoring\Entity\SensorConfig $monitoring_sensor_config
    *   The Sensor config.
    *
    * @return string

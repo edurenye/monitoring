@@ -185,7 +185,7 @@ class MultigraphForm extends EntityForm {
    *
    * @param array $form
    *   The updated form structure array.
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state structure.
    *
    * @return array
@@ -210,7 +210,7 @@ class MultigraphForm extends EntityForm {
    *
    * @param array $form
    *   The form structure array
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state structure.
    */
   public function addSensorSubmit(array $form, FormStateInterface $form_state) {
@@ -232,7 +232,7 @@ class MultigraphForm extends EntityForm {
    *
    * @param array $form
    *   The form structure array
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state structure.
    */
   public function removeSensorSubmit(array $form, FormStateInterface $form_state) {
