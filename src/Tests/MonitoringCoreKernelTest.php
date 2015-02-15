@@ -442,7 +442,9 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // The command creates a line for every file in unexpected state.
     $sensor_config = SensorConfig::load('monitoring_git_dirty_tree');
     $sensor_config->status = TRUE;
-    $sensor_config->settings['cmd'] = 'echo "dummy output\nanother dummy output"';
+    // Ensure that newlines are treated correctly, see
+    // http://unix.stackexchange.com/questions/48106/what-does-it-mean-to-have-a-dollarsign-prefixed-string-in-a-script.
+    $sensor_config->settings['cmd'] = "echo $'dummy output\nanother dummy output'";
     $sensor_config->save();
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isCritical());
