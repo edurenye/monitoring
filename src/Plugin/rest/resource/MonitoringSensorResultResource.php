@@ -80,8 +80,6 @@ class MonitoringSensorResultResource extends ResourceBase {
       // The HTTP method is a requirement for this route.
       '_method' => 'GET',
       '_permission' => "restful get $this->pluginId",
-    ), array(
-      '_access_mode' => AccessManagerInterface::ACCESS_MODE_ANY,
     ));
     foreach ($this->serializerFormats as $format_name) {
       // Expose one route per available format.
