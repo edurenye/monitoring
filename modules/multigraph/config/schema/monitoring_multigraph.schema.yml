@@ -15,11 +15,11 @@ monitoring_multigraph.multigraph.*:
       type: sequence
       label: 'Sensors'
       sequence:
-        - type: mapping
-          mapping:
-            weight:
-              type: integer
-              label: 'Weight'
-            label:
-              type: label
-              label: 'Custom label'
+        type: mapping
+        mapping:
+          weight:
+            type: integer
+            label: 'Weight'
+          label:
+            type: label
+            label: 'Custom label'

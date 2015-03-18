@@ -93,14 +93,14 @@ monitoring.settings.aggregator_base:
       type: sequence
       label: Conditions
       sequence:
-        - type: mapping
-          mapping:
-            field:
-              type: string
-            value:
-              type: string
-            operator:
-              type: string
+        type: mapping
+        mapping:
+          field:
+            type: string
+          value:
+            type: string
+          operator:
+            type: string
 
 monitoring.settings.database_aggregator:
   type: monitoring.settings.aggregator_base
@@ -151,8 +151,8 @@ monitoring.settings.core_requirements:
       type: sequence
       label: 'Exclude list'
       sequence:
-        - type: string
-          label: 'Exclude key'
+        type: string
+        label: 'Exclude key'
 
 monitoring.settings.payment_turnover:
   type: monitoring.settings.entity_aggregator
@@ -204,8 +204,8 @@ monitoring.settings.monitoring_enabled_modules:
       label: Enabled modules
       type: sequence
       sequence:
-        - type: string
-          label: 'Module name'
+        type: string
+        label: 'Module name'
 
 monitoring.settings.config_value:
   type: monitoring.settings_base
