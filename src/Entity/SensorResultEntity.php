@@ -18,6 +18,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   label = @Translation("Monitoring sensor result"),
  *   base_table = "monitoring_sensor_result",
  *   translatable = FALSE,
+ *   handlers = {
+ *     "views_data" = "Drupal\monitoring\Entity\ViewsData\SensorResultViewsData",
+ *   },
  *   entity_keys = {
  *     "id" = "record_id",
  *     "label" = "sensor_message",
