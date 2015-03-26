@@ -59,26 +59,26 @@ class MultigraphWebTest extends WebTestBase {
       'label' => $this->randomString(),
       'id' => 'multigraph_123',
       'description' => $this->randomString(),
-      'sensor_add[sensor_add_select]' => 'dblog_404',
+      'sensor_add_select' => 'dblog_404',
     );
     $this->drupalPostForm('admin/config/system/monitoring/multigraphs/add', $values, t('Add'));
     $this->assertText(t('Sensor "Page not found errors" added. You have unsaved changes.'));
 
     $this->drupalPostForm(NULL, array(
-      'sensor_add[sensor_add_select]' => 'user_failed_logins',
+      'sensor_add_select' => 'user_failed_logins',
     ), t('Add'));
     $this->assertText(t('Sensor "Failed user logins" added. You have unsaved changes.'));
 
     $this->drupalPostForm(NULL, array(
-      'sensor_add[sensor_add_select]' => 'user_successful_logins',
+      'sensor_add_select' => 'user_successful_logins',
     ), t('Add'));
     $this->assertText(t('Sensor "Successful user logins" added. You have unsaved changes.'));
 
     // And last but not least, change all sensor label values and save form.
     $this->drupalPostForm(NULL, array(
-      'sensor_add[sensors][dblog_404][label]' => 'Page not found errors (test)',
-      'sensor_add[sensors][user_failed_logins][label]' => 'Failed user logins (test)',
-      'sensor_add[sensors][user_successful_logins][label]' => 'Successful user logins (test)',
+      'sensors[dblog_404][label]' => 'Page not found errors (test)',
+      'sensors[user_failed_logins][label]' => 'Failed user logins (test)',
+      'sensors[user_successful_logins][label]' => 'Successful user logins (test)',
     ), t('Save'));
     $this->assertText(t('Multigraph settings saved.'));
     $this->assertText('Page not found errors (test), Failed user logins (test), Successful user logins (test)');
@@ -105,7 +105,7 @@ class MultigraphWebTest extends WebTestBase {
     $values = array(
       'label' => 'Watchdog severe entries (test)',
       'description' => 'Watchdog entries with severity Warning or higher (test)',
-      'sensor_add[sensor_add_select]' => 'user_successful_logins',
+      'sensor_add_select' => 'user_successful_logins',
     );
     $this->drupalPostForm(NULL, $values, t('Add'));
     $this->assertText('Sensor "Successful user logins" added. You have unsaved changes.');
@@ -118,11 +118,11 @@ class MultigraphWebTest extends WebTestBase {
 
     // Change weights and save form.
     $this->drupalPostForm('admin/config/system/monitoring/multigraphs/watchdog_severe_entries', array(
-      'sensor_add[sensors][user_successful_logins][weight]' => -2,
-      'sensor_add[sensors][dblog_event_severity_error][weight]' => -1,
-      'sensor_add[sensors][dblog_event_severity_critical][weight]' => 0,
-      'sensor_add[sensors][dblog_event_severity_emergency][weight]' => 1,
-      'sensor_add[sensors][dblog_event_severity_alert][weight]' => 2,
+      'sensors[user_successful_logins][weight]' => -2,
+      'sensors[dblog_event_severity_error][weight]' => -1,
+      'sensors[dblog_event_severity_critical][weight]' => 0,
+      'sensors[dblog_event_severity_emergency][weight]' => 1,
+      'sensors[dblog_event_severity_alert][weight]' => 2,
     ), t('Save'));
     $this->assertText(t('Multigraph settings saved.'));
 

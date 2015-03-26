@@ -19,7 +19,7 @@ use Drupal\rest\Tests\RESTTestBase;
  */
 class MonitoringServicesTest extends RESTTestBase {
 
-  public static $modules = array('dblog', 'hal', 'rest', 'monitoring');
+  public static $modules = array('dblog', 'hal', 'rest', 'monitoring', 'views');
 
   /**
    * User account created.

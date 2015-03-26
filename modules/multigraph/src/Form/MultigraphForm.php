@@ -72,6 +72,7 @@ class MultigraphForm extends EntityForm {
       '#title' => $this->t('Sensors'),
       '#prefix' => '<div id="selected-sensors">',
       '#suffix' => '</div>',
+      '#tree' => FALSE,
     );
 
     // Create an array suitable for the sensor_add_select element.
@@ -105,6 +106,7 @@ class MultigraphForm extends EntityForm {
     // Table for included sensors.
     $form['sensor_add']['sensors'] = array(
       '#type' => 'table',
+      '#tree' => TRUE,
       '#header' => array(
         'category' => $this->t('Category'),
         'label' => $this->t('Sensor label'),
@@ -196,16 +198,6 @@ class MultigraphForm extends EntityForm {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
-    // Get rid of structural form elements before copying.
-    $form_state->setValue('sensors', $form_state->getValue(array('sensor_add', 'sensors')) ?: array());
-    $form_state->unsetValue('sensor_add');
-    parent::copyFormValuesToEntity($entity, $form, $form_state);
-  }
-
-  /**
    * Adds sensor to entity when 'Add sensor' button is pressed.
    *
    * @param array $form
@@ -220,10 +212,13 @@ class MultigraphForm extends EntityForm {
     $multigraph = $this->entity;
 
     // Add any selected sensor to entity.
-    if ($sensor_name = $form_state->getValue(array('sensor_add', 'sensor_add_select'))) {
+    if ($sensor_name = $form_state->getValue(array('sensor_add_select'))) {
       $sensor_label = \Drupal::entityManager()->getStorage('monitoring_sensor_config')->load($sensor_name)->getLabel();
       $multigraph->addSensor($sensor_name);
       drupal_set_message($this->t('Sensor "@sensor_label" added. You have unsaved changes.', array('@sensor_label' => $sensor_label)), 'warning');
+    }
+    else {
+      drupal_set_message($this->t('No sensor selected.'), 'warning');
     }
   }
 

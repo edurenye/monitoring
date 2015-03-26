@@ -13,7 +13,7 @@ use Drupal\simpletest\KernelTestBase;
  */
 abstract class MonitoringUnitTestBase extends KernelTestBase {
 
-  public static $modules = array('monitoring', 'monitoring_test', 'field', 'system', 'user');
+  public static $modules = array('monitoring', 'monitoring_test', 'field', 'system', 'user', 'views', 'text');
 
   /**
    * {@inheritdoc}
@@ -22,7 +22,7 @@ abstract class MonitoringUnitTestBase extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('monitoring_sensor_result');
-    $this->installConfig(array('monitoring'));
+    $this->installConfig(array('monitoring', 'monitoring_test'));
   }
 
   /**

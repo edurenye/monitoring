@@ -4,6 +4,9 @@ description: Monitoring base.
 package: Monitoring
 core: 8.x
 
+dependencies:
+ - views
+
 test_dependencies:
  - search_api
  - simplenews
