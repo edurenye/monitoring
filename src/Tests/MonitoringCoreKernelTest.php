@@ -5,7 +5,7 @@
  */
 namespace Drupal\monitoring\Tests;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -324,7 +324,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $result = $this->runSensor('node_new_' . $type1->id());
     $this->assertEqual($result->getValue(), 2);
     // Test for the SensorSimpleDatabaseAggregator custom message.
-    $this->assertEqual($result->getMessage(), String::format('@count @unit in @time_interval', array(
+    $this->assertEqual($result->getMessage(), SafeMarkup::format('@count @unit in @time_interval', array(
       '@count' => $result->getValue(),
       '@unit' => strtolower($result->getSensorConfig()->getValueLabel()),
       '@time_interval' => \Drupal::service('date.formatter')

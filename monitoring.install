@@ -4,7 +4,7 @@
  * Monitoring base install file.
  */
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\node\Entity\NodeType;
@@ -22,10 +22,10 @@ function monitoring_install() {
     foreach (NodeType::loadMultiple() as $node_type) {
       $sensor = SensorConfig::create(array(
         'id' => 'node_new_' . $node_type->id(),
-        'label' => String::format('New @type nodes', array('@type' => $node_type->label())),
-        'description' => String::format('New nodes of type @type', array('@type' => $node_type->label())),
+        'label' => SafeMarkup::format('New @type nodes', array('@type' => $node_type->label())),
+        'description' => SafeMarkup::format('New nodes of type @type', array('@type' => $node_type->label())),
         'plugin_id' => 'entity_aggregator',
-        'value_label' => String::format('@type nodes', array('@type' => $node_type->label())),
+        'value_label' => SafeMarkup::format('@type nodes', array('@type' => $node_type->label())),
         'value_type' => 'number',
         'category' => 'Content',
         'status' => TRUE,
@@ -49,7 +49,7 @@ function monitoring_install() {
     foreach (Index::loadMultiple() as $index) {
       $sensor = SensorConfig::create(array(
         'id' => 'search_api_' . $index->id(),
-        'label' => String::format('Search index queue size of @index', array('@index' => $index->label())),
+        'label' => SafeMarkup::format('Search index queue size of @index', array('@index' => $index->label())),
         'plugin_id' => 'search_api_unindexed',
         'value_type' => 'number',
         'value_label' => 'Unindexed items',
@@ -155,8 +155,8 @@ function monitoring_install() {
     }
     $sensor = SensorConfig::create(array(
       'id' => 'core_requirements_' . $module,
-      'label' => String::format('Module @module', array('@module' => $module)),
-      'description' => String::format('Requirements of the @module module', array('@module' => $module)),
+      'label' => SafeMarkup::format('Module @module', array('@module' => $module)),
+      'description' => SafeMarkup::format('Requirements of the @module module', array('@module' => $module)),
       'plugin_id' => 'core_requirements',
       'value_type' => 'no_value',
       'category' => 'Requirements',

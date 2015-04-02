@@ -5,7 +5,7 @@
  */
 namespace Drupal\monitoring\Tests;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -147,16 +147,16 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
 
     $log = $this->loadWatchdog();
     $this->assertEqual(count($log), 2, 'There should be two log entries: comment_new sensor added, all sensors enabled by default added.');
-    $this->assertEqual(String::format($log[0]->message, unserialize($log[0]->variables)),
-      String::format('@count new sensor/s added: @names', array(
+    $this->assertEqual(SafeMarkup::format($log[0]->message, unserialize($log[0]->variables)),
+      SafeMarkup::format('@count new sensor/s added: @names', array(
           '@count' => 1,
           '@names' => 'comment_new'
         )));
 
     $sensor_config_all = monitoring_sensor_manager()->getAllSensorConfig();
     unset($sensor_config_all['comment_new']);
-    $this->assertEqual(String::format($log[1]->message, unserialize($log[1]->variables)),
-      String::format('@count new sensor/s added: @names', array(
+    $this->assertEqual(SafeMarkup::format($log[1]->message, unserialize($log[1]->variables)),
+      SafeMarkup::format('@count new sensor/s added: @names', array(
         '@count' => count($sensor_config_all),
         '@names' => implode(', ', array_keys($sensor_config_all))
       )));
@@ -192,8 +192,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertTrue($result->isOk());
     $log = $this->loadWatchdog();
     $this->assertEqual(count($log), 3, 'Removal of comment_new sensor should be logged.');
-    $this->assertEqual(String::format($log[2]->message, unserialize($log[2]->variables)),
-      String::format('@count new sensor/s removed: @names', array(
+    $this->assertEqual(SafeMarkup::format($log[2]->message, unserialize($log[2]->variables)),
+      SafeMarkup::format('@count new sensor/s removed: @names', array(
           '@count' => 1,
           '@names' => 'comment_new'
         )));

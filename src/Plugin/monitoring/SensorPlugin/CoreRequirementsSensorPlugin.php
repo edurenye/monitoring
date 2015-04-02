@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
@@ -195,7 +195,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
     $function = $module . '_requirements';
 
     if (!function_exists($function)) {
-      throw new \RuntimeException(String::format('Requirement function @function not found', array('@function' => $function)));
+      throw new \RuntimeException(SafeMarkup::format('Requirement function @function not found', array('@function' => $function)));
     }
 
     return (array)$function('runtime');

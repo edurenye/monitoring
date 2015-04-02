@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Drupal;
@@ -212,7 +212,7 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
           $non_installed_modules_info[] = $names[$non_installed_module] . ' (' . $non_installed_module . ')';
         }
         else {
-          $non_installed_modules_info[] = String::format('@module_name (unknown)', array('@module_name' => $non_installed_module));
+          $non_installed_modules_info[] = SafeMarkup::format('@module_name (unknown)', array('@module_name' => $non_installed_module));
         }
       }
       $result->addStatusMessage('Following modules are expected to be installed: @modules', array('@modules' => implode(', ', $non_installed_modules_info)));

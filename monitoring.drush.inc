@@ -4,8 +4,8 @@
  * Drush support for monitoring.
  */
 
-use Drupal\Component\Utility\Json;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
@@ -169,10 +169,10 @@ function monitoring_drush_sensor_config_single($sensor_name) {
     return drush_set_error('MONITORING_SENSOR_INVALID_NAME', dt('Sensor "@name" does not exist.', array('@name' => $sensor_name)));
   }
 
-  $rows[] = array(String::format("@label (@id)", array('@label' => $sensor_config->getLabel(), '@id' => $sensor_config->id())), '====================');
+  $rows[] = array(SafeMarkup::format("@label (@id)", array('@label' => $sensor_config->getLabel(), '@id' => $sensor_config->id())), '====================');
   $rows[] = array(dt('Category'), $sensor_config->getCategory());
   $rows[] = array(dt('Description'), $sensor_config->getDescription());
-  $rows[] = array(dt('Value info'), String::format('type: @type, label: @label, numeric: @numeric', array(
+  $rows[] = array(dt('Value info'), SafeMarkup::format('type: @type, label: @label, numeric: @numeric', array(
     '@type' => ($sensor_config->getValueType() ? $sensor_config->getValueType() : dt('N/A')),
     '@label' => ($sensor_config->getValueLabel() ? $sensor_config->getValueLabel() : dt('N/A')),
     '@numeric' => ($sensor_config->isNumeric() ? dt('Yes') : dt('No')),
@@ -324,7 +324,7 @@ function monitoring_drush_result_output_table_multiple(array $results, $show_exe
 
   foreach ($results as $result) {
     $rows[$result->getSensorId()] = array(
-      String::format("@label\n(@id)", array('@label' => Unicode::truncate($result->getSensorConfig()->getLabel(), 40, TRUE, TRUE), '@id' => $result->getSensorId())),
+      SafeMarkup::format("@label\n(@id)", array('@label' => Unicode::truncate($result->getSensorConfig()->getLabel(), 40, TRUE, TRUE), '@id' => $result->getSensorId())),
       $result->getStatusLabel(),
       Unicode::truncate($result->getMessage(), 40, TRUE, TRUE),
       \Drupal::service('date.formatter')->formatInterval(time() - $result->getTimestamp()),

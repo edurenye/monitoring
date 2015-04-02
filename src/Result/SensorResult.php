@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Result;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\monitoring\Sensor\SensorCompilationException;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -202,7 +202,7 @@ class SensorResult implements SensorResultInterface {
     if (!empty($this->sensorMessage)) {
       // A message has been set by the sensor, use that as is and only do
       // placeholder replacements with the provided variables.
-      $message = String::format($this->sensorMessage['message'], $this->sensorMessage['variables']);
+      $message = SafeMarkup::format($this->sensorMessage['message'], $this->sensorMessage['variables']);
     }
     else {
 
@@ -226,7 +226,7 @@ class SensorResult implements SensorResultInterface {
         // If the sensor defines time interval value we append
         // the info to the message.
         if ($this->getSensorConfig()->getTimeIntervalValue()) {
-          $messages[] = String::format('!formatted_value in !time_interval', $default_variables);
+          $messages[] = SafeMarkup::format('!formatted_value in !time_interval', $default_variables);
         }
         else {
           $messages[] = $default_variables['!formatted_value'];
@@ -239,7 +239,7 @@ class SensorResult implements SensorResultInterface {
 
       // Set the expected value message if the sensor did not match.
       if ($this->isCritical() && $this->getExpectedValue() !== NULL) {
-        $messages[] = String::format('expected !expected', $default_variables);
+        $messages[] = SafeMarkup::format('expected !expected', $default_variables);
       }
       // Set the threshold message if there is any.
       if ($threshold_message !== NULL) {
@@ -248,7 +248,7 @@ class SensorResult implements SensorResultInterface {
 
       // Append all status messages which were added by the sensor.
       foreach ($this->statusMessages as $msg) {
-        $messages[] = String::format($msg['message'], array_merge($default_variables, $msg['variables']));
+        $messages[] = SafeMarkup::format($msg['message'], array_merge($default_variables, $msg['variables']));
       }
 
       $message = implode(', ', $messages);
@@ -310,14 +310,14 @@ class SensorResult implements SensorResultInterface {
 
       $value_types = monitoring_value_types();
       if (!isset($value_types[$value_type])) {
-        throw new SensorCompilationException(String::format('Invalid value type @type', array('@type' => $value_type)));
+        throw new SensorCompilationException(SafeMarkup::format('Invalid value type @type', array('@type' => $value_type)));
       }
       elseif (empty($value_types[$value_type]['formatter_callback']) && $label = $this->getSensorConfig()->getValueLabel()) {
         $label = Unicode::strtolower($label);
-        return String::format('!value !label', array('!value' => $value, '!label' => $label));
+        return SafeMarkup::format('!value !label', array('!value' => $value, '!label' => $label));
       }
       elseif (isset($value_types[$value_type]['formatter_callback']) && !function_exists($value_types[$value_type]['formatter_callback'])) {
-        throw new SensorCompilationException(String::format('Formatter callback @callback for @type does not exist',
+        throw new SensorCompilationException(SafeMarkup::format('Formatter callback @callback for @type does not exist',
           array('@callback' => $value_types[$value_type]['formatter_callback'], '@type' => $value_type)));
       }
       elseif(isset($value_types[$value_type]['formatter_callback'])) {
@@ -333,10 +333,10 @@ class SensorResult implements SensorResultInterface {
       // @todo This assumption will no longer work when non-english messages
       // supported.
       $label = Unicode::strtolower($label);
-      return String::format('!value !label', array('!value' => $value, '!label' => $label));
+      return SafeMarkup::format('!value !label', array('!value' => $value, '!label' => $label));
     }
 
-    return String::format('Value !value', array('!value' => $value));
+    return SafeMarkup::format('Value !value', array('!value' => $value));
   }
 
   /**

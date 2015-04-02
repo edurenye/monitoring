@@ -6,7 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -231,7 +231,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   public function calculateDependencies() {
     $entity_type_id = $this->getEntityType();
     if (!$entity_type_id) {
-      throw new \Exception(String::format('Sensor @id is missing the required entity_type setting.', array('@id' => $this->id())));
+      throw new \Exception(SafeMarkup::format('Sensor @id is missing the required entity_type setting.', array('@id' => $this->id())));
     }
     $entity_type = $this->entityManager->getDefinition($entity_type_id);
     $this->addDependency('module', $entity_type->getProvider());

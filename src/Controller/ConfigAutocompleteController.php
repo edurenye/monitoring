@@ -7,7 +7,7 @@
 
 namespace Drupal\monitoring\Controller;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +31,7 @@ class ConfigAutocompleteController {
     $matches = array();
     $prefixMatches = array_slice(\Drupal::service('config.factory')->listAll($request->query->get('q')), 0, 10);
     foreach ($prefixMatches as $config) {
-      $matches[] = array('value' => $config, 'label' => String::checkPlain($config));
+      $matches[] = array('value' => $config, 'label' => SafeMarkup::checkPlain($config));
     }
     return new JsonResponse($matches);
   }
