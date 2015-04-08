@@ -284,15 +284,10 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'field_name' => 'term_reference',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'entity_type' => 'node',
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'entity_types' => array('node'),
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     ))->save();
 
@@ -301,31 +296,18 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'field_name' => 'term_reference',
       'entity_type' => 'node',
       'bundle' => $type2->id(),
-      'settings' => array(),
+      'settings' => array('bundles' => [$vocabulary->id() => $vocabulary->id()]),
       'required' => FALSE,
-      'widget' => array(
-        'type' => 'options_select',
-      ),
-      'display' => array(
-        'default' => array(
-          'type' => 'taxonomy_term_reference_link',
-        ),
-      ),
     ))->save();
 
     entity_create('field_storage_config', array(
       'field_name' => 'term_reference2',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'entity_type' => 'node',
-      'type' => 'taxonomy_term_reference',
+      'type' => 'entity_reference',
       'entity_types' => array('node'),
       'settings' => array(
-        'allowed_values' => array(
-          array(
-            'vocabulary' => $vocabulary->id(),
-            'parent' => 0,
-          ),
-        ),
+        'target_type' => 'taxonomy_term',
       ),
     ))->save();
 
@@ -334,16 +316,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'field_name' => 'term_reference2',
       'entity_type' => 'node',
       'bundle' => $type2->id(),
-      'settings' => array(),
+      'settings' => array('bundles' => [$vocabulary->id() => $vocabulary->id()]),
       'required' => FALSE,
-      'widget' => array(
-        'type' => 'options_select',
-      ),
-      'display' => array(
-        'default' => array(
-          'type' => 'taxonomy_term_reference_link',
-        ),
-      ),
     ))->save();
 
     // Create some terms.

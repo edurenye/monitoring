@@ -87,8 +87,8 @@ function monitoring_install() {
     }
     $sensor = SensorConfig::create(array(
       'id' => 'dblog_event_severity_' . $severities[$level],
-      'label' => String::format('Severity @severity', array('@severity' => $name)),
-      'description' => String::format('Watchdog entries of severity @severity',array('@severity' => $name)),
+      'label' => SafeMarkup::format('Severity @severity', array('@severity' => $name)),
+      'description' => SafeMarkup::format('Watchdog entries of severity @severity',array('@severity' => $name)),
       'plugin_id' => 'database_aggregator',
       'value_label' => 'Events',
       'value_type' => 'number',
