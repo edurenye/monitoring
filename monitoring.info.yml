@@ -10,7 +10,8 @@ dependencies:
 test_dependencies:
  - search_api
  - simplenews
- - elysia_cron
+ # Disabled until the elysia_cron integration is available again.
+ #- elysia_cron
  - payment
  - captcha
  - past
