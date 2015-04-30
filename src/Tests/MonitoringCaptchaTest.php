@@ -14,11 +14,6 @@ namespace Drupal\monitoring\Tests;
  */
 class MonitoringCaptchaTest extends MonitoringTestBase {
 
- /**
-  * Disabled config schema checking temporarily until all errors are resolved.
-  */
- protected $strictConfigSchema = FALSE;
-
   public static $modules = array('captcha');
 
   /**
@@ -44,6 +39,8 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
     // Set a CAPTCHA on login form.
     captcha_set_form_id_setting('user_login_form', 'captcha/Math');
 
+    // Assert the number of entries in the captcha_session table is 1.
+    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 1);
     // Try to log in, with invalid captcha answer which should fail.
     $edit = array(
       'name' => $user->getUsername(),
@@ -52,14 +49,14 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
     );
     $this->drupalPostForm('user', $edit, t('Log in'));
 
+    // Assert the total number of entries in captcha_sessions table is now 2.
+    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 2);
+
     // Run sensor and get the message.
     $message = $this->runSensor('captcha_failed_count')->getMessage();
 
     // Assert the number of failed attempts.
     $this->assertEqual($message, '1 attempt(s)');
-
-    // Assert the total number of entries in captcha_sessions table.
-    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 3);
   }
 
 }
