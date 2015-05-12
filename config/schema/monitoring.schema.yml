@@ -218,7 +218,8 @@ monitoring.settings.config_value:
       type: string
       label: 'Key'
     value:
-      type: string
+      # Value can be of different type (string, ...), depending on the settings.
+      type: ignore
       label: 'Value'
 
 monitoring.settings.state_value:
@@ -229,7 +230,8 @@ monitoring.settings.state_value:
       type: string
       label: 'Key'
     value:
-      type: string
+      # Value can be of different type (string, ...), depending on the settings.
+      type: ignore
       label: 'Value'
 
 monitoring.settings.cron_last_run_time:

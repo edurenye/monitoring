@@ -36,6 +36,12 @@ use Drupal\monitoring_multigraph\MultigraphInterface;
  *     "id" = "id",
  *     "label" = "label"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "description",
+ *     "sensors",
+ *   },
  *   links = {
  *     "delete-form" = "/admin/config/system/monitoring/multigraphs/{monitoring_multigraph}/delete",
  *     "edit-form" = "/admin/config/system/monitoring/multigraphs/{monitoring_multigraph}"

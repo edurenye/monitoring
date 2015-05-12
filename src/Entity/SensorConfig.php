@@ -35,6 +35,20 @@ use Drupal\monitoring\SensorConfigInterface;
  *     "id" = "id",
  *     "label" = "label"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "description",
+ *     "category",
+ *     "plugin_id",
+ *     "result_class",
+ *     "value_label",
+ *     "value_type",
+ *     "status",
+ *     "caching_time",
+ *     "settings",
+ *     "thresholds",
+ *   },
  *   links = {
  *     "delete-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}/delete",
  *     "edit-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}",

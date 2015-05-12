@@ -9,4 +9,4 @@ status: TRUE
 settings:
   table: 'sessions'
   time_interval_field: 'timestamp'
-  time_interval_value: '86400'
+  time_interval_value: 86400

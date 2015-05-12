@@ -17,4 +17,4 @@ settings:
       field: 'message'
       value: 'Session closed for %name.'
   time_interval_field: 'timestamp'
-  time_interval_value: '86400'
+  time_interval_value: 86400

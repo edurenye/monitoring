@@ -8,10 +8,10 @@ value_label: 'Active sessions'
 status: TRUE
 settings:
   table: 'sessions'
-  time_interval_value: '86400'
+  time_interval_value: 86400
   time_interval_field: 'timestamp'
   conditions:
     -
       field: 'uid'
-      value: 0
+      value: '0'
       operator: '!='

@@ -15,7 +15,7 @@ namespace Drupal\monitoring\Tests;
  */
 class MonitoringPastTest extends MonitoringUnitTestBase {
 
-  public static $modules = array('views', 'past', 'past_db', 'past_db_test', 'options');
+  public static $modules = array('views', 'past', 'past_db', 'options');
 
   /**
    * {@inheritdoc}
