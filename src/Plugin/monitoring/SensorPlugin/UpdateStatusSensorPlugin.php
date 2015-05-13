@@ -164,7 +164,7 @@ class UpdateStatusSensorPlugin extends SensorPluginBase {
    *   One of the SensorResultInterface status constants.
    */
   protected function calculateStatus($type) {
-    module_load_include('install', 'update');
+    \Drupal::service('module_handler')->loadInclude('update', 'install');
 
     $requirements = update_requirements('runtime');
 
