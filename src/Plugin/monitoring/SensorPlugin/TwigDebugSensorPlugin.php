@@ -54,15 +54,14 @@ class TwigDebugSensorPlugin extends SensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-
     $twig_config = $this->container->getParameter('twig.config');
     $result->setStatus(SensorResultInterface::STATUS_OK);
 
-    if ($twig_config['debug']) {
+    if (!empty($twig_config['debug'])) {
       $result->setStatus(SensorResultInterface::STATUS_WARNING);
       $result->addStatusMessage('Twig debug mode is enabled');
     }
-    if (!$twig_config['cache']) {
+    if (isset($twig_config['cache']) && !$twig_config['cache']) {
       $result->setStatus(SensorResultInterface::STATUS_WARNING);
       $result->addStatusMessage('Twig cache disabled');
     }
