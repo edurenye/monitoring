@@ -67,7 +67,7 @@ class MultigraphForm extends EntityForm {
     );
 
     // Fieldset for sensor list elements.
-    $form['sensor_add'] = array(
+    $form['sensor_list'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Sensors'),
       '#prefix' => '<div id="selected-sensors">',
@@ -84,7 +84,7 @@ class MultigraphForm extends EntityForm {
     }
 
     // Select element for available sensors.
-    $form['sensor_add']['sensor_add_select'] = array(
+    $form['sensor_list']['sensor_add_select'] = array(
       '#type' => 'select',
       '#title' => $this->t('Available sensors'),
       '#options' => $sensors_options,
@@ -92,7 +92,7 @@ class MultigraphForm extends EntityForm {
       '#empty_value' => '',
     );
 
-    $form['sensor_add']['sensor_add_button'] = array(
+    $form['sensor_list']['sensor_add_button'] = array(
       '#type' => 'submit',
       '#value' => $this->t('Add'),
       '#ajax' => array(
@@ -104,7 +104,7 @@ class MultigraphForm extends EntityForm {
     );
 
     // Table for included sensors.
-    $form['sensor_add']['sensors'] = array(
+    $form['sensor_list']['sensors'] = array(
       '#type' => 'table',
       '#tree' => TRUE,
       '#header' => array(
@@ -130,7 +130,7 @@ class MultigraphForm extends EntityForm {
     // Fill the sensors table with form elements for each sensor.
     $weight = 0;
     foreach ($multigraph->getSensors() as $sensor) {
-      $form['sensor_add']['sensors'][$sensor->id()] = array(
+      $form['sensor_list']['sensors'][$sensor->id()] = array(
         'category' => array(
           '#markup' => $sensor->getCategory(),
         ),
@@ -194,7 +194,7 @@ class MultigraphForm extends EntityForm {
    *   The updated form component for the selected sensors.
    */
   public function sensorsReplace(array $form, FormStateInterface $form_state) {
-    return $form['sensor_add'];
+    return $form['sensor_list'];
   }
 
   /**
