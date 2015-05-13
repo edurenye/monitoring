@@ -80,12 +80,12 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       $row['severity'] = $severity;
 
       // Map column message with title and description.
-      $title = '';
+      $title = [];
       if (isset($value['title'])) {
-        $title .= $value['title'];
+        $title[] = $value['title'];
       }
       if (isset($value['value'])) {
-        $title .= $value['value'];
+        $title[] = $value['value'];
       }
       $description = '';
       if (isset($value['description'])) {
@@ -93,7 +93,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       }
       $message = array(
         '#type' => 'item',
-        '#title' => $title,
+        '#title' => implode(' ', $title),
         '#markup' => $description,
       );
       $row['message'] = drupal_render($message);
