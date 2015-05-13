@@ -18,6 +18,7 @@ display:
     display_title: Master
     position: 0
     display_options:
+      rendering_language: '***LANGUAGE_entity_default***'
       access:
         type: none
         options: {  }
@@ -403,6 +404,7 @@ display:
     display_title: 'Detail Page Log'
     position: 2
     display_options:
+      rendering_language: '***LANGUAGE_entity_default***'
       display_extenders: {  }
       fields:
         timestamp:
@@ -617,6 +619,7 @@ display:
     display_title: Page
     position: 1
     display_options:
+      rendering_language: '***LANGUAGE_entity_default***'
       display_extenders: {  }
       path: admin/reports/monitoring/log
       menu:
