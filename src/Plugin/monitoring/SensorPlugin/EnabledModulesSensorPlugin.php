@@ -165,8 +165,6 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
 
     unset($sensor_config->settings['extended']);
     unset($sensor_config->settings['update_modules']);
-
-    return $form_state;
   }
 
   /**

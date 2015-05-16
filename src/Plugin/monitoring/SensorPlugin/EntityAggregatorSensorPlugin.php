@@ -10,7 +10,9 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -61,7 +63,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   /**
    * Builds the entity aggregate query.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryAggregateInterface
    *   The entity query object.
    */
   protected function getEntityQueryAggregate() {
@@ -191,12 +193,19 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       '#markup' => $this->aggregateField,
     );
 
-    // @todo show query.
-
     // Fetch the last 10 matching entries, unaggregated.
     $entity_ids = $this->getEntityQuery()
       ->range(0, 10)
       ->execute();
+
+    // Show query.
+    // @todo show query. This needs an injected FakeStatement.
+    // $query = '';
+    // $output['query'] = array(
+    //   '#type' => 'item',
+    //   '#title' => t('Query'),
+    //   '#markup' => '<pre>' . $query . '</pre>',
+    // );
 
     // Load entities.
     $entity_type = $this->getEntityType();
@@ -204,21 +213,33 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       ->getStorage($entity_type)
       ->loadMultiple($entity_ids);
 
+    // @todo add extra fields, formatted...
     // Render entities.
-    $rendered_items = array();
+    $rows = [];
     foreach ($entities as $id => $entity) {
+      $row = [];
       $entity_link = array(
         '#type' => 'link',
-        '#title' => $entity->id() . ': ' . $entity->label(),
+        '#title' => $entity->label(),
         '#url' => $entity->urlInfo(),
       );
-      $rendered_items[$id] = drupal_render($entity_link);
+
+      $row[] = $entity->id();
+      $row[] = drupal_render($entity_link);
+      $rows[] = array(
+        'data' => $row,
+        'class' => 'entity',
+      );
     }
-    if (count($rendered_items) > 0) {
+    if (count($rows) > 0) {
+      $header = [];
+      $header[] = t('#');
+      $header[] = t('Label');
+
       $output['entities'] = array(
-        '#title' => 'Entities',
-        '#theme' => 'item_list',
-        '#items' => $rendered_items,
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
       );
     }
 
@@ -244,10 +265,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $settings = $this->sensorConfig->getSettings();
-    $conditions = array(array('field' => '', 'value' => ''));
-    if (isset($settings['conditions'])) {
-      $conditions = $settings['conditions'];
-    }
+
     $form['entity_type'] = array(
       '#type' => 'select',
       '#default_value' => $this->getEntityType(),
@@ -259,84 +277,166 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       $form['entity_type']['#required'] = TRUE;
     }
 
-    /*    if (isset($form_state['values']['settings']['conditions']['table'])) {
-      $conditions = $form_state['values']['settings']['conditions']['table'];
-    }
 
-    $form['conditions'] = array(
+    // Add conditions.
+    // Fieldset for sensor list elements.
+    $form['conditions_table'] = array(
       '#type' => 'fieldset',
       '#title' => t('Conditions'),
-      '#prefix' => '<div id="add-conditions">',
+      '#prefix' => '<div id="selected-conditions">',
       '#suffix' => '</div>',
+      '#tree' => FALSE,
     );
 
-    $form['conditions']['conditions_add_button'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add Condition'),
-      '#ajax' => array(
-        'wrapper' => 'add-conditions',
-        'callback' => array($this, 'addConditions'),
-        'method' => 'replace',
-      ),
-      '#submit' => array(
-        array($this, 'addConditionSubmit'),
-      ),
-    );
-
-    $form['conditions']['table'] = array(
+    // Table for included sensors.
+    $form['conditions_table']['conditions'] = array(
       '#type' => 'table',
+      '#tree' => TRUE,
       '#header' => array(
-        'no' => t('Condition No.'),
         'field' => t('Field'),
+        'operator' => t('Operator'),
         'value' => t('Value'),
       ),
-      '#prefix' => '<div id="add-conditions">',
-      '#suffix' => '</div>',
       '#empty' => t(
-        'Add Conditions to this sensor.'
-      ),
-      '#tabledrag' => array(
-        array(
-          'action' => 'order',
-          'relationship' => 'sibling',
-          'group' => 'sensors-table-weight',
-        ),
+        'Add conditions to filter the results.'
       ),
     );
-    */
-    foreach ($conditions as $no => $condition) {
-      $form['conditions'][$no] = array(
+
+    // Fill the sensors table with form elements for each sensor.
+    $conditions = $this->sensorConfig->getSetting('conditions');
+    if (empty($conditions)) {
+      $conditions = [];
+    }
+
+    if (!$form_state->has('conditions_rows')) {
+      $form_state->set('conditions_rows', count($conditions) + 1);
+    }
+
+    for ($i = 0; $i < $form_state->get('conditions_rows'); $i++) {
+      $condition = isset($conditions[$i]) ? $conditions[$i] : array();
+
+      $condition += array(
+        'field' => '',
+        'value' => '',
+        'operator' => '=',
+      );
+
+      // See operators https://api.drupal.org/api/drupal/includes%21entity.inc/function/EntityFieldQuery%3A%3AaddFieldCondition/7
+      $operators = array(
+        '=' => t('='),
+        '!=' => t('!='),
+        '<' => t('<'),
+        '=<' => t('=<'),
+        '>' => t('>'),
+        '>=' => t('>='),
+        'STARTS_WITH' => t('STARTS_WITH'),
+        'CONTAINS' => t('CONTAINS'),
+        //'BETWEEN' => t('BETWEEN'), // Requires
+        //'IN' => t('IN'),
+        //'NOT IN' => t('NOT IN'),
+        //'EXISTS' => t('EXISTS'),
+        //'NOT EXISTS' => t('NOT EXISTS'),
+        //'LIKE' => t('LIKE'),
+        //'IS NULL' => t('IS NULL'),
+        //'IS NOT NULL' => t('IS NOT NULL'),
+      );
+      $form['conditions_table']['conditions'][$i] = array(
         'field' => array(
           '#type' => 'textfield',
-          '#title' => t("Condition's Field"),
           '#default_value' => $condition['field'],
+          '#title' => t('Field'),
+          '#title_display' => 'invisible',
+          '#size' => 20,
+          //'#required' => TRUE,
+        ),
+        'operator' => array(
+          '#type' => 'select',
+          '#default_value' => $condition['operator'],
+          '#title' => t('Operator'),
+          '#title_display' => 'invisible',
+          '#options' => $operators,
+          //'#required' => TRUE,
         ),
         'value' => array(
           '#type' => 'textfield',
-          '#title' => t("Condition's Value"),
           '#default_value' => $condition['value'],
-        )
+          '#title' => t('Value'),
+          '#title_display' => 'invisible',
+          '#size' => 40,
+          //'#required' => TRUE,
+        ),
       );
     }
+
+    // Select element for available conditions.
+    $form['conditions_table']['condition_add_button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add more conditions'),
+      '#ajax' => array(
+        'wrapper' => 'selected-conditions',
+        'callback' => array($this, 'conditionsReplace'),
+        'method' => 'replace',
+      ),
+      '#submit' => array(array($this, 'addConditionSubmit')),
+    );
+
     return $form;
   }
 
   /**
-   * Returns the rebuild form.
+   * {@inheritdoc}
    */
-  public function addConditions(array $form, FormStateInterface $form_state) {
-    return $form['settings']['conditions'];
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
+    /** @var \Drupal\monitoring\Form\SensorForm $sensor_form */
+    $sensor_form = $form_state->getFormObject();
+    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
+    $sensor_config = $sensor_form->getEntity();
+    $settings = $sensor_config->getSettings();
+
+    // Cleanup conditions, remove empty.
+    $settings['conditions'] = [];
+    foreach($form_state->getValue('conditions') as $key => $condition) {
+      if (!empty($condition['field'])) {
+        $settings['conditions'][] = $condition;
+      }
+    }
+
+    $sensor_config->set('settings', $settings);
+  }
+
+    /**
+   * Returns the updated 'conditions' fieldset for replacement by ajax.
+   *
+   * @param array $form
+   *   The updated form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   *
+   * @return array
+   *   The updated form component for the selected fields.
+   */
+  public function conditionsReplace(array $form, FormStateInterface $form_state) {
+    return $form['plugin_container']['settings']['conditions_table'];
   }
 
   /**
-   * Adds new condition field and value to the form.
+   * Adds sensor to entity when 'Add field' button is pressed.
+   *
+   * @param array $form
+   *   The form structure array
+   * @param FormStateInterface $form_state
+   *   The form state structure.
    */
   public function addConditionSubmit(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
-    if (!$form_state->hasValue(array('settings', 'conditions', 'table'))) {
-      $form_state->setValue(array('settings', 'conditions', 'table'), array(array('field' => '', 'value' => '')));
-    }
+
+    $form_state->set('conditions_rows', $form_state->get('conditions_rows') + 1);
+
+    drupal_set_message(t('Condition added.'), 'status');
   }
+
   /**
    * {@inheritdoc}
    */
@@ -361,9 +461,12 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   }
 
   /**
-   * @param $query
+   * Add aggregation to the query.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryAggregateInterface $query
+   *   The query.
    */
-  protected function addAggregate($query) {
+  protected function addAggregate(QueryAggregateInterface $query) {
     $query->aggregate($this->aggregateField, 'COUNT');
   }
 

@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 

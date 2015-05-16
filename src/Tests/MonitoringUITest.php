@@ -71,14 +71,17 @@ class MonitoringUITest extends MonitoringTestBase {
     ), t('Select sensor'));
 
     $this->assertText('Sensor plugin settings');
+    $this->drupalPostForm(NULL, array('settings[entity_type]' => 'field_storage_config'), t('Add more conditions'));
     $this->drupalPostForm(NULL, array(
       'description' => 'Sensor created to test UI',
       'value_label' => 'Test Value',
       'caching_time' => 100,
       'settings[aggregation][time_interval_value]' => 86400,
       'settings[entity_type]' => 'field_storage_config',
-      'settings[conditions][0][field]' => 'type',
-      'settings[conditions][0][value]' => 'message',
+      'conditions[0][field]' => 'type',
+      'conditions[0][value]' => 'message',
+      'conditions[1][field]' => 'parent',
+      'conditions[1][value]' => 'article',
     ), t('Save'));
 
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'UI created Sensor')));
@@ -91,7 +94,8 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
-    $this->assertFieldByName('settings[conditions][0][value]', 'message');
+    $this->assertFieldByName('conditions[0][value]', 'message');
+    $this->assertFieldByName('conditions[1][value]', 'article');
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor/delete');
     $this->assertText('This action cannot be undone.');
@@ -173,8 +177,8 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalPostForm(NULL, array(), 'Run now');
     // The node labels should appear in verbose output.
     $this->assertText('Entities');
-    $this->assertLink($node1->id() . ': ' . $node1->getTitle());
-    $this->assertLink($node2->id() . ': ' . $node2->getTitle());
+    $this->assertLink($node1->getTitle());
+    $this->assertLink($node2->getTitle());
 
     // Check the sensor overview to verify that the sensor result is
     // calculated and the sensor message is displayed.
@@ -488,7 +492,7 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'Module system')));
     $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
-    // Verify the change in excluded keys
+    // Verify the change in excluded keys.
     $this->assertText('requirement_excluded');
     $this->assertNoText('cron');
 

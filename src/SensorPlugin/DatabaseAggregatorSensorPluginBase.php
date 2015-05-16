@@ -122,7 +122,6 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
       unset($sensor_config->settings['time_interval_value']);
     }
     unset($sensor_config->settings['aggregation']);
-    return $form_state;
   }
 
   /**

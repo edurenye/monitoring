@@ -264,7 +264,6 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
     $keys = array_filter(explode("\n", $form_state->getValue(array('settings', 'exclude_keys'))));
     $keys = array_map('trim', $keys);
     $this->sensorConfig->settings['exclude_keys'] = $keys;
-    return $form_state;
   }
 
 }
