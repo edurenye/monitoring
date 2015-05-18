@@ -63,6 +63,14 @@ class SensorDetailForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  public function actions(array $form, FormStateInterface $form_state) {
+    // Remove save button on sensor detail page as it breaks settings.
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */

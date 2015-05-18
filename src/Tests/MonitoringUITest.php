@@ -174,9 +174,11 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // Visit the sensor detail page with verbose output.
     $this->drupalGet('admin/reports/monitoring/sensors/entity_aggregate_test');
+    // Check that there is no Save button on the detail page.
+    $this->assertNoLink('Save');
     $this->drupalPostForm(NULL, array(), 'Run now');
     // The node labels should appear in verbose output.
-    $this->assertText('Entities');
+    $this->assertText('Label');
     $this->assertLink($node1->getTitle());
     $this->assertLink($node2->getTitle());
 
