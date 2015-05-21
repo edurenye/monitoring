@@ -51,6 +51,17 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertOptionSelected('edit-settings-entity-type', 'user');
     $this->assertText('Sensor Plugin');
     $this->assertText('Entity Aggregator');
+
+    // Tests adding a condition to the log out sensor.
+    $this->drupalGet('admin/config/system/monitoring/sensors/user_session_logouts');
+    $edit = array(
+      'conditions[2][field]' => 'TEST',
+      'conditions[2][value]' => 'TEST',
+    );
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->drupalGet('admin/config/system/monitoring/sensors/user_session_logouts');
+    $this->assertFieldByName('conditions[2][field]', 'TEST');
+    $this->assertFieldByName('conditions[2][value]', 'TEST');
   }
 
   /**
