@@ -60,7 +60,7 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
 
     if (!empty($this->cmdOutput)) {
       $result->setValue(count($this->cmdOutput));
-      $result->addStatusMessage('Files in unexpected state');
+      $result->addStatusMessage('Files in unexpected state: ' . $this->getShortFileList($this->cmdOutput, 2));
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
     }
     else {
@@ -69,6 +69,41 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
       $result->setStatus(SensorResultInterface::STATUS_OK);
     }
   }
+
+  /**
+   * Returns a shortened file list for the status message.
+   *
+   * @param string $input
+   *   Result from running the git command.
+   *
+   * @param int $max_files
+   *   Limit the number of files returned.
+   *
+   * @param int $max_length
+   *   Limit the length of the path to the file
+   *
+   * @return string
+   *   File names from $output.
+   */
+  protected function getShortFileList($input, $max_files = 2, $max_length = 50) {
+    $output = array();
+    // Remove unnecessary whitespace.
+    foreach (array_slice($input, 0, $max_files) as $line) {
+      // Separate type of modification and path to file.
+      $parts = explode(' ', $line, 2);
+      if (strlen($parts[1]) > $max_length) {
+        // Put together type of modification and path to file limited by
+        // $pathLength.
+        $output[] = $parts[0] . ' …' . substr($parts[1], -$max_length);
+      }
+      else {
+        // Return whole line if path is shorter then $pathLength.
+        $output[] = $line;
+      }
+    }
+    return implode(', ', $output);
+  }
+
 
   /**
    * {@inheritdoc}

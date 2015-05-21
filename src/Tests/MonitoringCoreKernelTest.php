@@ -444,18 +444,20 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $sensor_config->status = TRUE;
     // Ensure that newlines are treated correctly, see
     // http://unix.stackexchange.com/questions/48106/what-does-it-mean-to-have-a-dollarsign-prefixed-string-in-a-script.
-    $sensor_config->settings['cmd'] = "echo $'dummy output\nanother dummy output'";
+    $sensor_config->settings['cmd'] = 'printf "A addedfile.txt\nM sites/all/modules/monitoring/test/tests/monitoring.core.test\nD deleted file.txt"';
     $sensor_config->save();
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isCritical());
     // The verbose output should contain the cmd output.
     $verbose_output = $result->getVerboseOutput();
     $this->setRawContent(drupal_render($verbose_output));
-    $this->assertText('dummy output');
-    // Two lines of cmd output.
-    $this->assertEqual($result->getValue(), 2);
-    // If exec() is disabed on an environment, make it visible in output.
-    $this->assertEqual($result->getMessage(), 'Value 2, expected 0, Files in unexpected state');
+    $this->assertText('A addedfile.txt');
+    $this->assertText('M sites/all/modules/monitoring/test/tests/monitoring.core.test');
+    $this->assertText('D deleted file.txt');
+    // Three lines of cmd output.
+    $this->assertEqual($result->getValue(), 3);
+    // Check if the sensor message has the expected value.
+    $this->assertEqual($result->getMessage(), 'Value 3, expected 0, Files in unexpected state: A addedfile.txt, M …modules/monitoring/test/tests/monitoring.core.test');
 
     // Now echo empty string.
     $sensor_config->settings['cmd'] = 'true';
