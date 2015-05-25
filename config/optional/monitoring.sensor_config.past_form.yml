@@ -14,4 +14,11 @@ settings:
       field: 'module'
       value: 'past_form'
   time_interval_field: 'timestamp'
-  time_interval_value: '86400'
+  time_interval_value: 86400
+dependencies:
+  module:
+    - past_db
+    - past_form
+  enforced:
+    module:
+    - past_form

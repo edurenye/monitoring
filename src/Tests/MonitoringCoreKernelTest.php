@@ -33,17 +33,6 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function enableModules(array $modules) {
-    parent::enableModules($modules);
-    // Call our own hook_modules_installed() so that optional sensors are
-    // installed.
-    monitoring_modules_installed($modules);
-  }
-
-
-  /**
    * Tests cron last run age sensor.
    *
    * @see CronLastRunAgeSensorPlugin.

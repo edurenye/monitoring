@@ -28,8 +28,6 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
     $this->installSchema('past_db', array('past_event_argument', 'past_event_data'));
     $this->installSchema('system', ['router']);
     \Drupal::service('router.builder')->rebuild();
-
-    monitoring_modules_installed(array('past_db'));
   }
 
   /**

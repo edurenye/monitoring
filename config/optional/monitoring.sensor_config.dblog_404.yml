@@ -1,3 +1,8 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - dblog
 id: dblog_404
 label: 'Page not found errors'
 description: 'Page not found errors logged by watchdog'
@@ -5,21 +10,17 @@ category: Watchdog
 plugin_id: dblog_404
 result_class: null
 value_label: 'Watchdog events'
-value_type: 'number'
-status: TRUE
+value_type: number
 caching_time: 3600
 settings:
-  table: 'watchdog'
+  table: watchdog
   conditions:
     -
-      field: 'type'
+      field: type
       value: 'page not found'
-  time_interval_field: 'timestamp'
-  time_interval_value: '86400'
+  time_interval_field: timestamp
+  time_interval_value: 86400
 thresholds:
   type: exceeds
-  warning: '20'
-  critical: '100'
-dependencies:
-  module:
-    - dblog
+  warning: 20
+  critical: 100

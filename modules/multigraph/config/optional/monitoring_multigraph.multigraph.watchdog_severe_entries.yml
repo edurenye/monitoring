@@ -17,3 +17,6 @@ sensors:
   dblog_event_severity_error:
     weight: 4
     label: Error
+dependencies:
+  module:
+    - dblog

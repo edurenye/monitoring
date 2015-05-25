@@ -9,7 +9,7 @@ status: FALSE
 caching_time: 3600
 settings:
   entity_type: 'comment'
-  time_interval_value: '86400'
+  time_interval_value: 86400
   time_interval_field: created
 dependencies:
   module:
