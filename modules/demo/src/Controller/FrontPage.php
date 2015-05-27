@@ -23,20 +23,23 @@ class FrontPage extends ControllerBase {
         '#type' => 'item',
         '#title' => \Drupal::l(t('Monitoring sensors overview'), Url::fromRoute('monitoring.sensor_list')),
         '#description' => t('Basic dashboard showing the sensor list with their status and information.'),
+        '#description_display' => 'after',
       ),
       'configuration' => array(
         '#type' => 'item',
         '#title' =>\Drupal::l(t('Monitoring sensors settings'), Url::fromRoute('monitoring.sensors_overview_settings')),
         '#description' => t('Monitoring sensors configuration page. See this page for the complete list of the available sensors.'),
+        '#description_display' => 'after',
       ),
       'sensor_enabled_modules' => array(
         '#type' => 'item',
         '#title' => t('Sensor example: "Enabled modules"'),
         '#description' => t('Monitors which modules are supposed to be enabled. In case there is a needed module disabled or excess module enabled you will be noticed.'),
+        '#description_display' => 'after',
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(
-            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => 'monitoring_enabled_modules')))),
+            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => 'monitoring_enabled_modules'))->toString())),
             t('<a href="@url">Disable</a> Dashboard module and enable Book module.', array('@url' => Url::fromRoute('system.modules_list')->toString())),
             t('Visit the <a href="@url">sensors overview page</a> to see the reported issue.', array('@url' => Url::fromRoute('monitoring.sensor_list')->toString())),
           )
@@ -46,6 +49,7 @@ class FrontPage extends ControllerBase {
         '#type' => 'item',
         '#title' => t('Sensor example: "Disappeared sensors"'),
         '#description' => t('Additionally to disabling modules, configuration changes like removing content types or search API indexes could lead to sensors that silently disappear.'),
+        '#description_display' => 'after',
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(

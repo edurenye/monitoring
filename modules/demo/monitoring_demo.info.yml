@@ -3,10 +3,11 @@ type: module
 description: Monitoring simplytest.me integration.
 package: Monitoring
 core: 8.x
-hidden: TRUE
 
 dependencies:
-# Uncomment once the search API is available for D8.
+ - node
+ - comment
+ - search_api
  - search_api_db
  - monitoring
  - rest

@@ -4,6 +4,8 @@
  *   Install file of the monitoring_demo module.
  */
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\search_api\Entity\Index;
 
 /**
  * Implements hook_install().
@@ -12,10 +14,9 @@ use Drupal\Component\Utility\Random;
  */
 function monitoring_demo_install() {
   $random = new Random();
-  require_once drupal_get_path('module', 'monitoring') . '/monitoring.setup.inc';
 
   // Set the front page to monitoring-demo.
-  \Drupal::config('system.site')->set('page.front', 'monitoring-demo')->save();
+  \Drupal::configFactory()->getEditable('system.site')->set('page.front', 'monitoring-demo')->save();
 
   // Enable REST API for monitoring resources.
   $settings = array(
@@ -32,7 +33,7 @@ function monitoring_demo_install() {
       ),
     ),
   );
-  \Drupal::config('rest.settings')->set('resources', $settings)->save();
+  \Drupal::configFactory()->getEditable('rest.settings')->set('resources', $settings)->save();
 
   // Create a few nodes and comments as sample data for some sensors.
   $node = _monitoring_setup_create_node(array('type' => 'article'));
@@ -47,25 +48,20 @@ function monitoring_demo_install() {
 
   $sensor_manager = monitoring_sensor_manager();
 
-  /* Uncomment once we have search API in D8.
-   *
   // Setup search API.
-  monitoring_setup_search_api();
   $sensor_manager->resetCache();
-  $indexes = search_api_index_load_multiple(FALSE);
+  $indices = Index::loadMultiple();
   // Enable sensor for the index created above.
-  if (!empty($indexes)) {
-    foreach ($indexes as $index) {
-      $sensor_manager->enableSensor('search_api_' . $index->machine_name);
+  if (!empty($indices)) {
+    foreach ($indices as $index) {
+      $sensor_manager->enableSensor('search_api_' . $index->id());
     }
   }
-
   // Enable content sensors.
   $sensor_manager->enableSensor('node_new_all');
   $sensor_manager->enableSensor('node_new_page');
   $sensor_manager->enableSensor('node_new_article');
   $sensor_manager->enableSensor('comment_new');
-  */
 
   // Generate watchdog entries.
   // Watchdog sensors are enabled by default, no need to enable them here.
@@ -103,6 +99,7 @@ function _monitoring_setup_create_comment($settings = array()) {
     'entity_id' => $settings['entity_id'],
     'field_name' => 'comment',
     'entity_type' => 'node',
+    'comment_type' => 'comment',
     'comment_body' => $random->name(40),
   );
 
@@ -133,7 +130,7 @@ function _monitoring_setup_create_node($settings = array()) {
     'status'    => NODE_PUBLISHED,
     'sticky'    => NODE_NOT_STICKY,
     'type'      => 'page',
-    'langcode'  => Language::LANGCODE_NOT_SPECIFIED,
+    'langcode'  => LanguageInterface::LANGCODE_NOT_SPECIFIED,
   );
 
   // Use the original node's created time for existing nodes.
@@ -144,7 +141,7 @@ function _monitoring_setup_create_node($settings = array()) {
   // If the node's user uid is not specified manually, use the currently
   // logged in user if available, or else the user running the test.
   if (!isset($settings['uid'])) {
-    $user = \Drupal::currentUser() ?: $GLOBALS['user'];
+    $user = \Drupal::currentUser();
     $settings['uid'] = $user->id();
   }
 

@@ -173,6 +173,14 @@ monitoring.settings.view_display_aggregator:
       type: string
       label: 'Display'
 
+monitoring.settings.search_api_unindexed:
+  type: monitoring.settings_base
+  label: 'Search Api settings'
+  mapping:
+    index_id:
+      type: string
+      label: 'Index ID'
+
 monitoring.settings.dblog_404:
   type: monitoring.settings.database_aggregator
   label: '404 settings'
