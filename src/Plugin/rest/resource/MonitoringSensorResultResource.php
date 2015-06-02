@@ -77,10 +77,9 @@ class MonitoringSensorResultResource extends ResourceBase {
       // Pass the resource plugin ID along as default property.
       '_plugin' => $this->pluginId,
     ), array(
-      // The HTTP method is a requirement for this route.
-      '_method' => 'GET',
       '_permission' => "restful get $this->pluginId",
     ));
+    $route->setMethods(['GET']);
     foreach ($this->serializerFormats as $format_name) {
       // Expose one route per available format.
       $format_route = clone $route;
