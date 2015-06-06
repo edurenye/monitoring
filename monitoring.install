@@ -10,7 +10,7 @@ use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\search_api\Entity\Index;
 
-/*
+/**
  * Implements hook_install().
  *
  * Declares initial set of sensors.
@@ -40,7 +40,7 @@ function monitoring_install() {
         ),
         'dependencies' => array('module' => 'node'),
       ));
-      $sensor->save();
+      $sensor->trustData()->save();
     }
   }
 
