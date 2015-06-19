@@ -72,7 +72,6 @@ function monitoring_install() {
   drupal_load_updates();
 
   foreach (\Drupal::moduleHandler()->getImplementations('requirements') as $module) {
-    debug($module);
     // Skip update module as there is a separate sensors for core and contrib.
     if ($module == 'update') {
       continue;
