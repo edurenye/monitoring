@@ -3,11 +3,11 @@
  * @file
  * Contains \Drupal\monitoring\Tests\MonitoringCoreWebTest.
  */
+
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
-use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -29,6 +29,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     $this->installSchema('dblog', ['watchdog']);
 
+    \Drupal::moduleHandler()->loadAllIncludes('install');
     monitoring_install();
   }
 
