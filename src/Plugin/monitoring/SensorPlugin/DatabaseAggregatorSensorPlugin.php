@@ -138,9 +138,15 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   public function calculateDependencies() {
     parent::calculateDependencies();
 
-    $schema = drupal_get_schema($this->sensorConfig->getSetting('table'));
-    if ($schema) {
-      $this->addDependency('module', $schema['module']);
+    // There is no API to load a list of all tables, loop through all modules
+    // with a hook_schema() hook and try to find the table.
+    \Drupal::moduleHandler()->loadAllIncludes('install');
+    foreach (\Drupal::moduleHandler()->getImplementations('schema') as $module) {
+      $schema = drupal_get_module_schema($module, $this->sensorConfig->getSetting('table'));
+      if ($schema) {
+        $this->addDependency('module', $schema['module']);
+        break;
+      }
     }
     return $this->dependencies;
   }
