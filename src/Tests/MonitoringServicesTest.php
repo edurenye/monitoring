@@ -7,7 +7,6 @@
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\rest\Tests\RESTTestBase;
@@ -33,6 +32,9 @@ class MonitoringServicesTest extends RESTTestBase {
    */
   public function setUp() {
     parent::setUp();
+
+    $this->defaultMimeType = 'application/json';
+    $this->defaultFormat = 'json';
 
     // Enable REST API for monitoring resources.
     $config = $this->config('rest.settings');
@@ -76,7 +78,7 @@ class MonitoringServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$sensor_name]['caching_time'], $sensor_config->getCachingTime());
       $this->assertEqual($response_data[$sensor_name]['time_interval'], $sensor_config->getTimeIntervalValue());
       $this->assertEqual($response_data[$sensor_name]['enabled'], $sensor_config->isEnabled());
-      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromUri('internal:/monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+      $this->assertEqual($response_data[$sensor_name]['uri'], Url::fromRoute('rest.monitoring-sensor.GET.json' , ['id' => $sensor_name, '_format' => 'json'])->setAbsolute()->toString());
 
       if ($sensor_config->isDefiningThresholds()) {
         $this->assertEqual($response_data[$sensor_name]['thresholds'], $sensor_config->getThresholds());
@@ -100,7 +102,7 @@ class MonitoringServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['caching_time'], $sensor_config->getCachingTime());
     $this->assertEqual($response_data['time_interval'], $sensor_config->getTimeIntervalValue());
     $this->assertEqual($response_data['enabled'], $sensor_config->isEnabled());
-    $this->assertEqual($response_data['uri'], Url::fromUri('internal:/monitoring-sensor/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_data['uri'], Url::fromRoute('rest.monitoring-sensor.GET.json' , ['id' => $sensor_name, '_format' => 'json'])->setAbsolute()->toString());
 
     if ($sensor_config->isDefiningThresholds()) {
       $this->assertEqual($response_data['thresholds'], $sensor_config->getThresholds());
@@ -166,9 +168,7 @@ class MonitoringServicesTest extends RESTTestBase {
    */
   protected function assertSensorResult($response_result, SensorConfig $sensor_config) {
     $this->assertEqual($response_result['sensor_name'], $sensor_config->id());
-    // Test the uri - the hardcoded endpoint is defined in the
-    // monitoring_test.default_services.inc.
-    $this->assertEqual($response_result['uri'], Url::fromUri('internal:/monitoring-sensor-result/' . $sensor_config->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_result['uri'], Url::fromRoute('rest.monitoring-sensor-result.GET.json' , ['id' => $sensor_config->id(), '_format' => 'json'])->setAbsolute()->toString());
 
     // If the result is cached test also for the result values. In case of
     // result which is not cached we might not get the same values.
@@ -201,7 +201,8 @@ class MonitoringServicesTest extends RESTTestBase {
    *   Decoded json object.
    */
   protected function doRequest($action, $query = array()) {
-    $url = Url::fromUri("internal:/$action", array('absolute' => TRUE, 'query' => $query))->toString();
+    $query['_format'] = $this->defaultFormat;
+    $url = $this->container->get('url_generator')->generateFromPath($action, array('absolute' => TRUE, 'query' => $query));
     $result = $this->httpRequest($url, 'GET', NULL, $this->defaultMimeType);
     return Json::decode($result);
   }

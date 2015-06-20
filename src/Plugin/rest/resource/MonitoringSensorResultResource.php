@@ -8,6 +8,7 @@
 namespace Drupal\monitoring\Plugin\rest\resource;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Url;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -60,7 +61,7 @@ class MonitoringSensorResultResource extends ResourceBase {
       $container->getParameter('serializer.formats'),
       $container->get('monitoring.sensor_manager'),
       $container->get('monitoring.sensor_runner'),
-      $container->get('logger.factory')->get('ajax')
+      $container->get('logger.factory')->get('rest')
     );
   }
 
@@ -103,12 +104,14 @@ class MonitoringSensorResultResource extends ResourceBase {
   public function get($sensor_name = NULL) {
     $request = \Drupal::request();
 
+    $format = \Drupal::request()->getRequestFormat('ĵson');
+
     if ($sensor_name) {
       try {
         $sensor_config[$sensor_name] = $this->sensorManager->getSensorConfigByName($sensor_name);
         $result = $this->sensorRunner->runSensors($sensor_config);
         $response = $result[$sensor_name]->toArray();
-        $response['uri'] = $request->getUriForPath('/monitoring-sensor-result/' . $sensor_name);
+        $response['uri'] = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
         if ($request->get('expand') == 'sensor') {
           $response['sensor'] = $result[$sensor_name]->getSensorConfig()->toArray();
         }
@@ -125,7 +128,7 @@ class MonitoringSensorResultResource extends ResourceBase {
       $list = array();
       foreach ($this->sensorRunner->runSensors() as $sensor_name => $result) {
         $list[$sensor_name] = $result->toArray();
-        $list[$sensor_name]['uri'] = $request->getUriForPath('/monitoring-sensor-result/' . $sensor_name);
+        $list[$sensor_name]['uri'] = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
         if ($request->get('expand') == 'sensor') {
           $list[$sensor_name]['sensor'] = $result->getSensorConfig()->toArray();
         }

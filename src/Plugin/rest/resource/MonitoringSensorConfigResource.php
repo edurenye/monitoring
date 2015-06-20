@@ -8,6 +8,7 @@
 namespace Drupal\monitoring\Plugin\rest\resource;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Url;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
 use Drupal\rest\Plugin\ResourceBase;
@@ -49,7 +50,7 @@ class MonitoringSensorConfigResource extends ResourceBase {
       $plugin_definition,
       $container->getParameter('serializer.formats'),
       $container->get('monitoring.sensor_manager'),
-      $container->get('logger.factory')->get('ajax')
+      $container->get('logger.factory')->get('rest')
     );
   }
 
@@ -90,6 +91,7 @@ class MonitoringSensorConfigResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function get($sensor_name = NULL) {
+    $format = \Drupal::request()->getRequestFormat('ĵson');
     if ($sensor_name) {
       try {
         $sensor_config = $this->sensorManager->getSensorConfigByName($sensor_name);
@@ -98,14 +100,14 @@ class MonitoringSensorConfigResource extends ResourceBase {
         throw new NotFoundHttpException($e->getMessage(), $e);
       }
       $response = $sensor_config->getDefinition();
-      $response['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor/' . $sensor_name);
+      $response['uri'] = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
       return new ResourceResponse($response);
     }
 
     $list = array();
     foreach ($this->sensorManager->getAllSensorConfig() as $sensor_name => $sensor_config) {
       $list[$sensor_name] = $sensor_config->getDefinition();
-      $list[$sensor_name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-sensor/' . $sensor_name);
+      $list[$sensor_name]['uri'] = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
     }
     return new ResourceResponse($list);
   }
