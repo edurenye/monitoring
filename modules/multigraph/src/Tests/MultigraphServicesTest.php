@@ -43,6 +43,9 @@ class MultigraphServicesTest extends RESTTestBase {
   public function setUp() {
     parent::setUp();
 
+    $this->defaultMimeType = 'application/json';
+    $this->defaultFormat = 'json';
+
     // Enable REST API for monitoring resources.
     $config = $this->config('rest.settings');
     $settings = array(
@@ -82,7 +85,7 @@ class MultigraphServicesTest extends RESTTestBase {
       $this->assertEqual($response_data[$name]['label'], $multigraph->label());
       $this->assertEqual($response_data[$name]['description'], $multigraph->getDescription());
       $this->assertEqual($response_data[$name]['sensors'], $multigraph->getSensorsRaw());
-      $this->assertEqual($response_data[$name]['uri'], Url::fromUri('internal:/monitoring-multigraph/' . $multigraph->id(), array('absolute' => TRUE))->toString());
+      $this->assertEqual($response_data[$name]['uri'], Url::fromRoute('rest.monitoring-multigraph.GET.json' , ['id' => $multigraph->id(), '_format' => 'json'])->setAbsolute()->toString());
     }
 
     // Test response for non-existing multigraph.
@@ -99,7 +102,7 @@ class MultigraphServicesTest extends RESTTestBase {
     $this->assertEqual($response_data['label'], $multigraph->label());
     $this->assertEqual($response_data['description'], $multigraph->getDescription());
     $this->assertEqual($response_data['sensors'], $multigraph->getSensorsRaw());
-    $this->assertEqual($response_data['uri'], Url::fromUri('internal:/monitoring-multigraph/' . $multigraph->id(), array('absolute' => TRUE))->toString());
+    $this->assertEqual($response_data['uri'], Url::fromRoute('rest.monitoring-multigraph.GET.json' , ['id' => $multigraph->id(), '_format' => 'json'])->setAbsolute()->toString());
   }
 
   /**
@@ -114,7 +117,8 @@ class MultigraphServicesTest extends RESTTestBase {
    *   Decoded json object.
    */
   protected function doRequest($action, $query = array()) {
-    $url = Url::fromUri("internal:/$action", array('absolute' => TRUE, 'query' => $query))->toString();
+    $query['_format'] = $this->defaultFormat;
+    $url = $this->container->get('url_generator')->generateFromPath($action, array('absolute' => TRUE, 'query' => $query));
     $result = $this->httpRequest($url, 'GET', NULL, $this->defaultMimeType);
     return Json::decode($result);
   }

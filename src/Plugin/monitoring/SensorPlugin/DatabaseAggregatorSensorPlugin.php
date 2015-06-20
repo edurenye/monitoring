@@ -143,7 +143,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     \Drupal::moduleHandler()->loadAllIncludes('install');
     foreach (\Drupal::moduleHandler()->getImplementations('schema') as $module) {
       $schema = drupal_get_module_schema($module, $this->sensorConfig->getSetting('table'));
-      if ($schema) {
+      if (isset($schema['module'])) {
         $this->addDependency('module', $schema['module']);
         break;
       }

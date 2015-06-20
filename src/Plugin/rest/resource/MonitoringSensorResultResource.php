@@ -104,7 +104,7 @@ class MonitoringSensorResultResource extends ResourceBase {
   public function get($sensor_name = NULL) {
     $request = \Drupal::request();
 
-    $format = \Drupal::request()->getRequestFormat('ĵson');
+    $format = $request->getRequestFormat('ĵson');
 
     if ($sensor_name) {
       try {

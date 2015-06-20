@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring_multigraph\Plugin\rest\resource;
 
+use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
 use Drupal\rest\Plugin\ResourceBase;
@@ -61,6 +62,10 @@ class MonitoringMultigraphResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
   public function get($multigraph_name = NULL) {
+
+    $request = \Drupal::request();
+    $format = $request->getRequestFormat('ĵson');
+
     if ($multigraph_name) {
       /** @var \Drupal\monitoring_multigraph\Entity\Multigraph $multigraph */
       $multigraph = \Drupal::entityManager()
@@ -70,7 +75,7 @@ class MonitoringMultigraphResource extends ResourceBase {
         throw new NotFoundHttpException('No multigraph with name "' . $multigraph_name . '"');
       }
       $response = $multigraph->getDefinition();
-      $response['uri'] = \Drupal::request()->getUriForPath('/monitoring-multigraph/' . $multigraph_name);
+      $response['uri'] = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $multigraph_name, '_format' => $format])->setAbsolute()->toString();
       return new ResourceResponse($response);
     }
 
@@ -81,7 +86,7 @@ class MonitoringMultigraphResource extends ResourceBase {
     foreach ($multigraphs as $name => $multigraph) {
       /** @var \Drupal\monitoring_multigraph\Entity\Multigraph $multigraph */
       $list[$name] = $multigraph->getDefinition();
-      $list[$name]['uri'] = \Drupal::request()->getUriForPath('/monitoring-multigraph/' . $name);
+      $list[$name]['uri'] = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $name, '_format' => $format])->setAbsolute()->toString();
     }
     return new ResourceResponse($list);
   }
