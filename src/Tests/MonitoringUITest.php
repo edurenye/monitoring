@@ -228,9 +228,15 @@ class MonitoringUITest extends MonitoringTestBase {
   }
 
   /**
-   * Sensor over page tests coverage.
+   * Tests the sensor results overview and the global sensor log.
    */
   public function testSensorOverviewPage() {
+    // Check access for the overviews.
+    $this->drupalGet('admin/reports/monitoring');
+    $this->assertResponse(403);
+    $this->drupalGet('admin/reports/monitoring/log');
+    $this->assertResponse(403);
+
     $account = $this->drupalCreateUser(array('monitoring reports'));
     $this->drupalLogin($account);
 
@@ -278,6 +284,15 @@ class MonitoringUITest extends MonitoringTestBase {
       $i++;
     }
 
+    // Test the global sensor log.
+    $this->clickLink(t('Log'));
+    $this->assertText('test_sensor');
+    $this->assertText(t('OK'));
+    $this->assertText(t('No value'));
+    $this->assertRaw('class="monitoring-ok"');
+    $this->clickLink('test_sensor');
+    $this->assertResponse(200);
+    $this->assertUrl(SensorConfig::load('test_sensor')->url('details-form'));
   }
 
   /**
@@ -332,7 +347,9 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertEqual(count($rows), 2);
     // The latest log result should be displayed first.
     $this->assertEqual(trim((string) $rows[0]->td[1]), 'OK');
+    $this->assertTrue(preg_match('/\b' . 'monitoring-ok' . '\b/', $rows[0]->attributes()['class']));
     $this->assertEqual(trim((string) $rows[1]->td[1]), 'WARNING');
+    $this->assertTrue(preg_match('/\b' . 'monitoring-warning' . '\b/', $rows[1]->attributes()['class']));
 
     // Refresh the page, this not run the sensor again.
     $this->drupalGet('admin/reports/monitoring/sensors/entity_aggregate_test');

@@ -3,6 +3,7 @@ status: true
 dependencies:
   module:
     - monitoring
+    - user
 id: monitoring_sensor_results
 label: 'Monitoring Sensor Results'
 module: views
@@ -20,8 +21,9 @@ display:
     display_options:
       rendering_language: '***LANGUAGE_entity_default***'
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'monitoring reports'
       cache:
         type: none
         options: {  }
@@ -66,6 +68,59 @@ display:
           quantity: 9
       style:
         type: table
+        options:
+          grouping: {  }
+          row_class: ''
+          default_row_class: true
+          override: true
+          sticky: false
+          caption: ''
+          summary: ''
+          description: ''
+          columns:
+            sensor_name: sensor_name
+            sensor_status: sensor_status
+            sensor_message: sensor_message
+            execution_time: execution_time
+            timestamp: timestamp
+          info:
+            sensor_name:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            sensor_status:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            sensor_message:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            execution_time:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            timestamp:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+          default: '-1'
+          empty_table: true
       row:
         type: fields
       fields:
@@ -81,8 +136,8 @@ display:
           alter:
             alter_text: false
             text: ''
-            make_link: false
-            path: ''
+            make_link: true
+            path: 'admin/reports/monitoring/sensors/{{ sensor_name }}'
             absolute: false
             external: false
             replace_spaces: false
@@ -354,7 +409,18 @@ display:
       title: Log
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content: 'No sensor results yet.'
+          plugin_id: text_custom
       relationships: {  }
       arguments:
         sensor_name:
@@ -364,7 +430,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          default_action: 'not found'
+          default_action: ignore
           exception:
             value: all
             title_enable: false
@@ -398,6 +464,13 @@ display:
           entity_type: monitoring_sensor_result
           plugin_id: string
       display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - 'url.query_args.pagers:0'
+        - user.permissions
+      cacheable: false
   detail_page_log:
     display_plugin: embed
     id: detail_page_log
@@ -613,6 +686,13 @@ display:
       defaults:
         fields: false
       display_description: ''
+    cache_metadata:
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - 'url.query_args.pagers:0'
+        - user.permissions
+      cacheable: false
   page_1:
     display_plugin: page
     id: page_1
@@ -630,3 +710,10 @@ display:
         weight: 0
         context: '0'
         menu_name: admin
+    cache_metadata:
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - 'url.query_args.pagers:0'
+        - user.permissions
+      cacheable: false

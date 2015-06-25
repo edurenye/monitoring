@@ -138,9 +138,9 @@ function monitoring_preprocess_views_view_table(&$vars) {
   }
 
   foreach ($vars['rows'] as $num => $row) {
-    if (isset($vars['result'][$num]->monitoring_sensor_result_sensor_status)) {
+    if (isset($vars['result'][$num]->_entity->sensor_status->value)) {
       $vars['rows'][$num]['attributes'] = new Attribute(array(
-        'class' => 'monitoring-' . strtolower($vars['result'][$num]->monitoring_sensor_result_sensor_status),
+        'class' => 'monitoring-' . strtolower($vars['result'][$num]->_entity->sensor_status->value),
       ));
     }
   }
