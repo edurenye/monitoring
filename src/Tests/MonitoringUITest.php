@@ -292,7 +292,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertRaw('class="monitoring-ok"');
     $this->clickLink('test_sensor');
     $this->assertResponse(200);
-    $this->assertUrl(SensorConfig::load('test_sensor')->url('details-form'));
+    $this->assertUrl(SensorConfig::load('test_sensor')->urlInfo('details-form'));
   }
 
   /**
