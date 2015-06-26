@@ -13,7 +13,7 @@
       // Check if there are any criticals, warnings or unknowns.
       if (drupalSettings.monitoring_escalated_sensors > 0) {
         // Inject toggle link into DOM.
-        $('<a class="monitoring-sensor-toggle" href="#">' + Drupal.t('Show OK sensors') + '</a>')
+        $('<a class="button button--primary button--small" href="#">' + Drupal.t('Show OK sensors') + '</a>')
             .appendTo('.monitoring-overview-summary', context)
             .click(
               function () {
