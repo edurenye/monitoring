@@ -1,8 +1,16 @@
+monitoring.settings:
+  path: '/admin/config/system/monitoring/settings'
+  defaults:
+    _form: '\Drupal\monitoring\Form\MonitoringSettingsForm'
+    _title: 'Monitoring settings'
+  requirements:
+    _permission: 'administer monitoring'
+
 monitoring.sensors_overview_settings:
   path: '/admin/config/system/monitoring/sensors'
   defaults:
     _entity_list: 'monitoring_sensor_config'
-    _title: 'Sensor Overview'
+    _title: 'Sensor overview'
   requirements:
     _permission: 'administer monitoring'
 

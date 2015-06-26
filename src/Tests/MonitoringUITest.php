@@ -28,6 +28,26 @@ class MonitoringUITest extends MonitoringTestBase {
   }
 
   /**
+   * Test the monitoring settings UI.
+   */
+  public function testSettingsUI() {
+    // Create a test user and log in.
+    $account = $this->drupalCreateUser(array(
+      'access administration pages',
+      'administer monitoring',
+    ));
+    $this->drupalLogin($account);
+
+    // Check the form.
+    $this->drupalGet('admin/config/system');
+    $this->assertText(t('Configure enabled monitoring products.'));
+    $this->clickLink(t('Monitoring settings'));
+    $this->assertField('sensor_call_logging');
+    $this->assertOptionSelected('edit-sensor-call-logging', 'on_request');
+    $this->assertText(t('Control local logging of sensor call results.'));
+  }
+
+  /**
    * Test the sensor settings UI.
    */
   public function testSensorSettingsUI() {
