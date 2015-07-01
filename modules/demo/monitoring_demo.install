@@ -16,7 +16,7 @@ function monitoring_demo_install() {
   $random = new Random();
 
   // Set the front page to monitoring-demo.
-  \Drupal::configFactory()->getEditable('system.site')->set('page.front', 'monitoring-demo')->save();
+  \Drupal::configFactory()->getEditable('system.site')->set('page.front', '/monitoring-demo')->save();
 
   // Enable REST API for monitoring resources.
   $settings = array(
