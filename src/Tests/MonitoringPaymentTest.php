@@ -14,11 +14,12 @@ use Drupal\payment\Payment;
  * Tests for the payment sensor in monitoring.
  *
  * @group monitoring
+ *
  * @dependencies payment
  */
 class MonitoringPaymentTest extends MonitoringUnitTestBase {
 
-  public static $modules = array('payment', 'currency');
+  public static $modules = array('payment', 'currency', 'plugin');
 
   /**
    * {@inheritdoc}
