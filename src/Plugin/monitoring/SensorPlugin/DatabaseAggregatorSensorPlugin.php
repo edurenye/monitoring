@@ -6,12 +6,14 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Simple database aggregator able to query a single db table.
@@ -57,6 +59,13 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   protected $fetchedObject;
 
   /**
+   * The currently active keys for verbose output.
+   *
+   * @var array
+   */
+  protected $currentKeys;
+
+  /**
    * Builds simple aggregate query over one db table.
    *
    * @return \Drupal\Core\Database\Query\Select
@@ -94,21 +103,38 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the  query for verbose output.
+   *
+   * Similar to the aggregate query, but without aggregation.
+   *
+   * @return \Drupal\Core\Database\Query\Select
+   *   The select query object.
+   *
+   * @see getQueryAggregate()
    */
-  public function runSensor(SensorResultInterface $result) {
-    $query = $this->getAggregateQuery();
-    $this->queryArguments = $query->getArguments();
-    $this->executedQuery = $query->execute();
-    $this->queryString = $this->executedQuery->getQueryString();
-    $this->fetchedObject = $this->executedQuery->fetchObject();
-
-    $records_count = 0;
-    if (!empty($this->fetchedObject->records_count)) {
-      $records_count = $this->fetchedObject->records_count;
+  protected function getQuery() {
+    /* @var \Drupal\Core\Database\Connection $database */
+    $database = $this->getService('database');
+    // Get query for the table.
+    $query = $database->select($this->sensorConfig->getSetting('table'));
+    // Add conditions.
+    foreach ($this->getConditions() as $condition) {
+      $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
+    }
+    // Apply time interval on field.
+    if ($this->getTimeIntervalField() && $this->getTimeIntervalValue()) {
+      $query->condition($this->getTimeIntervalField(), REQUEST_TIME - $this->getTimeIntervalValue(), '>');
     }
 
-    $result->setValue($records_count);
+    // Add key fields.
+    $keys = $this->sensorConfig->getSetting('keys');
+    if (!empty($keys)) {
+      foreach ($this->sensorConfig->getSetting('keys') as $key) {
+        $query->addField($this->sensorConfig->getSetting('table'), $key);
+      }
+    }
+
+    return $query;
   }
 
   /**
@@ -129,7 +155,61 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
     );
 
+    $output['result_title'] = array(
+      '#type' => 'item',
+      '#title' => t('RESULT'),
+    );
+
+    // Fetch the last 10 matching entries, unaggregated.
+    $query_result = $this->getQuery()
+      ->range(0, 10)
+      ->execute();
+    // Render rows.
+    $rows = [];
+    foreach ($query_result as $record) {
+      $row = [];
+      foreach ($record as $key => $value) {
+        $row[$key] = $value;
+      }
+
+      $rows[] = array(
+        'data' => $row,
+        'class' => 'entity',
+      );
+    }
+    if (count($rows) > 0) {
+      $header = array_keys($rows[0]['data']);
+      $output['result'] = array(
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
+      );
+    }
+    else {
+      $output['result'] = [
+        '#type' => 'item',
+        '#markup' => t('No results were found in the table.'),
+      ];
+    }
     return $output;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function runSensor(SensorResultInterface $result) {
+    $query = $this->getAggregateQuery();
+    $this->queryArguments = $query->getArguments();
+    $this->executedQuery = $query->execute();
+    $this->queryString = $this->executedQuery->getQueryString();
+    $this->fetchedObject = $this->executedQuery->fetchObject();
+
+    $records_count = 0;
+    if (!empty($this->fetchedObject->records_count)) {
+      $records_count = $this->fetchedObject->records_count;
+    }
+
+    $result->setValue($records_count);
   }
 
   /**
@@ -157,8 +237,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $field = '';
-    $field_value = '';
     $settings = $this->sensorConfig->getSettings();
     $form['table'] = array(
       '#type' => 'textfield',
@@ -193,6 +271,25 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     );
 
     // Fill the sensors table with form elements for each sensor.
+    $form['output_table'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Verbose Output configuration'),
+      '#prefix' => '<div id="selected-output">',
+      '#suffix' => '</div>',
+      '#tree' => FALSE,
+    );
+    // Fill the keys text field with keys.
+    $form['output_table']['keys'] = array(
+      '#type' => 'textarea',
+      '#tree' => FALSE,
+      '#default_value' => implode("\n", $this->sensorConfig->getSetting('keys')),
+      '#maxlength' => 255,
+      '#title' => t('Keys'),
+      '#required' => TRUE,
+    );
+
+
+    // Fill the conditions table with keys and values for each condition.
     $conditions = $this->sensorConfig->getSetting('conditions');
     if (empty($conditions)) {
       $conditions = [];
@@ -296,17 +393,41 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     // Cleanup conditions, remove empty.
     $settings['conditions'] = [];
-    foreach($form_state->getValue('conditions') as $key => $condition) {
+    foreach ($form_state->getValue('conditions') as $key => $condition) {
       if (!empty($condition['field'])) {
         $settings['conditions'][] = $condition;
       }
     }
 
-    $sensor_config->set('settings', $settings);
+    // Update the verbose output keys.
+    try {
+      $this->currentKeys = $this->sensorConfig->getSetting('keys');
+      $keys = array_filter(explode("\n", $form_state->getValue('keys')));
+      $keys = array_map('trim', $keys);
+      $settings['keys'] = $keys;
+
+      $this->sensorConfig->set('settings', $settings);
+      $this->getQuery()->execute();
+    }
+    catch (DatabaseExceptionWrapper $e) {
+      $settings = $this->sensorConfig->getSettings();
+      $settings['keys'] = $this->currentKeys;
+      $this->sensorConfig->set('settings', $settings);
+      drupal_set_message('Verbose output configuration is invalid, keys were not saved.', 'error');
+      drupal_set_message($e, 'warning');
+    }
   }
 
   /**
    * Returns the updated 'conditions' fieldset for replacement by ajax.
+   *
+   * @param array $form
+   *   The updated form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   *
+   * @return array
+   *   The updated form component for the selected fields.
    */
   public function conditionsReplace(array $form, FormStateInterface $form_state) {
     return $form['plugin_container']['settings']['conditions_table'];
@@ -314,6 +435,11 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
   /**
    * Adds sensor to entity when 'Add field' button is pressed.
+   *
+   * @param array $form
+   *   The form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
    */
   public function addConditionSubmit(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
@@ -331,7 +457,11 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     /** @var \Drupal\Core\Database\Connection $database */
     $database = $this->getService('database');
-    $field_name = $form_state->getValue(array('settings', 'aggregation', 'time_interval_field'));
+    $field_name = $form_state->getValue(array(
+      'settings',
+      'aggregation',
+      'time_interval_field',
+    ));
     if (!empty($field_name)) {
       // @todo instead of validate, switch to a form select.
       $table = $form_state->getValue(array('settings', 'table'));

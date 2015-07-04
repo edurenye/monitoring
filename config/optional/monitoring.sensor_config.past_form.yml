@@ -13,6 +13,12 @@ settings:
     -
       field: 'module'
       value: 'past_form'
+  keys:
+    - 'event_id'
+    - 'type'
+    - 'module'
+    - 'message'
+    - 'timestamp'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
 dependencies:

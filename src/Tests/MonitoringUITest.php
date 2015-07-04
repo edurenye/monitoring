@@ -122,7 +122,6 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->clickLink(t('UI created Sensor'));
     $this->assertText('Result');
 
-
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
     $this->assertFieldByName('conditions[0][value]', 'message');
@@ -256,7 +255,6 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertResponse(403);
     $this->drupalGet('admin/reports/monitoring/log');
     $this->assertResponse(403);
-
     $account = $this->drupalCreateUser(array('monitoring reports'));
     $this->drupalLogin($account);
 

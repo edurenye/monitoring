@@ -101,6 +101,12 @@ monitoring.settings.aggregator_base:
             type: string
           operator:
             type: string
+    keys:
+      type: sequence
+      label: Keys
+      sequence:
+        type: string
+        label: 'Key'
 
 monitoring.settings.database_aggregator:
   type: monitoring.settings.aggregator_base

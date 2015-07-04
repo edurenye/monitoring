@@ -18,7 +18,11 @@ settings:
     -
       field: type
       value: 'page not found'
-  time_interval_field: timestamp
+  keys:
+    - 'wid'
+    - 'location'
+    - 'referer'
+  time_interval_field: 'timestamp'
   time_interval_value: 86400
 thresholds:
   type: exceeds

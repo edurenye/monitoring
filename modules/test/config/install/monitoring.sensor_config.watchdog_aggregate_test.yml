@@ -6,10 +6,14 @@ plugin_id: database_aggregator
 value_type : 'number'
 settings:
   result_logging: FALSE
-  table: 'watchdog'
+  table: watchdog
   time_interval_field: 'timestamp'
   time_interval_value: 86400
+  keys:
+    - 'wid'
+    - 'message'
+    - 'variables'
 thresholds:
-  type: 'exceeds'
+  type: exceeds
   warning: 1
   critical: 2

@@ -18,6 +18,10 @@ settings:
     -
       field: severity
       value: '0'
+  keys:
+    - 'wid'
+    - 'message'
+    - 'variables'
   time_interval_field: timestamp
   time_interval_value: 86400
 thresholds:

@@ -17,6 +17,10 @@ settings:
         field: 'attempts'
         value: '0'
         operator: '>'
+  keys:
+    - 'uid'
+    - 'form_id'
+    - 'attempts'
 dependencies:
   module:
     - captcha

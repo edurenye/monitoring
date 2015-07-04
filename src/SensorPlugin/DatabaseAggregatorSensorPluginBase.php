@@ -7,7 +7,6 @@
 namespace Drupal\monitoring\SensorPlugin;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Form\SensorForm;
 
 /**
  * Base class for database aggregator sensors.

@@ -197,7 +197,6 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     $entity_ids = $this->getEntityQuery()
       ->range(0, 10)
       ->execute();
-
     // Show query.
     // @todo show query. This needs an injected FakeStatement.
     // $query = '';

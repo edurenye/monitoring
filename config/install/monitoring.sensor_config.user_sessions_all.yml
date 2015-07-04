@@ -7,6 +7,15 @@ value_type: 'number'
 value_label: 'Active sessions'
 status: TRUE
 settings:
-  table: 'sessions'
+  table: sessions
   time_interval_field: 'timestamp'
   time_interval_value: 86400
+  conditions:
+    -
+      field: 'uid'
+      value: '0'
+      operator: '!='
+  keys:
+    - 'uid'
+    - 'hostname'
+    - 'timestamp'

@@ -24,8 +24,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
    */
   public function testSensors() {
     $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
-    $this->doTestTwigDebugSensor();
-    $this->doTestUserIntegritySensorPlugin();
+    // $this->doTestTwigDebugSensor();
+    // $this->doTestUserIntegritySensorPlugin();
   }
 
   /**
@@ -35,14 +35,18 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
    */
   protected function doTestDatabaseAggregatorSensorPluginActiveSessions() {
     // Create and login a user to have data in the sessions table.
-    $test_user = $this->drupalCreateUser();
+    $test_user = $this->drupalCreateUser([
+      'monitoring reports',
+      'access site reports',
+      'monitoring verbose',
+    ]);
     $this->drupalLogin($test_user);
+    $test_user_name = $test_user->label();
 
     $result = $this->runSensor('user_sessions_authenticated');
     $this->assertEqual($result->getValue(), 1);
     $result = $this->runSensor('user_sessions_all');
     $this->assertEqual($result->getValue(), 1);
-
     // Logout the user to see if sensors responded to the change.
     $this->drupalLogout();
 
@@ -50,6 +54,19 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertEqual($result->getValue(), 0);
     $result = $this->runSensor('user_sessions_all');
     $this->assertEqual($result->getValue(), 0);
+
+    // Check verbose output.
+    $this->drupalLogin($test_user);
+    $this->drupalGet('/admin/reports/monitoring/sensors/user_sessions_authenticated');
+    // 3 fields are expected to be displayed.
+    $results = $this->xpath('//fieldset[@id="edit-verbose"]//table//tbody//tr')[0]->td;
+    $this->assertTrue(count($results) == 3, '3 fields have been found in the verbose result.');
+    // The username should be replaced in the message.
+    $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_notice');
+    $this->assertText('Session opened for %name');
+    // 'No results' text is displayed when the query has 0 results.
+    $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_warning');
+    $this->assertText('No results were found in the table.');
   }
 
   /**

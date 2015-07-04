@@ -8,7 +8,7 @@ value_label: 'Logouts'
 status: TRUE
 caching_time: 3600
 settings:
-  table: 'watchdog'
+  table: watchdog
   conditions:
     -
       field: 'type'
@@ -16,5 +16,9 @@ settings:
     -
       field: 'message'
       value: 'Session closed for %name.'
+  keys:
+    - 'message'
+    - 'wid'
+    - 'variables'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
