@@ -16,7 +16,7 @@ use Drupal\monitoring\Tests\MonitoringTestBase;
 class MonitoringDemoTest extends MonitoringTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * @var string[]
    */
@@ -38,7 +38,7 @@ class MonitoringDemoTest extends MonitoringTestBase {
     $this->assertText(t('Welcome to the Monitoring demo installation.'));
     $this->assertLink(t('Monitoring sensors overview'));
     $this->assertLink(t('Monitoring sensors settings'));
-    $this->assertText(t('Sensor example: "Enabled modules"'));
+    $this->assertText(t('Sensor example: "Installed modules"'));
     $this->assertLink(t('Configure'));
     $this->assertLink(t('Disable'));
     $this->assertLink(t('Uninstall'));

@@ -207,15 +207,15 @@ monitoring.settings.twig_debug_mode:
   type: monitoring.settings_base
   label: 'Monitor twig settings'
 
-monitoring.settings.monitoring_enabled_modules:
+monitoring.settings.monitoring_installed_modules:
   type: monitoring.settings_base
-  label: 'Enabled modules sensor settings'
+  label: 'Installed modules sensor settings'
   mapping:
     allow_additional:
       label: Allow additional
       type: boolean
     modules:
-      label: Enabled modules
+      label: Installed modules
       type: sequence
       sequence:
         type: string

@@ -149,7 +149,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
    * Tests for disappearing sensors.
    *
    * We provide a separate test method for the DisappearedSensorsSensorPlugin as we
-   * need to enable and disable additional modules.
+   * need to install and uninstall additional modules.
    *
    * @see DisappearedSensorsSensorPlugin
    */
@@ -219,37 +219,37 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
   /**
    * Tests enabled modules sensor.
    *
-   * We use separate test method as we need to enable/disable modules.
+   * We use separate test method as we need to install/uninstall modules.
    *
    * @see EnabledModulesSensorPlugin
    */
   public function testSensorInstalledModulesAPI() {
     // The initial run of the sensor will acknowledge all installed modules as
     // expected and so the status should be OK.
-    $result = $this->runSensor('monitoring_enabled_modules');
+    $result = $this->runSensor('monitoring_installed_modules');
     $this->assertTrue($result->isOk());
 
     // Install additional module. As the setting "allow_additional" is not
     // enabled by default this should result in sensor escalation to critical.
     $this->installModules(array('contact'));
-    $result = $this->runSensor('monitoring_enabled_modules');
+    $result = $this->runSensor('monitoring_installed_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are NOT expected to be installed: Contact (contact)');
     $this->assertEqual($result->getValue(), 1);
 
     // Allow additional modules and run the sensor - it should not escalate now.
-    $sensor_config = SensorConfig::load('monitoring_enabled_modules');
+    $sensor_config = SensorConfig::load('monitoring_installed_modules');
     $sensor_config->settings['allow_additional'] = TRUE;
     $sensor_config->save();
-    $result = $this->runSensor('monitoring_enabled_modules');
+    $result = $this->runSensor('monitoring_installed_modules');
     $this->assertTrue($result->isOk());
 
-    // Add comment module to be expected and disable the module. The sensor
-    // should escalate to critical.
+    // Install comment module to be expected and uninstall the module again.
+    // The sensor should escalate to critical.
     $sensor_config->settings['modules']['contact'] = 'contact';
     $sensor_config->save();
     $this->uninstallModules(array('contact'));
-    $result = $this->runSensor('monitoring_enabled_modules');
+    $result = $this->runSensor('monitoring_installed_modules');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), '1 modules delta, expected 0, Following modules are expected to be installed: Contact (contact)');
     $this->assertEqual($result->getValue(), 1);

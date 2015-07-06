@@ -16,8 +16,8 @@ use Drupal\Core\Form\FormStateInterface;
  * Monitors installed modules.
  *
  * @SensorPlugin(
- *   id = "monitoring_enabled_modules",
- *   label = @Translation("Enabled Modules"),
+ *   id = "monitoring_installed_modules",
+ *   label = @Translation("Installed Modules"),
  *   description = @Translation("Monitors installed modules."),
  *   addable = FALSE
  * )
@@ -35,7 +35,7 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     // sensor result is critical.
     $configured_modules = array_filter($this->sensorConfig->getSetting('modules', NULL));
 
-    // If the sensor is not configured, select enabled modules.
+    // If the sensor is not configured, select installed modules.
     if (!$configured_modules) {
       $enabled_modules = Drupal::moduleHandler()->getModuleList();
       // Reduce to the module name only.
@@ -83,8 +83,8 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
 
     $form['allow_additional'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Allow additional modules to be enabled'),
-      '#description' => t('If checked additionally enabled modules will not be considered a critical state.'),
+      '#title' => t('Allow additional modules to be installed'),
+      '#description' => t('If checked additionally installed modules will not be considered a critical state.'),
       '#default_value' => $this->sensorConfig->getSetting('allow_additional'),
     );
 
@@ -127,8 +127,8 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     $form['modules'] = array(
       '#type' => 'checkboxes',
       '#options' => $visible_modules,
-      '#title' => t('Modules expected to be enabled'),
-      '#description' => t('Check all modules that are supposed to be enabled.'),
+      '#title' => t('Modules expected to be installed'),
+      '#description' => t('Check all modules that are supposed to be installed.'),
       '#default_value' => $visible_default_value,
     );
 
@@ -141,9 +141,9 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
     $form['extended']['modules_hidden'] = array(
       '#type' => 'checkboxes',
       '#options' => $hidden_modules,
-      '#title' => t('Hidden modules expected to be enabled'),
+      '#title' => t('Hidden modules expected to be installed'),
       '#default_value' => $hidden_default_value,
-      '#description' => t('Check all modules that are supposed to be enabled.'),
+      '#description' => t('Check all modules that are supposed to be installed.'),
     );
 
     return $form;
@@ -181,27 +181,27 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
       $names[$name] = $module->info['name'];
     }
 
-    $monitoring_enabled_modules = array();
+    $monitoring_installed_modules = array();
     // Filter out install profile.
     foreach (array_keys(Drupal::moduleHandler()->getModuleList()) as $module) {
       $path_parts = explode('/', drupal_get_path('module', $module));
       if ($path_parts[0] != 'profiles') {
-        $monitoring_enabled_modules[$module] = $module;
+        $monitoring_installed_modules[$module] = $module;
       }
     }
 
     $expected_modules = array_filter($this->sensorConfig->getSetting('modules'));
 
     // If there are no expected modules, the sensor is not configured, so init
-    // the expected modules list as currently enabled modules.
+    // the expected modules list as currently installed modules.
     if (empty($expected_modules)) {
-      $expected_modules = $monitoring_enabled_modules;
-      $this->sensorConfig->settings['modules'] = $monitoring_enabled_modules;
+      $expected_modules = $monitoring_installed_modules;
+      $this->sensorConfig->settings['modules'] = $monitoring_installed_modules;
       $this->sensorConfig->save();
     }
 
     // Check for modules not being installed but expected.
-    $non_installed_modules = array_diff($expected_modules, $monitoring_enabled_modules);
+    $non_installed_modules = array_diff($expected_modules, $monitoring_installed_modules);
     if (!empty($non_installed_modules)) {
       $delta += count($non_installed_modules);
       $non_installed_modules_info = array();
@@ -218,7 +218,7 @@ class EnabledModulesSensorPlugin extends SensorPluginBase {
 
     // In case we do not allow additional modules check for modules installed
     // but not expected.
-    $unexpected_modules = array_diff($monitoring_enabled_modules, $expected_modules);
+    $unexpected_modules = array_diff($monitoring_installed_modules, $expected_modules);
     if (!$this->sensorConfig->getSetting('allow_additional') && !empty($unexpected_modules)) {
       $delta += count($unexpected_modules);
       $unexpected_modules_info = array();

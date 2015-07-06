@@ -18,7 +18,7 @@ use Drupal\rest\Tests\RESTTestBase;
 class MultigraphServicesTest extends RESTTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * @var string[]
    */

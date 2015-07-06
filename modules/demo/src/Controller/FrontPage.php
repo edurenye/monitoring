@@ -33,14 +33,14 @@ class FrontPage extends ControllerBase {
       ),
       'sensor_enabled_modules' => array(
         '#type' => 'item',
-        '#title' => t('Sensor example: "Enabled modules"'),
-        '#description' => t('Monitors which modules are supposed to be enabled. In case there is a needed module disabled or excess module enabled you will be noticed.'),
+        '#title' => t('Sensor example: "Installed modules"'),
+        '#description' => t('Monitors which modules are supposed to be installed. In case there is a needed module uninstalled or excess module installed you will be noticed.'),
         '#description_display' => 'after',
         'list' => array(
           '#theme' => 'item_list',
           '#items' => array(
-            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => 'monitoring_enabled_modules'))->toString())),
-            t('<a href="@url">Disable</a> Dashboard module and enable Book module.', array('@url' => Url::fromRoute('system.modules_list')->toString())),
+            t('<a href="@url">Configure</a> the module by submitting the default settings.', array('@url' => Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => 'monitoring_installed_modules'))->toString())),
+            t('<a href="@url">Uninstall</a> Dashboard module and install Book module.', array('@url' => Url::fromRoute('system.modules_list')->toString())),
             t('Visit the <a href="@url">sensors overview page</a> to see the reported issue.', array('@url' => Url::fromRoute('monitoring.sensor_list')->toString())),
           )
         ),

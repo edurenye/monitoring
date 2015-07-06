@@ -33,7 +33,7 @@
  INSTALLATION
  ============
 
- * Prior to enabling monitoring_* modules enable the monitoring base module.
+ * Prior to install monitoring_* modules install the monitoring base module.
    This will secure the base PHP classes are available during the submodules
    installation.
 
