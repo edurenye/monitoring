@@ -24,8 +24,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
    */
   public function testSensors() {
     $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
-    // $this->doTestTwigDebugSensor();
-    // $this->doTestUserIntegritySensorPlugin();
+    $this->doTestTwigDebugSensor();
+    $this->doTestUserIntegritySensorPlugin();
   }
 
   /**
