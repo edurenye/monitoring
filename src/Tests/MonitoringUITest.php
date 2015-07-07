@@ -75,13 +75,13 @@ class MonitoringUITest extends MonitoringTestBase {
     // Tests adding a condition to the log out sensor.
     $this->drupalGet('admin/config/system/monitoring/sensors/user_session_logouts');
     $edit = array(
-      'conditions[2][field]' => 'TEST',
-      'conditions[2][value]' => 'TEST',
+      'conditions[2][field]' => 'severity',
+      'conditions[2][value]' => 5,
     );
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->drupalGet('admin/config/system/monitoring/sensors/user_session_logouts');
-    $this->assertFieldByName('conditions[2][field]', 'TEST');
-    $this->assertFieldByName('conditions[2][value]', 'TEST');
+    $this->assertFieldByName('conditions[2][field]', 'severity');
+    $this->assertFieldByName('conditions[2][value]', 5);
   }
 
   /**

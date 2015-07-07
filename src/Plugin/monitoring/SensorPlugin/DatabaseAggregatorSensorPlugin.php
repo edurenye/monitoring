@@ -414,7 +414,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       $settings['keys'] = $this->currentKeys;
       $this->sensorConfig->set('settings', $settings);
       drupal_set_message('Verbose output configuration is invalid, keys were not saved.', 'error');
-      drupal_set_message($e, 'warning');
+      drupal_set_message($e->getMessage(), 'warning');
     }
   }
 
