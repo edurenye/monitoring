@@ -40,8 +40,8 @@ class MonitoringDemoTest extends MonitoringTestBase {
     $this->assertLink(t('Monitoring sensors settings'));
     $this->assertText(t('Sensor example: "Installed modules"'));
     $this->assertLink(t('Configure'));
-    $this->assertLink(t('Disable'));
-    $this->assertLink(t('Uninstall'));
+    $this->assertLink(t('Uninstall'), 0);
+    $this->assertLink(t('Uninstall'), 1);
     $this->assertText(t('Drush integration - open up your console and type in # drush monitoring-sensor-config'));
   }
 
