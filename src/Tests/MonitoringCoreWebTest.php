@@ -118,31 +118,31 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->drupalLogin($test_user_first);
     // Check sensor message after first privilege user creation.
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '1 privileged user(s)');
+    $this->assertEqual($result->getMessage(), '2 privileged user(s)');
 
     // Create second privileged user.
     $test_user_second = $this->drupalCreateUser(array('administer monitoring'), 'test_user_2');
     $this->drupalLogin($test_user_second);
     // Check sensor message after new privilege user creation.
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '2 privileged user(s), 1 new user(s)');
+    $this->assertEqual($result->getMessage(), '3 privileged user(s), 1 new user(s)');
 
     // Reset the user data, button is tested in UI tests.
     \Drupal::keyValue('monitoring.users')->deleteAll();
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '2 privileged user(s)');
+    $this->assertEqual($result->getMessage(), '3 privileged user(s)');
 
     // Make changes to a user.
     $test_user_second->setUsername('changed');
     $test_user_second->save();
     // Check sensor message for user changes.
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '2 privileged user(s), 1 changed user(s)');
+    $this->assertEqual($result->getMessage(), '3 privileged user(s), 1 changed user(s)');
 
     // Reset the user data again, check sensor message.
     \Drupal::keyValue('monitoring.users')->deleteAll();
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '2 privileged user(s)');
+    $this->assertEqual($result->getMessage(), '3 privileged user(s)');
   }
 
   /**
