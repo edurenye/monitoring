@@ -29,6 +29,17 @@ table#monitoring-sensors-overview th.actions {
   width: 65px;
 }
 
+.monitoring-sensor-details {
+  border: 0;
+  margin: 0;
+}
+
+.monitoring-sensor-details summary {
+  font-weight: normal;
+  text-transform: none;
+  padding: 0;
+}
+
 table.monitoring-severity-colors tr,
 div.view-id-monitoring_sensor_results table tr {
   border-left: 8px solid #bebfb9;
