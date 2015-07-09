@@ -185,7 +185,7 @@ class SensorList extends ControllerBase {
         $status_overview[SensorResultInterface::STATUS_UNKNOWN];
 
     $output['table'] = array(
-      '#theme' => 'table',
+      '#type' => 'table',
       '#header' => $header,
       '#rows' => $rows,
       '#sticky' => TRUE,

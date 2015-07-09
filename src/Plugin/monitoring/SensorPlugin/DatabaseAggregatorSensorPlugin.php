@@ -180,7 +180,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     if (count($rows) > 0) {
       $header = array_keys($rows[0]['data']);
       $output['result'] = array(
-        '#theme' => 'table',
+        '#type' => 'table',
         '#header' => $header,
         '#rows' => $rows,
       );

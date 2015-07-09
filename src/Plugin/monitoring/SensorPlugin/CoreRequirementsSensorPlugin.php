@@ -96,7 +96,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
         '#title' => implode(' ', $title),
         '#markup' => $description,
       );
-      $row['message'] = drupal_render($message);
+      $row['message'] = \Drupal::service('renderer')->renderPlain($message);
 
       $rows[] = array(
         'data' => $row,
@@ -111,7 +111,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       $header['message'] = t('Message');
 
       $output['requirements'] = array(
-        '#theme' => 'table',
+        '#type' => 'table',
         '#header' => $header,
         '#rows' => $rows,
       );

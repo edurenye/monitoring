@@ -224,7 +224,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       );
 
       $row[] = $entity->id();
-      $row[] = drupal_render($entity_link);
+      $row[] = \Drupal::service('renderer')->renderPlain($entity_link);
       $rows[] = array(
         'data' => $row,
         'class' => 'entity',
@@ -236,7 +236,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       $header[] = t('Label');
 
       $output['entities'] = array(
-        '#theme' => 'table',
+        '#type' => 'table',
         '#header' => $header,
         '#rows' => $rows,
       );

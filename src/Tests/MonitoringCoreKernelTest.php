@@ -198,7 +198,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->assertTrue(strpos($result->getMessage(), $file->getFileUri()) !== FALSE);
     $this->assertTrue($result->isWarning());
     $verbose_output = $result->getVerboseOutput();
-    $this->setRawContent(drupal_render($verbose_output));
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $this->assertText('monitoring_test');
     $this->assertText('test_object');
     $this->assertText('123456789');
@@ -277,7 +277,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Check verbose message. All output should be part of it.
 
     $verbose_output = $result->getVerboseOutput();
-    $this->setRawContent(drupal_render($verbose_output));
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $this->assertText('requirement1');
     $this->assertText('requirement1 description');
     $this->assertText('requirement_excluded');
@@ -440,7 +440,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->assertTrue($result->isCritical());
     // The verbose output should contain the cmd output.
     $verbose_output = $result->getVerboseOutput();
-    $this->setRawContent(drupal_render($verbose_output));
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $this->assertText('A addedfile.txt');
     $this->assertText('M sites/all/modules/monitoring/test/tests/monitoring.core.test');
     $this->assertText('D deleted file.txt');
