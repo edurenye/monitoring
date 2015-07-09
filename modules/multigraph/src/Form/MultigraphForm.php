@@ -110,7 +110,6 @@ class MultigraphForm extends EntityForm {
       '#header' => array(
         'category' => $this->t('Category'),
         'label' => $this->t('Sensor label'),
-        'description' => $this->t('Description'),
         'message' => $this->t('Sensor message'),
         'weight' => $this->t('Weight'),
         'operations' => $this->t('Operations'),
@@ -140,9 +139,7 @@ class MultigraphForm extends EntityForm {
           '#title' => $this->t('Custom sensor label'),
           '#title_display' => 'invisible',
           '#required' => TRUE,
-        ),
-        'description' => array(
-          '#markup' => $sensor->getDescription(),
+          '#description' => $sensor->getDescription(),
         ),
         'message' => array(
           '#markup' => monitoring_sensor_run($sensor->id())->getMessage(),
