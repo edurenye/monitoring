@@ -190,7 +190,7 @@ class SensorForm extends EntityForm {
           '#open' => TRUE,
           '#tree' => TRUE,
         );
-        $form['plugin_container']['thresholds'] += $this->thresholdsForm($form_state);
+        $this->thresholdsForm($form, $form_state);
       }
 
     }
@@ -289,7 +289,7 @@ class SensorForm extends EntityForm {
   /**
    * Builds the threshold settings form.
    */
-  protected function thresholdsForm(FormStateInterface $form_state) {
+  protected function thresholdsForm(array &$form, FormStateInterface $form_state) {
 
     $type = $form_state->getValue(array('thresholds', 'type'));
 
@@ -297,7 +297,7 @@ class SensorForm extends EntityForm {
       $type = $this->entity->getThresholdsType();
     }
 
-    $form['type'] = array(
+    $form['plugin_container']['thresholds']['type'] = array(
       '#type' => 'select',
       '#title' => $this->t('Threshold type'),
       '#options' => array(
@@ -316,13 +316,13 @@ class SensorForm extends EntityForm {
 
     switch ($type) {
       case 'exceeds':
-        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value exceeds the limits.');
-        $form['warning'] = array(
+        $form['plugin_container']['thresholds']['type']['#description'] = $this->t('The sensor will be set to the corresponding status if the value exceeds the limits.');
+        $form['plugin_container']['thresholds']['warning'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning'),
           '#default_value' => $this->entity->getThresholdValue('warning'),
         );
-        $form['critical'] = array(
+        $form['plugin_container']['thresholds']['critical'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical'),
           '#default_value' => $this->entity->getThresholdValue('critical'),
@@ -330,13 +330,13 @@ class SensorForm extends EntityForm {
         break;
 
       case 'falls':
-        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value falls below the limits.');
-        $form['warning'] = array(
+        $form['plugin_container']['thresholds']['type']['#description'] = $this->t('The sensor will be set to the corresponding status if the value falls below the limits.');
+        $form['plugin_container']['thresholds']['warning'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning'),
           '#default_value' => $this->entity->getThresholdValue('warning'),
         );
-        $form['critical'] = array(
+        $form['plugin_container']['thresholds']['critical'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical'),
           '#default_value' => $this->entity->getThresholdValue('critical'),
@@ -344,23 +344,23 @@ class SensorForm extends EntityForm {
         break;
 
       case 'inner_interval':
-        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value is within the limits.');
-        $form['warning_low'] = array(
+        $form['plugin_container']['thresholds']['type']['#description'] = $this->t('The sensor will be set to the corresponding status if the value is within the limits.');
+        $form['plugin_container']['thresholds']['warning_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning low'),
           '#default_value' => $this->entity->getThresholdValue('warning_low'),
         );
-        $form['warning_high'] = array(
+        $form['plugin_container']['thresholds']['warning_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning high'),
           '#default_value' => $this->entity->getThresholdValue('warning_high'),
         );
-        $form['critical_low'] = array(
+        $form['plugin_container']['thresholds']['critical_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical low'),
           '#default_value' => $this->entity->getThresholdValue('critical_low'),
         );
-        $form['critical_high'] = array(
+        $form['plugin_container']['thresholds']['critical_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical high'),
           '#default_value' => $this->entity->getThresholdValue('critical_high'),
@@ -368,23 +368,23 @@ class SensorForm extends EntityForm {
         break;
 
       case 'outer_interval':
-        $form['#description'] = $this->t('The sensor will be set to the corresponding status if the value is outside of the limits.');
-        $form['warning_low'] = array(
+        $form['plugin_container']['thresholds']['type']['#description'] = $this->t('The sensor will be set to the corresponding status if the value is outside of the limits.');
+        $form['plugin_container']['thresholds']['warning_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning low'),
           '#default_value' => $this->entity->getThresholdValue('warning_low'),
         );
-        $form['warning_high'] = array(
+        $form['plugin_container']['thresholds']['warning_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Warning high'),
           '#default_value' => $this->entity->getThresholdValue('warning_high'),
         );
-        $form['critical_low'] = array(
+        $form['plugin_container']['thresholds']['critical_low'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical low'),
           '#default_value' => $this->entity->getThresholdValue('critical_low'),
         );
-        $form['critical_high'] = array(
+        $form['plugin_container']['thresholds']['critical_high'] = array(
           '#type' => 'number',
           '#title' => $this->t('Critical high'),
           '#default_value' => $this->entity->getThresholdValue('critical_high'),
