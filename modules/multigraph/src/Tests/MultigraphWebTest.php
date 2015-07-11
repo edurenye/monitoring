@@ -61,17 +61,17 @@ class MultigraphWebTest extends WebTestBase {
       'description' => $this->randomString(),
       'sensor_add_select' => 'dblog_404',
     );
-    $this->drupalPostForm('admin/config/system/monitoring/multigraphs/add', $values, t('Add'));
+    $this->drupalPostForm('admin/config/system/monitoring/multigraphs/add', $values, t('Add sensor'));
     $this->assertText(t('Sensor "Page not found errors" added. You have unsaved changes.'));
 
     $this->drupalPostForm(NULL, array(
       'sensor_add_select' => 'user_failed_logins',
-    ), t('Add'));
+    ), t('Add sensor'));
     $this->assertText(t('Sensor "Failed user logins" added. You have unsaved changes.'));
 
     $this->drupalPostForm(NULL, array(
       'sensor_add_select' => 'user_successful_logins',
-    ), t('Add'));
+    ), t('Add sensor'));
     $this->assertText(t('Sensor "Successful user logins" added. You have unsaved changes.'));
 
     // And last but not least, change all sensor label values and save form.
@@ -107,7 +107,7 @@ class MultigraphWebTest extends WebTestBase {
       'description' => 'Watchdog entries with severity Warning or higher (test)',
       'sensor_add_select' => 'user_successful_logins',
     );
-    $this->drupalPostForm(NULL, $values, t('Add'));
+    $this->drupalPostForm(NULL, $values, t('Add sensor'));
     $this->assertText('Sensor "Successful user logins" added. You have unsaved changes.');
 
     // Remove a sensor.

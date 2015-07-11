@@ -84,17 +84,20 @@ class MultigraphForm extends EntityForm {
     }
 
     // Select element for available sensors.
-    $form['sensor_list']['sensor_add_select'] = array(
+    $form['sensor_list']['add'] = array(
+      '#type' => 'container',
+      '#attributes' => array('class' => array('container-inline')),
+    );
+    $form['sensor_list']['add']['sensor_add_select'] = array(
       '#type' => 'select',
       '#title' => $this->t('Available sensors'),
       '#options' => $sensors_options,
-      '#description' => $this->t('Choose a sensor to add.'),
       '#empty_value' => '',
     );
 
-    $form['sensor_list']['sensor_add_button'] = array(
+    $form['sensor_list']['add']['sensor_add_button'] = array(
       '#type' => 'submit',
-      '#value' => $this->t('Add'),
+      '#value' => $this->t('Add sensor'),
       '#ajax' => array(
         'wrapper' => 'selected-sensors',
         'callback' => array($this, 'sensorsReplace'),
