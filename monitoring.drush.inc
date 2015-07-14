@@ -36,7 +36,6 @@ define('MONITORING_DRUSH_SENSOR_STATUS_OK', 0);
  * - monitoring-run
  * - monitoring-enable
  * - monitoring-disable
- * - monitoring-purge-settings
  */
 function monitoring_drush_command() {
   $items = array();
@@ -101,18 +100,6 @@ function monitoring_drush_command() {
     'drupal dependencies' => array('monitoring'),
   );
 
-  $items['monitoring-purge-settings'] = array(
-    'callback' => 'monitoring_drush_purge_settings',
-    'description' => 'Purges settings for a specific sensor, or all sensors.',
-    'arguments' => array(
-      'sensor_name' => 'Sensor name for which to purge settings.',
-    ),
-    'examples' => array(
-      'drush monitoring-purge-settings monitoring_git_dirty_tree' => 'Enables monitoring_git_dirty_tree sensor.',
-    ),
-    'drupal dependencies' => array('monitoring'),
-  );
-
   return $items;
 }
 
@@ -137,17 +124,17 @@ function monitoring_drush_sensor_config($sensor_name = NULL) {
  * Provides info about available sensors.
  */
 function monitoring_drush_sensor_config_all() {
-  $sensors_config_all = monitoring_sensor_manager()->getAllSensorConfig();
+  $sensor_config_list = monitoring_sensor_manager()->getAllSensorConfig();
 
   $rows[] = array(dt('Label'), dt('Name'), dt('Category'), dt('Enabled'));
   $rows[] = array('----', '----', '----');
-  /** @var \Drupal\monitoring\Entity\SensorConfig $config */
-  foreach ($sensors_config_all as $name => $sensors_config) {
+  /** @var \Drupal\monitoring\Entity\SensorConfig $sensor_config */
+  foreach ($sensor_config_list as $name => $sensor_config) {
     $rows[] = array(
-      $config->getLabel(),
+      $sensor_config->getLabel(),
       $name,
-      $config->getCategory(),
-      ($config->isEnabled() ? t('Yes') : t('No')),
+      $sensor_config->getCategory(),
+      ($sensor_config->isEnabled() ? t('Yes') : t('No')),
     );
   }
 
@@ -372,36 +359,15 @@ function monitoring_drush_disable($sensor_name) {
   $sensor_manager = monitoring_sensor_manager();
   try {
     $sensor_config = $sensor_manager->getSensorConfigByName($sensor_name);
-    if (!$sensor_config->isEnabled()) {
-      $sensor_manager->enableSensor($sensor_name);
+    if ($sensor_config->isEnabled()) {
+      $sensor_manager->disableSensor($sensor_name);
       drush_log(dt('The sensor @name was disabled.', array('@name' => $sensor_config->getLabel())), 'ok');
     }
     else {
-      drush_log(dt('The sensor @name is currently disabled.', array('@name' => $sensor_config->getLabel())), 'warning');
+      drush_log(dt('The sensor @name is already disabled.', array('@name' => $sensor_config->getLabel())), 'warning');
     }
   }
   catch (NonExistingSensorException $e) {
     drush_set_error('MONITORING_SENSOR_INVALID_NAME', dt('Sensor "@name" does not exist.', array('@name' => $sensor_name)));
   }
-}
-
-/**
- * Drush callback to purge sensor settings.
- *
- * @param string $sensor_name
- *   Sensor name for which to purge settings.
- */
-function monitoring_drush_purge_settings($sensor_name = NULL) {
-  if (empty($sensor_name)) {
-    if (drush_confirm(dt('Do you want to purge all sensor settings?'))) {
-      foreach (monitoring_sensor_manager()->getAllSensorConfig() as $sensor_name => $sensor_config) {
-        \Drupal::config('monitoring.settings')->set($sensor_name, array())->save();
-      }
-      drush_print(dt('Purged settings for all sensors'));
-    }
-    return;
-  }
-
-  \Drupal::config('monitoring.settings')->set($sensor_name, array())->save();
-  drush_print(dt('Purged settings for sensor @sensor_name', array('@sensor_name' => $sensor_name)));
 }
