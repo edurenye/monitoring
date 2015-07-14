@@ -26,6 +26,43 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
     $this->doTestTwigDebugSensor();
     $this->doTestUserIntegritySensorPlugin();
+    $this->doTestWatchdogAggregatorSensorPlugin();
+  }
+
+  /**
+   * Tests successful user logins through watchdog sensor.
+   *
+   * @see DatabaseAggregatorSensorPlugin
+   */
+  protected function doTestWatchdogAggregatorSensorPlugin() {
+    // Create and login user with permission to edit sensors and view reports.
+    $test_user = $this->drupalCreateUser([
+      'administer site configuration',
+      'administer monitoring',
+      'monitoring reports',
+      'access site reports',
+      'monitoring verbose',
+    ]);
+    $this->drupalLogin($test_user);
+    // Test output and default message replacement.
+    $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
+    $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
+    $wid = (string) $xpath[0]->td[0];
+    $message = (string) $xpath[0]->td[1];
+    $this->assertTrue($wid == 6, 'Found WID in verbose output (WID == 6)');
+    $this->assertTrue($message == 'Session opened for .', 'Found replaced message in output.');
+    $this->assertText('Session opened for ' . $test_user->label());
+    // Remove variables from the fields and assert message has no replacements.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['keys' => 'wid' . PHP_EOL . 'message'], t('Save'));
+    $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
+    $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
+    $wid = (string) $xpath[0]->td[0];
+    $message = (string) $xpath[0]->td[1];
+    $this->assertTrue($wid == 6, 'Found WID in verbose output (WID == 6)');
+    $this->assertTrue($message == 'Session opened for %name.', 'Found unreplaced message in output.');
+    // Test wrong configuration (messages field does not exist).
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['keys' => 'wid' . PHP_EOL . 'messages'], t('Save'));
+    $this->assertText('Verbose output configuration is invalid, keys were not saved.');
   }
 
   /**
@@ -63,7 +100,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertTrue(count($results) == 3, '3 fields have been found in the verbose result.');
     // The username should be replaced in the message.
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_notice');
-    $this->assertText('Session opened for %name');
+    $this->assertText('Session opened for ' . $test_user->label());
     // 'No results' text is displayed when the query has 0 results.
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_warning');
     $this->assertText('No results were found in the table.');

@@ -193,6 +193,10 @@ monitoring.settings.search_api_unindexed:
       type: string
       label: 'Index ID'
 
+monitoring.settings.watchdog_aggregator:
+  type: monitoring.settings.database_aggregator
+  label: 'Watchdog sensor settings'
+
 monitoring.settings.dblog_404:
   type: monitoring.settings.database_aggregator
   label: '404 settings'

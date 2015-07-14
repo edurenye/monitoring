@@ -160,6 +160,17 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#title' => t('RESULT'),
     );
 
+    $this->verboseResultUnaggregated($output);
+    return $output;
+  }
+
+  /**
+   * Adds unaggregated verbose output to the render array $output.
+   *
+   * @param array &$output
+   *   Render array where the result will be added.
+   */
+  public function verboseResultUnaggregated(array &$output) {
     // Fetch the last 10 matching entries, unaggregated.
     $query_result = $this->getQuery()
       ->range(0, 10)
@@ -177,8 +188,11 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
         'class' => 'entity',
       );
     }
+
     if (count($rows) > 0) {
-      $header = array_keys($rows[0]['data']);
+      // Provide consistent keys for header and data rows for easy altering.
+      $keys = array_keys($rows[0]['data']);
+      $header = array_combine($keys, $keys);
       $output['result'] = array(
         '#type' => 'table',
         '#header' => $header,
@@ -191,7 +205,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
         '#markup' => t('No results were found in the table.'),
       ];
     }
-    return $output;
   }
 
   /**

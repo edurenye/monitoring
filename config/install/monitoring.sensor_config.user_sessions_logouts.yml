@@ -2,7 +2,7 @@ id: user_session_logouts
 label: 'User session logouts'
 description: 'User session logouts by Watchdog'
 category: 'User activity'
-plugin_id: database_aggregator
+plugin_id: watchdog_aggregator
 value_type: 'number'
 value_label: 'Logouts'
 status: TRUE

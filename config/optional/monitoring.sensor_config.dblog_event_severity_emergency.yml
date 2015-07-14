@@ -7,7 +7,7 @@ id: dblog_event_severity_emergency
 label: 'Severity Emergency'
 description: 'Watchdog entries of severity Emergency'
 category: Watchdog
-plugin_id: database_aggregator
+plugin_id: watchdog_aggregator
 result_class: null
 value_label: Events
 value_type: number

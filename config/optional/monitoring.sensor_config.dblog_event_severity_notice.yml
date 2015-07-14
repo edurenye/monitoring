@@ -7,7 +7,7 @@ id: dblog_event_severity_notice
 label: 'Severity Notice'
 description: 'Watchdog entries of severity Notice'
 category: Watchdog
-plugin_id: database_aggregator
+plugin_id: watchdog_aggregator
 result_class: null
 value_label: Events
 value_type: number
