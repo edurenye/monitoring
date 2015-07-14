@@ -122,6 +122,12 @@ monitoring.settings.entity_aggregator:
     entity_type:
       type: string
       label: 'Table'
+    verbose_fields:
+      type: sequence
+      label: Fields / Attributes
+      sequence:
+        type: string
+        label: The field to display
 
 monitoring.settings.monitoring_git_dirty_tree:
   type: mapping

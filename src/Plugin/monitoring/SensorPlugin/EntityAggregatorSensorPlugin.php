@@ -9,10 +9,10 @@ namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
+use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
-use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData;
 use Drupal\monitoring\Entity\SensorConfig;
@@ -67,10 +67,10 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    *   The entity query object.
    */
   protected function getEntityQueryAggregate() {
-    $entity_info = $this->entityManager->getDefinition($this->getEntityType(), TRUE);
+    $entity_info = $this->entityManager->getDefinition($this->getEntityTypeId(), TRUE);
 
     // Get aggregate query for the entity type.
-    $query = $this->entityQueryFactory->getAggregate($this->getEntityType());
+    $query = $this->entityQueryFactory->getAggregate($this->getEntityTypeId());
     $this->aggregateField = $entity_info->getKey('id');
 
     $this->addAggregate($query);
@@ -102,10 +102,10 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    * @see getEntityQueryAggregate()
    */
   protected function getEntityQuery() {
-    $entity_info = $this->entityManager->getDefinition($this->getEntityType(), TRUE);
+    $entity_info = $this->entityManager->getDefinition($this->getEntityTypeId(), TRUE);
 
     // Get query for the entity type.
-    $query = $this->entityQueryFactory->get($this->getEntityType());
+    $query = $this->entityQueryFactory->get($this->getEntityTypeId());
 
     // Add conditions.
     foreach ($this->getConditions() as $condition) {
@@ -159,8 +159,8 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    * @return string
    *   The entity type.
    */
-  protected function getEntityType() {
-    return $this->sensorConfig->getSetting('entity_type');
+  protected function getEntityTypeId() {
+    return $this->sensorConfig->getSetting('entity_type', 'node');
   }
 
   /**
@@ -168,7 +168,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    */
   public function runSensor(SensorResultInterface $result) {
     $query_result = $this->getEntityQueryAggregate()->execute();
-    $entity_type = $this->getEntityType();
+    $entity_type = $this->getEntityTypeId();
     $entity_info = $this->entityManager->getDefinition($entity_type);
 
     if (isset($query_result[0][$entity_info->getKey('id') . '_count'])) {
@@ -187,12 +187,6 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 
-    $output['field'] = array(
-      '#type' => 'item',
-      '#title' => t('Aggregate field'),
-      '#markup' => $this->aggregateField,
-    );
-
     // Fetch the last 10 matching entries, unaggregated.
     $entity_ids = $this->getEntityQuery()
       ->range(0, 10)
@@ -207,39 +201,72 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     // );
 
     // Load entities.
-    $entity_type = $this->getEntityType();
+    $entity_type = $this->getEntityTypeId();
     $entities = $this->entityManager
       ->getStorage($entity_type)
       ->loadMultiple($entity_ids);
 
-    // @todo add extra fields, formatted...
+    // Get the fields to display from the settings.
+    $fields = $this->sensorConfig->getSetting('verbose_fields', ['id', 'label']);
+
     // Render entities.
     $rows = [];
     foreach ($entities as $id => $entity) {
       $row = [];
-      $entity_link = array(
-        '#type' => 'link',
-        '#title' => $entity->label(),
-        '#url' => $entity->urlInfo(),
-      );
+      foreach ($fields as $field) {
+        switch ($field) {
+          case 'uuid':
+            $row[] = $entity->uuid();
+            break;
 
-      $row[] = $entity->id();
-      $row[] = \Drupal::service('renderer')->renderPlain($entity_link);
+          case 'id':
+            $row[] = $entity->id();
+            break;
+
+          case 'label':
+            $entity_link = array(
+              '#type' => 'link',
+              '#title' => $entity->label(),
+              '#url' => $entity->urlInfo(),
+            );
+
+            $row[] = \Drupal::service('renderer')->renderPlain($entity_link);
+            break;
+
+          case 'langcode':
+            $row[] = $entity->language()->getName();
+            break;
+
+          case 'bundle':
+            $row[] = $entity->bundle();
+            break;
+
+          default:
+            $property = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getMainPropertyName();
+            $value = $entity->$field->view(['label' => 'hidden']);
+            $row[] = $value ? \Drupal::service('renderer')->renderPlain($value) : $entity->$field->$property;
+            break;
+        }
+      }
+
       $rows[] = array(
         'data' => $row,
         'class' => 'entity',
       );
     }
     if (count($rows) > 0) {
-      $header = [];
-      $header[] = t('#');
-      $header[] = t('Label');
-
+      $header = $this->sensorConfig->getSetting('verbose_fields');
       $output['entities'] = array(
         '#type' => 'table',
         '#header' => $header,
         '#rows' => $rows,
       );
+    }
+    else {
+      $output['result'] = [
+        '#type' => 'item',
+        '#markup' => t('No matching entities were found.'),
+      ];
     }
 
     return $output;
@@ -249,17 +276,17 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    $entity_type_id = $this->getEntityType();
+    $entity_type_id = $this->getEntityTypeId();
     if (!$entity_type_id) {
       throw new \Exception(SafeMarkup::format('Sensor @id is missing the required entity_type setting.', array('@id' => $this->id())));
     }
-    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
     $this->addDependency('module', $entity_type->getProvider());
     return $this->dependencies;
   }
 
   /**
-   * Adds UI for variables entity_type and conditions.
+   * Adds UI for variables entity_type, conditions and verbose_fields.
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
@@ -267,7 +294,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
 
     $form['entity_type'] = array(
       '#type' => 'select',
-      '#default_value' => $this->getEntityType(),
+      '#default_value' => $this->getEntityTypeId(),
       '#maxlength' => 255,
       '#options' => $this->entityManager->getEntityTypeLabels(),
       '#title' => t('Entity Type'),
@@ -370,13 +397,56 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     // Select element for available conditions.
     $form['conditions_table']['condition_add_button'] = array(
       '#type' => 'submit',
-      '#value' => t('Add more conditions'),
+      '#value' => t('Add another condition'),
       '#ajax' => array(
         'wrapper' => 'selected-conditions',
         'callback' => array($this, 'conditionsReplace'),
         'method' => 'replace',
       ),
       '#submit' => array(array($this, 'addConditionSubmit')),
+    );
+
+    // Fill the sensors table with form elements for each sensor.
+    $form['verbose_fields'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Verbose Output configuration'),
+      '#prefix' => '<div id="selected-output">',
+      '#suffix' => '</div>',
+    );
+    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+    $form['verbose_fields']['available_fields'] = [
+      '#markup' => t('Available Fields for entity %type: <b>%fields</b>', [
+          '%type' => $entity_type->getLabel(),
+          '%fields' => implode(', ', array_keys($this->entityManager->getBaseFieldDefinitions($this->getEntityTypeId())))
+        ]
+      ),
+    ];
+
+    // Fill the sensors table with form elements for each sensor.
+    $fields = $this->sensorConfig->getSetting('verbose_fields', ['id']);
+    if (!$form_state->has('fields_rows')) {
+      $form_state->set('fields_rows', count($fields) + 1);
+    }
+
+    for ($i = 0; $i < $form_state->get('fields_rows'); $i++) {
+      $form['verbose_fields'][$i] = [
+        '#type' => 'textfield',
+        '#default_value' => isset($fields[$i]) ? $fields[$i] : '',
+        '#maxlength' => 256,
+        '#required' => FALSE,
+        '#tree' => TRUE,
+      ];
+    }
+
+    $form['verbose_fields']['field_add_button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add another field'),
+      '#ajax' => array(
+        'wrapper' => 'selected-output',
+        'callback' => array($this, 'fieldsReplace'),
+        'method' => 'replace',
+      ),
+      '#submit' => array(array($this, 'addFieldSubmit')),
     );
 
     return $form;
@@ -396,16 +466,22 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
 
     // Cleanup conditions, remove empty.
     $settings['conditions'] = [];
-    foreach($form_state->getValue('conditions') as $key => $condition) {
+    foreach ($form_state->getValue('conditions') as $key => $condition) {
       if (!empty($condition['field'])) {
         $settings['conditions'][] = $condition;
       }
     }
-
+    $verbose_fields = [];
+    foreach ($form_state->getValue('settings')['verbose_fields'] as $key => $field) {
+      if (!empty($field)) {
+        $verbose_fields[] = $field;
+      }
+    };
+    $settings['verbose_fields'] = array_unique($verbose_fields);
     $sensor_config->set('settings', $settings);
   }
 
-    /**
+  /**
    * Returns the updated 'conditions' fieldset for replacement by ajax.
    *
    * @param array $form
@@ -421,10 +497,10 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   }
 
   /**
-   * Adds sensor to entity when 'Add field' button is pressed.
+   * Adds sensor to entity when 'Add another condition' button is pressed.
    *
    * @param array $form
-   *   The form structure array
+   *   The form structure array.
    * @param FormStateInterface $form_state
    *   The form state structure.
    */
@@ -437,16 +513,50 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   }
 
   /**
+   * Returns the updated 'verbose_fields' fieldset for replacement by ajax.
+   *
+   * @param array $form
+   *   The updated form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   *
+   * @return array
+   *   The updated form component for the selected fields.
+   */
+  public function fieldsReplace(array $form, FormStateInterface $form_state) {
+    return $form['plugin_container']['settings']['verbose_fields'];
+  }
+
+  /**
+   * Adds sensor to entity when 'Add another field' button is pressed.
+   *
+   * @param array $form
+   *   The form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   */
+  public function addFieldSubmit(array $form, FormStateInterface $form_state) {
+    $form_state->setRebuild();
+
+    $form_state->set('fields_rows', $form_state->get('fields_rows') + 1);
+    drupal_set_message(t('Field added.'), 'status');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::validateConfigurationForm($form, $form_state);
 
-    $field_name = $form_state->getValue(array('settings', 'aggregation', 'time_interval_field'));
+    $field_name = $form_state->getValue(array(
+      'settings',
+      'aggregation',
+      'time_interval_field',
+    ));
     if (!empty($field_name)) {
       // @todo instead of validate, switch to a form select.
-      $entity_type = $form_state->getValue(array('settings', 'entity_type'));
-      $entity_info = $this->entityManager->getFieldStorageDefinitions($entity_type);
+      $entity_type_id = $form_state->getValue(array('settings', 'entity_type'));
+      $entity_info = $this->entityManager->getFieldStorageDefinitions($entity_type_id);
       $data_type = NULL;
       if (!empty($entity_info[$field_name])) {
         $data_type = $entity_info[$field_name]->getPropertyDefinition('value')->getDataType();

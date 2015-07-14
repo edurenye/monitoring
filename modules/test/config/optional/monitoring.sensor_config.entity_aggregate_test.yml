@@ -11,6 +11,9 @@ settings:
   entity_type: 'node'
   time_interval_field: 'created'
   time_interval_value: 86400
+  verbose_fields:
+    - id
+    - label
   conditions:
     -
       field: 'type'

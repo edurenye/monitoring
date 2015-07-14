@@ -122,7 +122,6 @@ abstract class SensorPluginBase implements SensorPluginInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-
     return $form;
   }
 

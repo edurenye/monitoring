@@ -11,6 +11,11 @@ settings:
   entity_type: 'past_event'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
+  verbose_fields:
+    - id
+    - module
+    - machine_name
+    - message
   conditions:
     -
       field: 'severity'

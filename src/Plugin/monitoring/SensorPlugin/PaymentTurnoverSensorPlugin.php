@@ -34,7 +34,7 @@ class PaymentTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
     $ids = $this->getEntityQuery()->execute();
 
     $payments = $this->entityManager
-      ->getStorage($this->getEntityType())
+      ->getStorage($this->getEntityTypeId())
       ->loadMultiple($ids);
 
     $turnover = 0;

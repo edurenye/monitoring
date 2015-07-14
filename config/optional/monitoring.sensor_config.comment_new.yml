@@ -11,6 +11,10 @@ settings:
   entity_type: 'comment'
   time_interval_value: 86400
   time_interval_field: created
+  verbose_fields:
+    - id
+    - comment_type
+    - label
 dependencies:
   module:
     - comment

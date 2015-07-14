@@ -102,17 +102,17 @@ class MonitoringUITest extends MonitoringTestBase {
     ), t('Select sensor'));
 
     $this->assertText('Sensor plugin settings');
-    $this->drupalPostForm(NULL, array('settings[entity_type]' => 'field_storage_config'), t('Add more conditions'));
+    $this->drupalPostForm(NULL, array('settings[entity_type]' => 'node'), t('Add another condition'));
     $this->drupalPostForm(NULL, array(
       'description' => 'Sensor created to test UI',
       'value_label' => 'Test Value',
       'caching_time' => 100,
       'settings[aggregation][time_interval_value]' => 86400,
-      'settings[entity_type]' => 'field_storage_config',
+      'settings[entity_type]' => 'node',
       'conditions[0][field]' => 'type',
-      'conditions[0][value]' => 'message',
-      'conditions[1][field]' => 'parent',
-      'conditions[1][value]' => 'article',
+      'conditions[0][value]' => 'article',
+      'conditions[1][field]' => 'sticky',
+      'conditions[1][value]' => '0',
     ), t('Save'));
 
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'UI created Sensor')));
@@ -124,8 +124,10 @@ class MonitoringUITest extends MonitoringTestBase {
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
-    $this->assertFieldByName('conditions[0][value]', 'message');
-    $this->assertFieldByName('conditions[1][value]', 'article');
+    $this->assertFieldByName('conditions[0][field]', 'type');
+    $this->assertFieldByName('conditions[0][value]', 'article');
+    $this->assertFieldByName('conditions[1][field]', 'sticky');
+    $this->assertFieldByName('conditions[1][value]', '0');
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor/delete');
     $this->assertText('This action cannot be undone.');
@@ -208,7 +210,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertNoLink('Save');
     $this->drupalPostForm(NULL, array(), 'Run now');
     // The node labels should appear in verbose output.
-    $this->assertText('Label');
+    $this->assertText('label');
     $this->assertLink($node1->getTitle());
     $this->assertLink($node2->getTitle());
 
@@ -357,7 +359,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertEqual(trim((string) $rows[0]->td[2]), '1 druplicons in 1 day, falls below 2');
 
     // Create another node and run again.
-    $this->drupalCreateNode(array('promote' => '1'));
+    $node = $this->drupalCreateNode(array('promote' => '1'));
     $this->drupalPostForm(NULL, array(), t('Run again'));
     $this->assertText('OK');
     $this->assertText('2 druplicons in 1 day');
@@ -380,8 +382,10 @@ class MonitoringUITest extends MonitoringTestBase {
     // Test the verbose output.
     $this->drupalPostForm(NULL, array(), t('Run now'));
     // Check that the verbose output is displayed.
-    $this->assertText('Aggregate field');
-    $this->assertText('nid');
+    $this->assertText('Verbose');
+    $this->assertText('id');
+    $this->assertText('label');
+    $this->assertText($node->getTitle());
 
     // Check the if the sensor message includes value type.
     $this->drupalGet('admin/reports/monitoring/sensors/core_cron_safe_threshold');
