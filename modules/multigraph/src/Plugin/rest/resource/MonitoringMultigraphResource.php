@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring_multigraph\Plugin\rest\resource;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
@@ -75,19 +76,30 @@ class MonitoringMultigraphResource extends ResourceBase {
         throw new NotFoundHttpException('No multigraph with name "' . $multigraph_name . '"');
       }
       $response = $multigraph->getDefinition();
-      $response['uri'] = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $multigraph_name, '_format' => $format])->setAbsolute()->toString();
-      return new ResourceResponse($response);
+      $url = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $multigraph_name, '_format' => $format])->setAbsolute()->toString(TRUE);
+      $response['uri'] = $url->getGeneratedUrl();
+      $response = new ResourceResponse($response);
+      $response->addCacheableDependency($multigraph);
+      $response->addCacheableDependency($url);
+      return $response;
     }
 
     $list = array();
     $multigraphs = \Drupal::entityManager()
       ->getStorage('monitoring_multigraph')
       ->loadMultiple();
+    $cacheable_metadata = new CacheableMetadata();
     foreach ($multigraphs as $name => $multigraph) {
       /** @var \Drupal\monitoring_multigraph\Entity\Multigraph $multigraph */
       $list[$name] = $multigraph->getDefinition();
-      $list[$name]['uri'] = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $name, '_format' => $format])->setAbsolute()->toString();
+      $url = Url::fromRoute('rest.monitoring-multigraph.GET.' . $format , ['id' => $name, '_format' => $format])->setAbsolute()->toString(TRUE);
+      $list[$name]['uri'] = $url->getGeneratedUrl();
+
+      $cacheable_metadata = $cacheable_metadata->merge($url);
+      $cacheable_metadata = $cacheable_metadata->merge(CacheableMetadata::createFromObject($multigraph));
+
     }
-    return new ResourceResponse($list);
+    $response = new ResourceResponse($list);
+    return $response->addCacheableDependency($cacheable_metadata);
   }
 }

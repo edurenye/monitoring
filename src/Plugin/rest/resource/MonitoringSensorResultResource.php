@@ -8,6 +8,9 @@
 namespace Drupal\monitoring\Plugin\rest\resource;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
@@ -17,6 +20,7 @@ use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Tests\DependencyInjection\RendererService;
 use Symfony\Component\Routing\Route;
 use Psr\Log\LoggerInterface;
 
@@ -44,10 +48,16 @@ class MonitoringSensorResultResource extends ResourceBase {
    */
   protected $sensorRunner;
 
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $serializer_formats, SensorManager $sensor_manager, SensorRunner $sensor_runner, LoggerInterface $logger) {
+  /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, array $serializer_formats, SensorManager $sensor_manager, SensorRunner $sensor_runner, LoggerInterface $logger, RendererInterface $renderer) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
     $this->sensorManager = $sensor_manager;
     $this->sensorRunner = $sensor_runner;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -61,7 +71,8 @@ class MonitoringSensorResultResource extends ResourceBase {
       $container->getParameter('serializer.formats'),
       $container->get('monitoring.sensor_manager'),
       $container->get('monitoring.sensor_runner'),
-      $container->get('logger.factory')->get('rest')
+      $container->get('logger.factory')->get('rest'),
+      $container->get('renderer')
     );
   }
 
@@ -109,13 +120,30 @@ class MonitoringSensorResultResource extends ResourceBase {
     if ($sensor_name) {
       try {
         $sensor_config[$sensor_name] = $this->sensorManager->getSensorConfigByName($sensor_name);
-        $result = $this->sensorRunner->runSensors($sensor_config);
+
+        // Some sensors might render or do things that we can not properly
+        // collect cacheability metadata for. So, run it in our own render
+        // context. For example, one is the run cron link of the system.module
+        // requirements hook.
+        $context = new RenderContext();
+        $sensor_runner = $this->sensorRunner;
+        $result = $this->renderer->executeInRenderContext($context, function() use ($sensor_runner, $sensor_config) {
+          return $sensor_runner->runSensors($sensor_config);
+        });
         $response = $result[$sensor_name]->toArray();
-        $response['uri'] = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
+        $url = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString(TRUE);
+        $response['uri'] = $url->getGeneratedUrl();
         if ($request->get('expand') == 'sensor') {
           $response['sensor'] = $result[$sensor_name]->getSensorConfig()->toArray();
         }
-        return new ResourceResponse($response);
+        $response = new ResourceResponse($response);
+        $response->addCacheableDependency($result[$sensor_name]->getSensorConfig());
+        $response->addCacheableDependency($url);
+        if (!$context->isEmpty()) {
+          $response->addCacheableDependency($context->pop());
+        }
+
+        return $response;
       }
       catch (NonExistingSensorException $e) {
         throw new NotFoundHttpException($e->getMessage(), $e);
@@ -126,14 +154,36 @@ class MonitoringSensorResultResource extends ResourceBase {
     }
     else {
       $list = array();
-      foreach ($this->sensorRunner->runSensors() as $sensor_name => $result) {
+      $cacheable_metadata = new CacheableMetadata();
+
+      // Some sensors might render or do things that we can not properly
+      // collect cacheability metadata for. So, run it in our own render
+      // context. For example, one is the run cron link of the system.module
+      // requirements hook.
+      $context = new RenderContext();
+      $sensor_runner = $this->sensorRunner;
+      $results = \Drupal::service('renderer')->executeInRenderContext($context, function() use ($sensor_runner) {
+        return $sensor_runner->runSensors();
+      });
+
+      foreach ($results as $sensor_name => $result) {
         $list[$sensor_name] = $result->toArray();
-        $list[$sensor_name]['uri'] = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
+        $url = Url::fromRoute('rest.monitoring-sensor-result.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString(TRUE);
+        $list[$sensor_name]['uri'] = $url->getGeneratedUrl();
         if ($request->get('expand') == 'sensor') {
           $list[$sensor_name]['sensor'] = $result->getSensorConfig()->toArray();
         }
+        $cacheable_metadata = $cacheable_metadata->merge($url);
+        $cacheable_metadata = $cacheable_metadata->merge(CacheableMetadata::createFromObject($result->getSensorConfig()));
       }
-      return new ResourceResponse($list);
+      $response = new ResourceResponse($list);
+      $response->addCacheableDependency($cacheable_metadata);
+
+      if (!$context->isEmpty()) {
+        $response->addCacheableDependency($context->pop());
+      }
+
+      return $response;
     }
 
   }

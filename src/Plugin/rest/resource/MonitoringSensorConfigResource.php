@@ -8,6 +8,7 @@
 namespace Drupal\monitoring\Plugin\rest\resource;
 
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
 use Drupal\monitoring\Sensor\SensorManager;
@@ -100,16 +101,27 @@ class MonitoringSensorConfigResource extends ResourceBase {
         throw new NotFoundHttpException($e->getMessage(), $e);
       }
       $response = $sensor_config->getDefinition();
-      $response['uri'] = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
-      return new ResourceResponse($response);
+      $url = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString(TRUE);
+      $response['uri'] = $url->getGeneratedUrl();
+      $response = new ResourceResponse($response);
+      $response->addCacheableDependency($url);
+      $response->addCacheableDependency($sensor_config);
+      return $response;
     }
 
     $list = array();
+    $cacheable_metadata = new CacheableMetadata();
     foreach ($this->sensorManager->getAllSensorConfig() as $sensor_name => $sensor_config) {
       $list[$sensor_name] = $sensor_config->getDefinition();
-      $list[$sensor_name]['uri'] = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString();
+      $url = Url::fromRoute('rest.monitoring-sensor.GET.' . $format, ['id' => $sensor_name, '_format' => $format])->setAbsolute()->toString(TRUE);
+      $list[$sensor_name]['uri'] = $url->getGeneratedUrl();
+
+      $cacheable_metadata = $cacheable_metadata->merge($url);
+      $cacheable_metadata = $cacheable_metadata->merge(CacheableMetadata::createFromObject($sensor_config));
     }
-    return new ResourceResponse($list);
+    $response = new ResourceResponse($list);
+    $response->addCacheableDependency($cacheable_metadata);
+    return $response;
   }
 
 }
