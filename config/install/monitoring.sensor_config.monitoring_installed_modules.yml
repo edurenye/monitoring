@@ -9,5 +9,4 @@ status: FALSE
 caching_time: 3600
 settings:
   allow_additional: FALSE
-  modules:
-    -
+  modules: {}
