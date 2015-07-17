@@ -53,7 +53,7 @@ use Drupal\monitoring\SensorConfigInterface;
  *     "delete-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}/delete",
  *     "edit-form" = "/admin/config/system/monitoring/sensors/{monitoring_sensor_config}",
  *     "details-form" = "/admin/reports/monitoring/sensors/{monitoring_sensor_config}",
- *     "force-run-sensor" = "monitoring/sensors/force/{monitoring_sensor_config}"
+ *     "force-run-sensor" = "/monitoring/sensors/force/{monitoring_sensor_config}"
  *   }
  * )
  */
