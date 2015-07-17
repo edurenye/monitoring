@@ -319,7 +319,7 @@ class MonitoringUITest extends MonitoringTestBase {
    * Tests the sensor detail page.
    */
   public function testSensorDetailPage() {
-    $account = $this->drupalCreateUser(array('monitoring reports', 'monitoring verbose', 'monitoring force run'));
+    $account = $this->drupalCreateUser(array('monitoring reports', 'monitoring verbose', 'monitoring force run'), 'integrity_test_user', TRUE);
     $this->drupalLogin($account);
 
     $this->drupalCreateNode(array('promote' => NODE_PROMOTED));

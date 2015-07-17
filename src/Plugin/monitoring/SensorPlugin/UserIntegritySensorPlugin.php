@@ -81,6 +81,9 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
    *   Available users.
    */
   protected function loadCurrentUsers(array $role_ids) {
+    if (!$role_ids) {
+      return [];
+    }
     $uids = \Drupal::entityQuery('user')
       ->condition('roles', $role_ids, 'IN')
       ->execute();
@@ -131,7 +134,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     $available_permissions = $permission_handler->getPermissions();;
     $restricted_permissions = array();
     foreach ($available_permissions as $key => $value) {
-      if (!isset($value['restrict access'])) {
+      if (!empty($value['restrict access'])) {
         $restricted_permissions[] = $key;
       }
     }
@@ -139,7 +142,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     $restricted_roles = array();
     foreach ($avaliable_roles as $role) {
       $permissions = $role->getPermissions();
-      if (array_intersect($permissions, $restricted_permissions)) {
+      if ($role->isAdmin() ||  array_intersect($permissions, $restricted_permissions)) {
         $restricted_roles[] = $role->id();
       }
     }
