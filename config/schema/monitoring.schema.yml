@@ -136,9 +136,24 @@ monitoring.settings.monitoring_git_dirty_tree:
     repo_path:
       type: string
       label: 'Repository path'
-    cmd:
+    status_cmd:
       type: string
-      label: 'Command'
+      label: 'Status command'
+    check_branch:
+      type: boolean
+      label: 'Should check branch'
+    ahead_cmd:
+      type: string
+      label: 'Ahead command'
+    branches_cmd:
+      type: string
+      label: 'Branches command'
+    actual_branch_cmd:
+      type: string
+      label: 'Actual branch command'
+    expected_branch:
+      type: string
+      label: 'Git branch'
 
 monitoring.settings.monitoring_disappeared_sensors:
   type: monitoring.settings_base
