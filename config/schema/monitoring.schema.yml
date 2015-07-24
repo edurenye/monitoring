@@ -154,6 +154,9 @@ monitoring.settings.monitoring_git_dirty_tree:
     expected_branch:
       type: string
       label: 'Git branch'
+    submodules_cmd:
+      type: string
+      label: 'Check submodules command'
 
 monitoring.settings.monitoring_disappeared_sensors:
   type: monitoring.settings_base

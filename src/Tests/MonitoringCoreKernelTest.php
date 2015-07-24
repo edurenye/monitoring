@@ -290,7 +290,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
   /**
    * Tests the node count per content type sensor.
    *
-   * @see SensorSimpleDatabaseAggregator
+   * @see SensorDatabaseAggregator
    */
   protected function testDefaultNodeTypeSensors() {
 
@@ -313,7 +313,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Run sensor for type1.
     $result = $this->runSensor('node_new_' . $type1->id());
     $this->assertEqual($result->getValue(), 2);
-    // Test for the SensorSimpleDatabaseAggregator custom message.
+    // Test for the SensorDatabaseAggregator custom message.
     $this->assertEqual($result->getMessage(), SafeMarkup::format('@count @unit in @time_interval', array(
       '@count' => $result->getValue(),
       '@unit' => strtolower($result->getSensorConfig()->getValueLabel()),
@@ -436,6 +436,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // http://unix.stackexchange.com/questions/48106/what-does-it-mean-to-have-a-dollarsign-prefixed-string-in-a-script.
     $sensor_config->settings['status_cmd'] = 'printf "A addedfile.txt\nM sites/all/modules/monitoring/test/tests/monitoring.core.test\nD deleted file.txt"';
     $sensor_config->settings['ahead_cmd'] = 'true';
+    $sensor_config->settings['submodules_cmd'] = 'true';
     $sensor_config->save();
 
     $result = $this->runSensor('monitoring_git_dirty_tree');
@@ -488,6 +489,36 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     // Test same as main branch.
     $sensor_config->settings['actual_branch_cmd'] = 'printf "8.0.x"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), 'Value 0, Git repository clean');
+
+    // Test submodule not initialized.
+    $sensor_config->settings['submodules_cmd'] = 'printf -- "-a5066d1778b9ec7c86631234ff2795e777bdff12 test\n156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isWarning());
+    $verbose_output = $result->getVerboseOutput();
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
+    $this->assertText('-a5066d1778b9ec7c86631234ff2795e777bdff12 test');
+    $this->assertEqual($result->getMessage(), 'Value 0, Submodules in unexpected state: -a5066d1778b9ec7c86631234ff2795e777bdff12 test');
+
+    // Test submodule with uncommited changes.
+    $sensor_config->settings['submodules_cmd'] = 'printf "a5066d1778b9ec7c86631234ff2795e777bdff12 test\n+156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isWarning());
+    $verbose_output = $result->getVerboseOutput();
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
+    $this->assertText('+156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)');
+    $this->assertEqual($result->getMessage(), 'Value 0, Submodules in unexpected state: +156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)');
+
+    // Test submodules in expected state.
+    $sensor_config->settings['submodules_cmd'] = 'printf "a5066d1778b9ec7c86631234ff2795e777bdff12 test\n156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
     $sensor_config->save();
 
     $result = $this->runSensor('monitoring_git_dirty_tree');
