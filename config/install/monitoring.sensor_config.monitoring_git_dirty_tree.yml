@@ -13,3 +13,4 @@ settings:
   branches_cmd: 'git rev-parse --symbolic --branches'
   actual_branch_cmd: 'git symbolic-ref HEAD --short'
   expected_branch: NULL
+  submodules_cmd: 'git submodule status --recursive'

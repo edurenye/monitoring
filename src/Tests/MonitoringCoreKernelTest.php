@@ -436,6 +436,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // http://unix.stackexchange.com/questions/48106/what-does-it-mean-to-have-a-dollarsign-prefixed-string-in-a-script.
     $sensor_config->settings['status_cmd'] = 'printf "A addedfile.txt\nM sites/all/modules/monitoring/test/tests/monitoring.core.test\nD deleted file.txt"';
     $sensor_config->settings['ahead_cmd'] = 'true';
+    $sensor_config->settings['submodules_cmd'] = 'true';
     $sensor_config->save();
 
     $result = $this->runSensor('monitoring_git_dirty_tree');
@@ -446,10 +447,8 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->assertText('A addedfile.txt');
     $this->assertText('M sites/all/modules/monitoring/test/tests/monitoring.core.test');
     $this->assertText('D deleted file.txt');
-    // Three lines of cmd output.
-    $this->assertEqual($result->getValue(), 3);
     // Check if the sensor message has the expected value.
-    $this->assertEqual($result->getMessage(), 'Value 3, expected 0, Files in unexpected state: A addedfile.txt, M …modules/monitoring/test/tests/monitoring.core.test');
+    $this->assertEqual($result->getMessage(), '3 files in unexpected state: A addedfile.txt, M …modules/monitoring/test/tests/monitoring.core.test');
 
     // Now echo empty string.
     $sensor_config->settings['status_cmd'] = 'true';
@@ -458,7 +457,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isOk());
     // The message should say that it is ok.
-    $this->assertEqual($result->getMessage(), 'Value 0, Git repository clean');
+    $this->assertEqual($result->getMessage(), 'Git repository clean');
 
     // Test 2 commits ahead of origin.
     $sensor_config->settings['ahead_cmd'] = 'printf "a4ea5e3ac5b7cca0c96aee4d00447c36121bd128\n299d85344fab9befbf6a275a4b64bda7b464b493"';
@@ -470,7 +469,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $this->assertText('a4ea5e3ac5b7cca0c96aee4d00447c36121bd128');
     $this->assertText('299d85344fab9befbf6a275a4b64bda7b464b493');
-    $this->assertEqual($result->getMessage(), 'Value 0, Branch is 2 ahead of origin');
+    $this->assertEqual($result->getMessage(), 'Branch is 2 ahead of origin');
 
     // Test not in main branch.
     $sensor_config->settings['check_branch'] = TRUE;
@@ -484,7 +483,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $verbose_output = $result->getVerboseOutput();
     $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $this->assertText('7.0.x');
-    $this->assertEqual($result->getMessage(), 'Value 0, Active branch 7.0.x, expected 8.0.x');
+    $this->assertEqual($result->getMessage(), 'Active branch 7.0.x, expected 8.0.x');
 
     // Test same as main branch.
     $sensor_config->settings['actual_branch_cmd'] = 'printf "8.0.x"';
@@ -492,7 +491,37 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     $result = $this->runSensor('monitoring_git_dirty_tree');
     $this->assertTrue($result->isOk());
-    $this->assertEqual($result->getMessage(), 'Value 0, Git repository clean');
+    $this->assertEqual($result->getMessage(), 'Git repository clean');
+
+    // Test submodule not initialized.
+    $sensor_config->settings['submodules_cmd'] = 'printf -- "-a5066d1778b9ec7c86631234ff2795e777bdff12 test\n156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isCritical());
+    $verbose_output = $result->getVerboseOutput();
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
+    $this->assertText('-a5066d1778b9ec7c86631234ff2795e777bdff12 test');
+    $this->assertEqual($result->getMessage(), '1 submodules in unexpected state: -a5066d1778b9ec7c86631234ff2795e777bdff12 test');
+
+    // Test submodule with uncommitted changes.
+    $sensor_config->settings['submodules_cmd'] = 'printf "a5066d1778b9ec7c86631234ff2795e777bdff12 test\n+156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isCritical());
+    $verbose_output = $result->getVerboseOutput();
+    $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
+    $this->assertText('+156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)');
+    $this->assertEqual($result->getMessage(), '1 submodules in unexpected state: +156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)');
+
+    // Test submodules in expected state.
+    $sensor_config->settings['submodules_cmd'] = 'printf "a5066d1778b9ec7c86631234ff2795e777bdff12 test\n156fff6ee58497fa22b57c32e22e3f13377b4120 test (8.x-1.0-240-g156fff6)"';
+    $sensor_config->save();
+
+    $result = $this->runSensor('monitoring_git_dirty_tree');
+    $this->assertTrue($result->isOk());
+    $this->assertEqual($result->getMessage(), 'Git repository clean');
   }
 
   /**

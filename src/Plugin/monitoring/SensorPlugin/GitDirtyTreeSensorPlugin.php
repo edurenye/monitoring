@@ -39,6 +39,7 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
   protected $distance;
   protected $branches;
   protected $actualBranch;
+  protected $submodules;
 
   /**
    * {@inheritdoc}
@@ -61,15 +62,36 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
     }
     $this->status = $this->runSensorCommand($result, 'status_cmd');
     $this->distance = $this->runSensorCommand($result, 'ahead_cmd');
+    $this->submodules = $this->runSensorCommand($result, 'submodules_cmd');
 
-    $result->setExpectedValue(0);
+    $wrong_submodules = [];
+    foreach ($this->submodules as $submodule) {
+      $prefix = substr($submodule, 0, 1);
+      if ($prefix == '-' || $prefix == '+') {
+        $wrong_submodules[] = $submodule;
+      }
+    }
+
     $is_expected_branch = $this->actualBranch === $this->sensorConfig->getSetting('expected_branch');
-    if ($this->status || $this->distance || (!$is_expected_branch && $branch_control)) {
-      $result->setValue(count($this->status));
+    if ($this->status || $this->distance || (!$is_expected_branch && $branch_control) || $wrong_submodules) {
+
+      // Critical situations.
       if ($this->status) {
-        $result->addStatusMessage('Files in unexpected state: @files', array('@files' => $this->getShortFileList($this->status, 2)));
+        $result->addStatusMessage('@num_files files in unexpected state: @files', array(
+          '@num_files' => count($this->status),
+          '@files' => $this->getShortFileList($this->status),
+          ));
         $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
       }
+      if ($wrong_submodules) {
+        $result->addStatusMessage('@num_submodules submodules in unexpected state: @submodules', array(
+          '@num_submodules' => count($wrong_submodules),
+          '@submodules' => $this->getShortFileList($wrong_submodules),
+          ));
+        $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      }
+
+      // Warnings.
       if ($this->distance) {
         $result->addStatusMessage('Branch is @distance ahead of origin', array('@distance' => count($this->distance)));
         if ($result->getStatus() != SensorResultInterface::STATUS_CRITICAL) {
@@ -87,7 +109,6 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
       }
     }
     else {
-      $result->setValue(0);
       $result->addStatusMessage('Git repository clean');
       $result->setStatus(SensorResultInterface::STATUS_OK);
     }
@@ -170,8 +191,8 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
     );
     $output['status'] = array(
       '#type' => 'fieldset',
-      '#attributes' => array(),
       '#title' => t('Status'),
+      '#attributes' => array(),
     );
     $output['status']['cmd'] = array(
       '#type' => 'item',
@@ -183,6 +204,23 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
       '#title' => t('Output'),
       '#markup' => '<pre>' . implode("\n", $this->status) . '</pre>',
       '#description' => t('Shows uncommitted, changed and deleted files.'),
+      '#description_display' => 'after',
+    );
+    $output['submodules'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Submodules'),
+      '#attributes' => array(),
+    );
+    $output['submodules']['cmd'] = array(
+      '#type' => 'item',
+      '#title' => t('Command'),
+      '#markup' => $this->buildCommand('submodules_cmd'),
+    );
+    $output['submodules']['output'] = array(
+      '#type' => 'item',
+      '#title' => t('Output'),
+      '#markup' => '<pre>' . implode("\n", $this->submodules) . '</pre>',
+      '#description' => t('Run "git submodule init" to initialize missing submodules ("-" prefix) or "git submodule update" to update submodules to the correct commit ("+" prefix).'),
       '#description_display' => 'after',
     );
 
