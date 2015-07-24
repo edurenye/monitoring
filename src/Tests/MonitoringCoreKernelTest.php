@@ -290,7 +290,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
   /**
    * Tests the node count per content type sensor.
    *
-   * @see SensorSimpleDatabaseAggregator
+   * @see SensorDatabaseAggregator
    */
   protected function testDefaultNodeTypeSensors() {
 
@@ -313,7 +313,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Run sensor for type1.
     $result = $this->runSensor('node_new_' . $type1->id());
     $this->assertEqual($result->getValue(), 2);
-    // Test for the SensorSimpleDatabaseAggregator custom message.
+    // Test for the SensorDatabaseAggregator custom message.
     $this->assertEqual($result->getMessage(), SafeMarkup::format('@count @unit in @time_interval', array(
       '@count' => $result->getValue(),
       '@unit' => strtolower($result->getSensorConfig()->getValueLabel()),

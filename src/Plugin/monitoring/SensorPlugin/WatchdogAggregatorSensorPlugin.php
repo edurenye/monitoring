@@ -20,8 +20,8 @@ use Drupal\Component\Utility\SafeMarkup;
  *
  * @SensorPlugin(
  *   id = "watchdog_aggregator",
- *   label = @Translation("Simple Watchdog Aggregator"),
- *   description = @Translation("Simple aggregator able to query the watchdog table."),
+ *   label = @Translation("Watchdog Aggregator"),
+ *   description = @Translation("Aggregator able to query the watchdog table."),
  *   addable = TRUE
  * )
  *
