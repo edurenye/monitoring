@@ -5,7 +5,7 @@ category: Content
 plugin_id: entity_aggregator
 value_label: Comments
 value_type: 'number'
-status: FALSE
+status: TRUE
 caching_time: 3600
 settings:
   entity_type: 'comment'
@@ -15,6 +15,10 @@ settings:
     - id
     - comment_type
     - label
+thresholds:
+  type: exceeds
+  warning: 10
+  critical: null
 dependencies:
   module:
     - comment
