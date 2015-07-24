@@ -16,12 +16,12 @@ use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Component\Utility\SafeMarkup;
 
 /**
- * Database aggregator able to query a single db table.
+ * Simple database aggregator able to query a single db table.
  *
  * @SensorPlugin(
  *   id = "database_aggregator",
- *   label = @Translation("Database Aggregator"),
- *   description = @Translation("Database aggregator able to query a single db table."),
+ *   label = @Translation("Simple Database Aggregator"),
+ *   description = @Translation("Simple database aggregator able to query a single db table."),
  *   addable = TRUE
  * )
  *
