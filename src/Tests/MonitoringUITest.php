@@ -162,20 +162,20 @@ class MonitoringUITest extends MonitoringTestBase {
     // Check the default status of cron safe threshold and new users sensors.
     $sensor_cron = SensorConfig::load('core_cron_safe_threshold');
     $this->assertTrue($sensor_cron->status());
-    $sensor_comment = SensorConfig::load('user_new');
-    $this->assertFalse($sensor_comment->status());
+    $sensor_theme = SensorConfig::load('core_theme_default');
+    $this->assertFalse($sensor_theme->status());
 
     // Change the status of these sensors.
     $this->drupalPostForm('admin/config/system/monitoring/sensors', array(
       'sensors[core_cron_safe_threshold]' => FALSE,
-      'sensors[user_new]' => TRUE,
+      'sensors[core_theme_default]' => TRUE,
     ), t('Update enabled sensors'));
 
     // Make sure the changes have been made.
     $sensor_cron = SensorConfig::load('core_cron_safe_threshold');
     $this->assertFalse($sensor_cron->status());
-    $sensor_comment = SensorConfig::load('user_new');
-    $this->assertTrue($sensor_comment->status());
+    $sensor_theme = SensorConfig::load('core_theme_default');
+    $this->assertTrue($sensor_theme->status());
 
   }
 
