@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\EntityAggregatorSensorPlugin.
+ * Contains \Drupal\monitoring\Plugin\monitoring\SensorPlugin\ContentEntityAggregatorSensorPlugin.
  */
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
@@ -11,6 +11,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
@@ -22,18 +23,18 @@ use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Entity database aggregator.
+ * Content entity database aggregator.
  *
  * It utilises the entity query aggregate functionality.
  *
  * @SensorPlugin(
  *   id = "entity_aggregator",
- *   label = @Translation("Entity Aggregator"),
+ *   label = @Translation("Content Entity Aggregator"),
  *   description = @Translation("Utilises the entity query aggregate functionality."),
  *   addable = TRUE
  * )
  */
-class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
+class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   use DependencySerializationTrait;
   use DependencyTrait;
@@ -201,9 +202,9 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     // );
 
     // Load entities.
-    $entity_type = $this->getEntityTypeId();
+    $entity_type_id = $this->getEntityTypeId();
     $entities = $this->entityManager
-      ->getStorage($entity_type)
+      ->getStorage($entity_type_id)
       ->loadMultiple($entity_ids);
 
     // Get the fields to display from the settings.
@@ -211,6 +212,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
 
     // Render entities.
     $rows = [];
+    /* @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
     foreach ($entities as $id => $entity) {
       $row = [];
       foreach ($fields as $field) {
@@ -242,9 +244,24 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
             break;
 
           default:
-            $property = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getMainPropertyName();
-            $value = $entity->$field->view(['label' => 'hidden']);
-            $row[] = $value ? \Drupal::service('renderer')->renderPlain($value) : $entity->$field->$property;
+            // Make sure the field exists on this entity.
+            if ($entity instanceof FieldableEntityInterface && $entity->hasField($field)) {
+              try {
+                // Get the main property as a fallback if the field can not be
+                // viewed.
+                $property = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getMainPropertyName();
+                $value = $entity->$field->view(['label' => 'hidden']);
+                // Try to render the field, fall back the main property.
+                $row[] = $value ? \Drupal::service('renderer')->renderPlain($value) : $entity->$field->$property;
+              } catch (\Exception $e) {
+                // Catch any exception and display as an error.
+                drupal_set_message(t('Error while trying to display %field: @error', ['%field' => $field, '@error' => $e->getMessage()]), 'error');
+                $row[] = '';
+              }
+            }
+            else {
+              $row[] = '';
+            }
             break;
         }
       }
@@ -255,7 +272,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
       );
     }
     if (count($rows) > 0) {
-      $header = $this->sensorConfig->getSetting('verbose_fields');
+      $header = $this->sensorConfig->getSetting('verbose_fields', ['id', 'label']);
       $output['entities'] = array(
         '#type' => 'table',
         '#header' => $header,
@@ -291,12 +308,20 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $settings = $this->sensorConfig->getSettings();
+    $entity_types = $this->entityManager->getEntityTypeLabels();
+    $options = [];
+    foreach ($entity_types as $id => $label) {
+      $class = $this->entityManager->getDefinition($id)->getClass();
+      if (is_subclass_of($class, '\Drupal\Core\Entity\FieldableEntityInterface')) {
+        $options[$id] = $label;
+      };
+    }
 
     $form['entity_type'] = array(
       '#type' => 'select',
-      '#default_value' => $this->getEntityTypeId(),
+      '#default_value' => $this->sensorConfig->getSetting('entity_type', 'node'),
       '#maxlength' => 255,
-      '#options' => $this->entityManager->getEntityTypeLabels(),
+      '#options' => $options,
       '#title' => t('Entity Type'),
     );
     if (!isset($settings['entity_type'])) {
@@ -329,7 +354,7 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     );
 
     // Fill the sensors table with form elements for each sensor.
-    $conditions = $this->sensorConfig->getSetting('conditions');
+    $conditions = array_values($this->sensorConfig->getSetting('conditions', []));
     if (empty($conditions)) {
       $conditions = [];
     }
@@ -416,10 +441,9 @@ class EntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase im
     $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
     $form['verbose_fields']['available_fields'] = [
       '#markup' => t('Available Fields for entity %type: <b>%fields</b>', [
-          '%type' => $entity_type->getLabel(),
-          '%fields' => implode(', ', array_keys($this->entityManager->getBaseFieldDefinitions($this->getEntityTypeId())))
-        ]
-      ),
+        '%type' => $entity_type->getLabel(),
+        '%fields' => implode(', ', array_keys($this->entityManager->getBaseFieldDefinitions($this->getEntityTypeId())))
+      ]),
     ];
 
     // Fill the sensors table with form elements for each sensor.

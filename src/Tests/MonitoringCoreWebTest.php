@@ -289,7 +289,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
   /**
    * Tests the entity aggregator.
    *
-   * @see EntityAggregatorSensorPlugin
+   * @see ContentEntityAggregatorSensorPlugin
    */
   public function testEntityAggregator() {
     // Create content types and nodes.
@@ -372,14 +372,14 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $term2 = $this->createTerm($vocabulary);
 
     // Create node that only references the first term.
-    $this->drupalCreateNode(array(
+    $node1 = $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
       'type' => $type2->id(),
       'term_reference' => array(array('target_id' => $term1->id())),
     ));
 
     // Create node that only references both terms.
-    $this->drupalCreateNode(array(
+    $node2 = $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
       'type' => $type2->id(),
       'term_reference' => array(
@@ -389,7 +389,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     ));
 
     // Create a third node that references both terms but in different fields.
-    $this->drupalCreateNode(array(
+    $node3 = $this->drupalCreateNode(array(
       'created' => REQUEST_TIME,
       'type' => $type2->id(),
       'term_reference' => array(array('target_id' => $term1->id())),
@@ -406,6 +406,42 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $result = $this->runSensor('entity_aggregate_test');
     // There should be three nodes with that reference.
     $this->assertEqual($result->getValue(), 3);
+
+    // Check the content entity aggregator verbose output and other UI elements.
+    $this->drupalLogin($this->createUser(['monitoring reports', 'administer monitoring']));
+    $this->drupalPostForm('admin/reports/monitoring/sensors/entity_aggregate_test', [], t('Run now'));
+    $this->assertText('id');
+    $this->assertText('label');
+    $this->assertLink($node1->label());
+    $this->assertLink($node2->label());
+    $this->assertLink($node3->label());
+    $this->clickLink(t('Edit'));
+    // Assert some of the 'available fields'.
+    $this->assertText('Content: nid, uuid, vid, type, langcode, title, uid, status, created, changed, promote, sticky, revision_timestamp, revision_uid,');
+    $this->assertFieldByName('conditions[0][field]', 'term_reference.target_id');
+    $this->assertFieldByName('conditions[0][value]', $term1->id());
+
+    // Test adding another field.
+    $this->drupalPostForm(NULL, [
+      'settings[verbose_fields][2]' => 'revision_timestamp',
+    ] , t('Add another field'));
+    // Repeat for a condition, add an invalid field while we are at it.
+    $this->drupalPostForm(NULL, [
+    'conditions[1][field]' => 'nid',
+      'conditions[1][operator]' => '>',
+      'conditions[1][value]' => 4,
+      // The invalid field.
+      'settings[verbose_fields][3]' => 'test_wrong_field',
+    ] , t('Add another condition'));
+
+    $this->drupalPostForm(NULL, [], t('Save'));
+    $this->clickLink('Entity Aggregate test');
+
+    // Assert the new field and it's formatted output.
+    $this->assertText('revision_timestamp');
+    $this->assertText(\Drupal::service('date.formatter')->format($node1->getRevisionCreationTime(), 'short'));
+    $this->assertText(\Drupal::service('date.formatter')->format($node2->getRevisionCreationTime(), 'short'));
+    $this->assertText(\Drupal::service('date.formatter')->format($node3->getRevisionCreationTime(), 'short'));
 
     // Update the sensor to look for nodes with a reference to term1 in the
     // first field and term2 in the second.

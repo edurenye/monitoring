@@ -23,7 +23,7 @@ use Drupal\payment\Entity\Payment;
  *   addable = TRUE
  * )
  */
-class PaymentTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
+class PaymentTurnoverSensorPlugin extends ContentEntityAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}

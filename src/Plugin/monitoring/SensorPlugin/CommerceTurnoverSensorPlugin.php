@@ -24,7 +24,7 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * )
  *
  */
-class CommerceTurnoverSensorPlugin extends EntityAggregatorSensorPlugin {
+class CommerceTurnoverSensorPlugin extends ContentEntityAggregatorSensorPlugin {
 
   /**
    * {@inheritdoc}

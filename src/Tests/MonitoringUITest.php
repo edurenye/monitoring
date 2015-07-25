@@ -183,8 +183,6 @@ class MonitoringUITest extends MonitoringTestBase {
    * Tests the entity aggregator sensors.
    *
    * Tests the entity aggregator with time interval settings and verbosity.
-   *
-   * @todo add tests for DB aggregator.
    */
   public function testAggregateSensorTimeIntervalConfig() {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports', 'monitoring reports'));
