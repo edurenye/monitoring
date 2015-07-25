@@ -134,6 +134,10 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       }
     }
 
+    if ($this->getTimeIntervalField()) {
+      $query->orderBy($this->getTimeIntervalField(), 'DESC');
+    }
+
     return $query;
   }
 

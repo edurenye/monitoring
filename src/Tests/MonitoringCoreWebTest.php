@@ -3,6 +3,7 @@
  * @file
  * Contains \Drupal\monitoring\Tests\MonitoringCoreWebTest.
  */
+
 namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -49,7 +50,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
-    $this->assertTrue($wid == 6, 'Found WID in verbose output (WID == 6)');
+    $this->assertEqual(count($xpath), 3, 'There are 3 results in the table.');
+    $this->assertTrue($wid == 14, 'Found WID in verbose output');
     $this->assertTrue($message == 'Session opened for .', 'Found replaced message in output.');
     $this->assertText('Session opened for ' . $test_user->label());
     // Remove variables from the fields and assert message has no replacements.
@@ -58,7 +60,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
-    $this->assertTrue($wid == 6, 'Found WID in verbose output (WID == 6)');
+    $this->assertTrue($wid == 14, 'Found WID in verbose output');
     $this->assertTrue($message == 'Session opened for %name.', 'Found unreplaced message in output.');
     // Test wrong configuration (messages field does not exist).
     $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['keys' => 'wid' . PHP_EOL . 'messages'], t('Save'));
