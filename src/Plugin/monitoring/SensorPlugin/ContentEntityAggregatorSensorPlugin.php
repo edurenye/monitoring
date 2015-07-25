@@ -188,6 +188,8 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 
+    /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
+    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     // Fetch the last 10 matching entries, unaggregated.
     $entity_ids = $this->getEntityQuery()
       ->range(0, 10)
@@ -202,6 +204,7 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
     // );
 
     // Load entities.
+    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
     $entity_type_id = $this->getEntityTypeId();
     $entities = $this->entityManager
       ->getStorage($entity_type_id)
@@ -217,30 +220,12 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
       $row = [];
       foreach ($fields as $field) {
         switch ($field) {
-          case 'uuid':
-            $row[] = $entity->uuid();
-            break;
-
           case 'id':
             $row[] = $entity->id();
             break;
 
           case 'label':
-            $entity_link = array(
-              '#type' => 'link',
-              '#title' => $entity->label(),
-              '#url' => $entity->urlInfo(),
-            );
-
-            $row[] = \Drupal::service('renderer')->renderPlain($entity_link);
-            break;
-
-          case 'langcode':
-            $row[] = $entity->language()->getName();
-            break;
-
-          case 'bundle':
-            $row[] = $entity->bundle();
+            $row[] = $entity->hasLinkTemplate('canonical') ? $entity->link() : $entity->label();
             break;
 
           default:
@@ -249,10 +234,17 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
               try {
                 // Get the main property as a fallback if the field can not be
                 // viewed.
-                $property = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getMainPropertyName();
-                $value = $entity->$field->view(['label' => 'hidden']);
-                // Try to render the field, fall back the main property.
-                $row[] = $value ? \Drupal::service('renderer')->renderPlain($value) : $entity->$field->$property;
+                $field_type = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getType();
+                // If the field type has a default formatter, try to view it.
+                if (isset($field_type_manager->getDefinition($field_type)['default_formatter'])) {
+                  $value = $entity->$field->view(['label' => 'hidden']);
+                  $row[] = \Drupal::service('renderer')->renderPlain($value);
+                }
+                else {
+                  // Fall back to the main property.
+                  $property = $entity->getFieldDefinition($field)->getFieldStorageDefinition()->getMainPropertyName();
+                  $row[] = SafeMarkup::checkPlain($entity->$field->$property);
+                }
               } catch (\Exception $e) {
                 // Catch any exception and display as an error.
                 drupal_set_message(t('Error while trying to display %field: @error', ['%field' => $field, '@error' => $e->getMessage()]), 'error');
@@ -433,21 +425,21 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
 
     // Fill the sensors table with form elements for each sensor.
     $form['verbose_fields'] = array(
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => t('Verbose Output configuration'),
       '#prefix' => '<div id="selected-output">',
       '#suffix' => '</div>',
+      '#open' => TRUE,
     );
     $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
-    $form['verbose_fields']['available_fields'] = [
-      '#markup' => t('Available Fields for entity %type: <b>%fields</b>', [
-        '%type' => $entity_type->getLabel(),
-        '%fields' => implode(', ', array_keys($this->entityManager->getBaseFieldDefinitions($this->getEntityTypeId())))
-      ]),
-    ];
+    $available_fields = array_merge(['id', 'label'], array_keys($this->entityManager->getBaseFieldDefinitions($entity_type->id())));
+    $form['verbose_fields']['#description'] = t('Available Fields for entity type %type: %fields.', [
+      '%type' => $entity_type->getLabel(),
+      '%fields' => implode(', ', $available_fields)
+    ]);
 
     // Fill the sensors table with form elements for each sensor.
-    $fields = $this->sensorConfig->getSetting('verbose_fields', ['id']);
+    $fields = $this->sensorConfig->getSetting('verbose_fields', ['id', 'label']);
     if (!$form_state->has('fields_rows')) {
       $form_state->set('fields_rows', count($fields) + 1);
     }

@@ -16,7 +16,7 @@ settings:
     -
       field: 'message'
       value: 'Login attempt failed for %user.'
-  keys:
+  verbose_fields:
     - 'wid'
     - 'message'
     - 'variables'

@@ -17,7 +17,7 @@ settings:
         field: 'attempts'
         value: '0'
         operator: '>'
-  keys:
+  verbose_fields:
     - 'uid'
     - 'form_id'
     - 'attempts'

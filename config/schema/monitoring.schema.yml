@@ -101,12 +101,12 @@ monitoring.settings.aggregator_base:
             type: string
           operator:
             type: string
-    keys:
+    verbose_fields:
       type: sequence
-      label: Keys
+      label: Verbose fields
       sequence:
         type: string
-        label: 'Key'
+        label: 'Field'
 
 monitoring.settings.database_aggregator:
   type: monitoring.settings.aggregator_base

@@ -13,7 +13,7 @@ settings:
     -
       field: 'module'
       value: 'past_form'
-  keys:
+  verbose_fields:
     - 'event_id'
     - 'type'
     - 'module'

@@ -22,7 +22,7 @@ settings:
     -
       field: message
       value: 'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.'
-  keys:
+  verbose_fields:
     - 'wid'
     - 'message'
     - 'variables'

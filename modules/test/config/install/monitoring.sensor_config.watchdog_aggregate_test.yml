@@ -9,7 +9,7 @@ settings:
   table: watchdog
   time_interval_field: 'timestamp'
   time_interval_value: 86400
-  keys:
+  verbose_fields:
     - 'wid'
     - 'message'
     - 'variables'

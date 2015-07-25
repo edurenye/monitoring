@@ -55,16 +55,16 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertTrue($message == 'Session opened for .', 'Found replaced message in output.');
     $this->assertText('Session opened for ' . $test_user->label());
     // Remove variables from the fields and assert message has no replacements.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['keys' => 'wid' . PHP_EOL . 'message'], t('Save'));
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['verbose_fields[variables][field_key]' => ''], t('Save'));
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
     $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
     $this->assertTrue($wid == 14, 'Found WID in verbose output');
     $this->assertTrue($message == 'Session opened for %name.', 'Found unreplaced message in output.');
-    // Test wrong configuration (messages field does not exist).
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['keys' => 'wid' . PHP_EOL . 'messages'], t('Save'));
-    $this->assertText('Verbose output configuration is invalid, keys were not saved.');
+    // Test field validation.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['verbose_fields[2][field_key]' => 'horstname'], t('Save'));
+    $this->assertText('The field horstname does not exist in the table "watchdog".');
   }
 
   /**
@@ -419,7 +419,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertLink($node3->label());
     $this->clickLink(t('Edit'));
     // Assert some of the 'available fields'.
-    $this->assertText('Content: nid, uuid, vid, type, langcode, title, uid, status, created, changed, promote, sticky, revision_timestamp, revision_uid,');
+    $this->assertText('Available Fields for entity type Content: id, label, nid, uuid, vid, type, langcode, title, uid, status, created, changed, promote, sticky, revision_timestamp, revision_uid, revision_log, revision_translation_affected, default_langcode.');
     $this->assertFieldByName('conditions[0][field]', 'term_reference.target_id');
     $this->assertFieldByName('conditions[0][value]', $term1->id());
 

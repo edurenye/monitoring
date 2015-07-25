@@ -15,7 +15,7 @@ settings:
       field: 'uid'
       value: '0'
       operator: '!='
-  keys:
+  verbose_fields:
     - 'uid'
     - 'hostname'
     - 'timestamp'

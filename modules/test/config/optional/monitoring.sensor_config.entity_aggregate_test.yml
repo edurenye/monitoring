@@ -18,6 +18,9 @@ settings:
     -
       field: 'type'
       value: 'page'
+  verbose_fields:
+    - id
+    - label
 thresholds:
   type: 'falls'
   warning: 2

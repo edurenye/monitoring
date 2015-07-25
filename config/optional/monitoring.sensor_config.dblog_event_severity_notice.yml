@@ -18,7 +18,7 @@ settings:
     -
       field: severity
       value: '5'
-  keys:
+  verbose_fields:
     - 'wid'
     - 'message'
     - 'variables'

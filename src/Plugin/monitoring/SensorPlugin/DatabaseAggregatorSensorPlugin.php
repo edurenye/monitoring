@@ -24,7 +24,6 @@ use Drupal\Component\Utility\SafeMarkup;
  *   description = @Translation("Database aggregator able to query a single db table."),
  *   addable = TRUE
  * )
- *
  */
 class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
@@ -57,13 +56,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    * @var mixed
    */
   protected $fetchedObject;
-
-  /**
-   * The currently active keys for verbose output.
-   *
-   * @var array
-   */
-  protected $currentKeys;
 
   /**
    * Builds simple aggregate query over one db table.
@@ -127,10 +119,10 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     }
 
     // Add key fields.
-    $keys = $this->sensorConfig->getSetting('keys');
-    if (!empty($keys)) {
-      foreach ($this->sensorConfig->getSetting('keys') as $key) {
-        $query->addField($this->sensorConfig->getSetting('table'), $key);
+    $fields = $this->sensorConfig->getSetting('verbose_fields');
+    if (!empty($fields)) {
+      foreach ($fields as $field) {
+        $query->addField($this->sensorConfig->getSetting('table'), $field);
       }
     }
 
@@ -249,12 +241,11 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
-   * Adds UI for variables table and conditions.
+   * Adds UI for variables table, conditions and keys.
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $settings = $this->sensorConfig->getSettings();
     $form['table'] = array(
       '#type' => 'textfield',
       '#default_value' => $this->sensorConfig->getSetting('table'),
@@ -278,39 +269,15 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#type' => 'table',
       '#tree' => TRUE,
       '#header' => array(
-        'field' => t('Field'),
+        'field' => t('Field key'),
         'operator' => t('Operator'),
         'value' => t('Value'),
       ),
-      '#empty' => t(
-        'Add conditions to filter the results.'
-      ),
+      '#empty' => t('Add conditions to filter the results.'),
     );
-
-    // Fill the sensors table with form elements for each sensor.
-    $form['output_table'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Verbose Output configuration'),
-      '#prefix' => '<div id="selected-output">',
-      '#suffix' => '</div>',
-      '#tree' => FALSE,
-    );
-    // Fill the keys text field with keys.
-    $form['output_table']['keys'] = array(
-      '#type' => 'textarea',
-      '#tree' => FALSE,
-      '#default_value' => implode("\n", $this->sensorConfig->getSetting('keys')),
-      '#maxlength' => 255,
-      '#title' => t('Keys'),
-      '#required' => TRUE,
-    );
-
 
     // Fill the conditions table with keys and values for each condition.
     $conditions = $this->sensorConfig->getSetting('conditions');
-    if (empty($conditions)) {
-      $conditions = [];
-    }
 
     if (!$form_state->has('conditions_rows')) {
       $form_state->set('conditions_rows', count($conditions) + 1);
@@ -356,13 +323,61 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     // Select element for available conditions.
     $form['conditions_table']['condition_add_button'] = array(
       '#type' => 'submit',
-      '#value' => t('Add more conditions'),
+      '#value' => t('Add another condition'),
       '#ajax' => array(
         'wrapper' => 'selected-conditions',
         'callback' => array($this, 'conditionsReplace'),
         'method' => 'replace',
       ),
       '#submit' => array(array($this, 'addConditionSubmit')),
+    );
+
+    // Add a fieldset to filter verbose output by fields.
+    $form['output_table'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Verbose Fields'),
+      '#prefix' => '<div id="selected-output">',
+      '#suffix' => '</div>',
+      '#tree' => FALSE,
+    );
+    // Add a table for the fields.
+    $form['output_table']['verbose_fields'] = array(
+      '#type' => 'table',
+      '#tree' => TRUE,
+      '#header' => array(
+        'field_key' => t('Field key'),
+      ),
+      '#title' => t('Verbose fields'),
+      '#empty' => t('Add keys to display in the verbose output.'),
+    );
+
+    // Fill the fields table with verbose fields to filter the output.
+    $fields = $this->sensorConfig->getSetting('verbose_fields');
+
+    if (!$form_state->has('fields_rows')) {
+      $form_state->set('fields_rows', count($fields) + 1);
+    }
+    for ($i = 0; $i < $form_state->get('fields_rows'); $i++) {
+      $field = isset($fields[$i]) ? $fields[$i] : $i;
+      $form['output_table']['verbose_fields'][$field] = array(
+        // This table only has one column called 'field_key'.
+        'field_key' => array(
+          '#type' => 'textfield',
+          '#default_value' => (is_int($field)) ? '' : $field,
+          '#size' => 20,
+        ),
+      );
+    }
+    // Select element for available fields.
+    $form['output_table']['fields_add_button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add another field'),
+      '#ajax' => array(
+        'wrapper' => 'selected-output',
+        'callback' => array($this, 'fieldsReplace'),
+        'method' => 'replace',
+      ),
+      '#submit' => array(array($this, 'addFieldSubmit')),
     );
 
     return $form;
@@ -401,12 +416,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-
-    /** @var \Drupal\monitoring\Form\SensorForm $sensor_form */
-    $sensor_form = $form_state->getFormObject();
-    /** @var \Drupal\monitoring\SensorConfigInterface $sensor_config */
-    $sensor_config = $sensor_form->getEntity();
-    $settings = $sensor_config->getSettings();
+    $settings = $this->sensorConfig->getSettings();
 
     // Cleanup conditions, remove empty.
     $settings['conditions'] = [];
@@ -416,23 +426,15 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       }
     }
 
-    // Update the verbose output keys.
-    try {
-      $this->currentKeys = $this->sensorConfig->getSetting('keys');
-      $keys = array_filter(explode("\n", $form_state->getValue('keys')));
-      $keys = array_map('trim', $keys);
-      $settings['keys'] = $keys;
+    // Update the verbose output fields.
+    $settings['verbose_fields'] = [];
+    foreach ($form_state->getValue('verbose_fields') as $field) {
+      if (!empty($field['field_key'])) {
+        $settings['verbose_fields'][] = $field['field_key'];
+      }
+    }
 
-      $this->sensorConfig->set('settings', $settings);
-      $this->getQuery()->execute();
-    }
-    catch (DatabaseExceptionWrapper $e) {
-      $settings = $this->sensorConfig->getSettings();
-      $settings['keys'] = $this->currentKeys;
-      $this->sensorConfig->set('settings', $settings);
-      drupal_set_message('Verbose output configuration is invalid, keys were not saved.', 'error');
-      drupal_set_message($e->getMessage(), 'warning');
-    }
+    $this->sensorConfig->set('settings', $settings);
   }
 
   /**
@@ -451,7 +453,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
-   * Adds sensor to entity when 'Add field' button is pressed.
+   * Add row to table when pressing 'Add another condition' and rebuild.
    *
    * @param array $form
    *   The form structure array.
@@ -467,6 +469,36 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
+   * Returns the updated 'output_table' fieldset for replacement by ajax.
+   *
+   * @param array $form
+   *   The updated form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   *
+   * @return array
+   *   The updated form component for the selected fields.
+   */
+  public function fieldsReplace(array $form, FormStateInterface $form_state) {
+    return $form['plugin_container']['settings']['output_table'];
+  }
+
+  /**
+   * Adds another field to the keys table when pressing 'Add another key'.
+   *
+   * @param array $form
+   *   The form structure array.
+   * @param FormStateInterface $form_state
+   *   The form state structure.
+   */
+  public function addFieldSubmit(array $form, FormStateInterface $form_state) {
+    $form_state->setRebuild();
+
+    $form_state->set('fields_rows', $form_state->get('fields_rows') + 1);
+    drupal_set_message(t('Field added.'), 'status');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
@@ -474,6 +506,17 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     /** @var \Drupal\Core\Database\Connection $database */
     $database = $this->getService('database');
+    $table = $form_state->getValue(array('settings', 'table'));
+    $query = $database->select($table);
+    if (!$database->schema()->tableExists($table)) {
+      try {
+        $query->range(0, 1)->execute();
+      }
+      catch (\Exception $e) {
+        $form_state->setErrorByName('settings][table', t('The table %table does not exist in the database %database', ['%table' => $table, '%database' => $database->getConnectionOptions()['database']]));
+        return;
+      }
+    }
     $field_name = $form_state->getValue(array(
       'settings',
       'aggregation',
@@ -481,10 +524,26 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     ));
     if (!empty($field_name)) {
       // @todo instead of validate, switch to a form select.
-      $table = $form_state->getValue(array('settings', 'table'));
       if (!$database->schema()->fieldExists($table, $field_name)) {
         $form_state->setErrorByName('settings][aggregation][time_interval_field',
-          t('The specified time interval field %name does not exist.', array('%name' => $field_name)));
+          t('The specified time interval field %name does not exist in table %table.', array('%name' => $field_name, '%table' => $table)));
+      }
+    }
+
+    // Validate verbose_fields.
+    $fields = $form_state->getValue('verbose_fields');
+    foreach ($fields as $key => $field) {
+      $query = $database->select($table);
+      $field_name = $field['field_key'];
+      if (!empty($field_name) && !$database->schema()->fieldExists($table, $field_name)) {
+        $query->addField($table, $field_name);
+        try {
+          $query->range(0, 1)->execute();
+        }
+        catch (\Exception $e) {
+          $form_state->setErrorByName("verbose_fields][$key][field_key", t('The field %field does not exist in the table "%table".', ['%field' => $field_name, '%table' => $table]));
+          continue;
+        }
       }
     }
   }

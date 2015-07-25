@@ -16,7 +16,7 @@ settings:
     -
       field: 'message'
       value: 'Session closed for %name.'
-  keys:
+  verbose_fields:
     - 'message'
     - 'wid'
     - 'variables'
