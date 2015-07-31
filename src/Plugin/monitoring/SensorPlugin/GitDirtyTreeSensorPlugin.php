@@ -22,23 +22,40 @@ use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
  * )
  *
  * Tracks both changed and untracked files.
- * Also supports git submodules.
+ * Supports git submodules and alerts if them are not initialized.
+ * Also checks branches.
  *
  * Limitations:
- * - Does not work as long as submodules are not initialized.
- * - Does not check branch / tag.
+ * - Does not check tag.
  */
 class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoSensorPluginInterface {
 
   /**
-   * The executed command output.
+   * The status_cmd command output.
    *
    * @var array
    */
   protected $status;
+
+  /**
+   * The ahead_cmd command output.
+   *
+   * @var array
+   */
   protected $distance;
-  protected $branches;
+
+  /**
+   * The actual_branch_cmd command output.
+   *
+   * @var array
+   */
   protected $actualBranch;
+
+  /**
+   * The submodules_cmd command output.
+   *
+   * @var array
+   */
   protected $submodules;
 
   /**
@@ -280,13 +297,13 @@ class GitDirtyTreeSensorPlugin extends SensorPluginBase implements ExtendedInfoS
       '#description' => t('Path to the Git repository relative to the Drupal root directory.'),
     );
 
-    $this->branches = $this->runCommand('branches_cmd', t('Failing to get Git branches, Git might not be available.'));
+    $branches = $this->runCommand('branches_cmd', t('Failing to get Git branches, Git might not be available.'));
     $expected_branch = $this->sensorConfig->getSetting('expected_branch');
     if (empty($expected_branch)) {
       $expected_branch = $this->runCommand('actual_branch_cmd', t('Failing to get the actual branch, Git might not be available.'));
     }
     $options = array();
-    foreach ($this->branches as $branch) {
+    foreach ($branches as $branch) {
       $options[$branch] = $branch;
     }
 
