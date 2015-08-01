@@ -6,13 +6,10 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
-use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
-use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Component\Utility\SafeMarkup;
 
 /**
@@ -24,7 +21,6 @@ use Drupal\Component\Utility\SafeMarkup;
  *   description = @Translation("Aggregator able to query the watchdog table."),
  *   addable = TRUE
  * )
- *
  */
 class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin implements ExtendedInfoSensorPluginInterface {
   /**
@@ -32,15 +28,14 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
    */
   public function verboseResultUnaggregated(array &$output) {
     parent::verboseResultUnaggregated($output);
-    if (isset($output['result']['#rows'])) {
-      if (array_key_exists('message', $output['result']['#header']) && array_key_exists('variables', $output['result']['#header'])) {
-        unset($output['result']['#header']['variables']);
-      }
+    // If sensor has message and variables, remove variables header.
+    if (isset($output['result']['#rows']) && array_key_exists('message', $output['result']['#header']) && array_key_exists('variables', $output['result']['#header'])) {
+      unset($output['result']['#header']['variables']);
+      // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
-        if (array_key_exists('message', $row['data']) && array_key_exists('variables', $row['data'])) {
-          $output['result']['#rows'][$delta]['data']['message'] = SafeMarkup::format($row['data']['message'], unserialize($row['data']['variables']));
-          unset($output['result']['#rows'][$delta]['data']['variables']);
-        };
+        $output['result']['#rows'][$delta]['message'] = Safemarkup::xssFilter(SafeMarkup::format($row['message'], unserialize($row['variables']), Xss::getAdminTagList()));
+        // Do not render the variables in the row.
+        unset($output['result']['#rows'][$delta]['variables']);
       };
     }
   }
@@ -52,7 +47,9 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['#title'] = t('Watchdog Sensor plugin settings');
     // The following fields should not be edited, so we disable them.
+    $form['table']['#default_value'] = 'watchdog';
     $form['table']['#disabled'] = TRUE;
+    $form['aggregation']['time_interval_field']['#default_value'] = 'timestamp';
     $form['aggregation']['time_interval_field']['#disabled'] = TRUE;
     return $form;
   }

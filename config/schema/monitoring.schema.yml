@@ -215,6 +215,10 @@ monitoring.settings.watchdog_aggregator:
   type: monitoring.settings.database_aggregator
   label: 'Watchdog sensor settings'
 
+monitoring.settings.php_notices:
+  type: monitoring.settings.watchdog_aggregator
+  label: 'PHP notices sensor settings'
+
 monitoring.settings.dblog_404:
   type: monitoring.settings.database_aggregator
   label: '404 settings'

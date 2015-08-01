@@ -28,6 +28,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->doTestDatabaseAggregatorSensorPluginActiveSessions();
     $this->doTestTwigDebugSensor();
     $this->doTestWatchdogAggregatorSensorPlugin();
+    $this->doTestPhpNoticesSensor();
   }
 
   /**
@@ -47,24 +48,21 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->drupalLogin($test_user);
     // Test output and default message replacement.
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
-    $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
+    $xpath = $this->xpath('//table[@id="edit-result"]/tbody/tr');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
-    $this->assertEqual(count($xpath), 3, 'There are 3 results in the table.');
-    $this->assertTrue($wid == 14, 'Found WID in verbose output');
+    $this->assertEqual(count($xpath), 5, 'There are 5 results in the table.');
+    $this->assertTrue($wid, 'Found WID in verbose output');
     $this->assertTrue($message == 'Session opened for .', 'Found replaced message in output.');
     $this->assertText('Session opened for ' . $test_user->label());
     // Remove variables from the fields and assert message has no replacements.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['verbose_fields[variables][field_key]' => ''], t('Save'));
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
-    $xpath = $this->xpath('//fieldset[@id="edit-verbose"]/div[@class="fieldset-wrapper"]/table/tbody/tr[@class="entity odd"]');
+    $xpath = $this->xpath('//table[@id="edit-result"]/tbody/tr');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
-    $this->assertTrue($wid == 14, 'Found WID in verbose output');
+    $this->assertTrue($wid, 'Found WID in verbose output');
     $this->assertTrue($message == 'Session opened for %name.', 'Found unreplaced message in output.');
-    // Test field validation.
-    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['verbose_fields[2][field_key]' => 'horstname'], t('Save'));
-    $this->assertText('The field horstname does not exist in the table "watchdog".');
   }
 
   /**
@@ -105,7 +103,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertText('Session opened for ' . $test_user->label());
     // 'No results' text is displayed when the query has 0 results.
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_warning');
-    $this->assertText('No results were found in the table.');
+    $this->assertText('There are no results for this sensor to display.');
   }
 
   /**
@@ -182,6 +180,83 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     \Drupal::keyValue('monitoring.users')->deleteAll();
     $result = $this->runSensor('user_integrity');
     $this->assertEqual($result->getMessage(), '2 privileged user(s)');
+  }
+
+  /**
+   * Tests the user integrity sensor.
+   *
+   * @see UserIntegritySensorPlugin
+   */
+  protected function doTestPhpNoticesSensor() {
+    $test_user_first = $this->drupalCreateUser(array(
+      'administer monitoring',
+      'monitoring reports',
+      'monitoring verbose',
+    ), 'test_user_php');
+    $this->drupalLogin($test_user_first);
+
+    // Prepare a fake PHP error.
+    $error = [
+      '%type' => 'Recoverable fatal error',
+      '!message' => 'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
+      '%function' => 'Drupal\Core\Form\ConfigFormBase->buildForm()',
+      '%line' => '42',
+      '%file' => DRUPAL_ROOT . '/core/lib/Drupal/Core/Form/ConfigFormBase.php',
+      'severity_level' => 3,
+    ];
+    // Prepare another fake PHP notice.
+    $new_error = [
+      '%type' => 'Notice',
+      '!message' => 'Use of undefined constant B - assumed \'B\'',
+      '%function' => 'Drupal\system\Form\CronForm->buildForm()',
+      '%line' => '126',
+      '%file' => DRUPAL_ROOT . '/core/modules/system/src/Form/CronForm.php',
+      'severity_level' => 5,
+    ];
+    // Log them.
+    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
+    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
+    \Drupal::logger('php')->log($new_error['severity_level'], '%type: !message in %function (line %line of %file).', $new_error);
+
+    $this->drupalGet('/admin/reports/monitoring/sensors/dblog_php_notices');
+    $expected_header = [
+      'Count',
+      'Type',
+      'Message',
+      'Caller',
+      'File',
+    ];
+    $expected_body_one = [
+      '2',
+      'Recoverable fatal error',
+      'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
+      'Drupal\Core\Form\ConfigFormBase->buildForm()',
+      'core/lib/Drupal/Core/Form/ConfigFormBase.php:42',
+    ];
+    $expected_body_two = [
+      '1',
+      'Notice',
+      'Use of undefined constant B - assumed \'B\'',
+      'Drupal\system\Form\CronForm->buildForm()',
+      'core/modules/system/src/Form/CronForm.php:126',
+    ];
+
+    // Check out sensor result page.
+    $this->drupalPostForm('/admin/reports/monitoring/sensors/dblog_php_notices', [], t('Run now'));
+    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $header = (array) $xpath[0]->thead->tr->th;
+    $body = (array) $xpath[0]->tbody;
+    $this->assertEqual($expected_header, $header, 'The header is correct.');
+    $first_message = (array) $body['tr'][0]->td;
+    $second_message = (array) $body['tr'][1]->td;
+    $this->assertEqual(count($body['tr']), 2, 'Two PHP notices were logged.');
+    $this->assertEqual($first_message, $expected_body_one, 'The first notice is as expected.');
+    $this->assertEqual($first_message[0], 2, 'The first notice was logged twice.');
+    $this->assertEqual($second_message, $expected_body_two, 'The second notice is as expected');
+    $this->assertEqual($second_message[0], 1, 'The second notice was logged once.');
+
+    // Test Filename shortening.
+    $this->assertEqual(str_replace(DRUPAL_ROOT . '/', '', $error['%file'] . ':' . $error['%line']), $first_message[4], 'Filename was successfully shortened.');
   }
 
   /**

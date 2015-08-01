@@ -138,6 +138,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    */
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
+    $this->verboseResultUnaggregated($output);
 
     // Show query.
     $output['query'] = array(
@@ -151,12 +152,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
     );
 
-    $output['result_title'] = array(
-      '#type' => 'item',
-      '#title' => t('RESULT'),
-    );
-
-    $this->verboseResultUnaggregated($output);
     return $output;
   }
 
@@ -167,40 +162,60 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    *   Render array where the result will be added.
    */
   public function verboseResultUnaggregated(array &$output) {
+    $output['result_title'] = array(
+      '#type' => 'item',
+      '#title' => t('RESULT'),
+    );
+
     // Fetch the last 10 matching entries, unaggregated.
     $query_result = $this->getQuery()
       ->range(0, 10)
       ->execute();
-    // Render rows.
+
+    $rows = $this->buildTableRows($query_result->fetchAll());
+    $output['result'] = array(
+      '#type' => 'table',
+      '#rows' => $rows,
+      '#header' => $this->buildTableHeader($rows),
+      '#empty' => $this->t('There are no results for this sensor to display.'),
+    );
+  }
+
+  /**
+   * Builds the header for a table.
+   *
+   * @param array $rows
+   *   The array of rows for which a header will be built.
+   *
+   * @return array $header
+   *   The associative header array for the table.
+   */
+  protected function buildTableHeader($rows = []) {
+    if (empty($rows)) {
+      return [];
+    }
+    // Provide consistent keys for header and data rows for easy altering.
+    $keys = array_keys($rows[0]);
+    $header = array_combine($keys, $keys);
+    return $header;
+  }
+
+  /**
+   * Builds the rows of a table.
+   *
+   * @param array $results
+   *   Array of query results.
+   *
+   * @return array $rows
+   *   The render array with the table rows.
+   */
+  protected function buildTableRows(array $results) {
     $rows = [];
-    foreach ($query_result as $record) {
-      $row = [];
-      foreach ($record as $key => $value) {
-        $row[$key] = $value;
-      }
-
-      $rows[] = array(
-        'data' => $row,
-        'class' => 'entity',
-      );
+    foreach ($results as $delta => $row) {
+      $rows[$delta] = (array) $row;
     }
 
-    if (count($rows) > 0) {
-      // Provide consistent keys for header and data rows for easy altering.
-      $keys = array_keys($rows[0]['data']);
-      $header = array_combine($keys, $keys);
-      $output['result'] = array(
-        '#type' => 'table',
-        '#header' => $header,
-        '#rows' => $rows,
-      );
-    }
-    else {
-      $output['result'] = [
-        '#type' => 'item',
-        '#markup' => t('No results were found in the table.'),
-      ];
-    }
+    return $rows;
   }
 
   /**
@@ -420,7 +435,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     // Cleanup conditions, remove empty.
     $settings['conditions'] = [];
-    foreach ($form_state->getValue('conditions') as $key => $condition) {
+    foreach ($form_state->getValue('conditions', []) as $key => $condition) {
       if (!empty($condition['field'])) {
         $settings['conditions'][] = $condition;
       }
@@ -428,7 +443,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     // Update the verbose output fields.
     $settings['verbose_fields'] = [];
-    foreach ($form_state->getValue('verbose_fields') as $field) {
+    foreach ($form_state->getValue('verbose_fields', []) as $field) {
       if (!empty($field['field_key'])) {
         $settings['verbose_fields'][] = $field['field_key'];
       }
