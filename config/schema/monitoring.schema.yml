@@ -1,6 +1,6 @@
 # General settings.
 monitoring.settings:
-  type: mapping
+  type: config_object
   label: 'Monitoring settings'
   mapping:
     sensor_call_logging:
@@ -130,7 +130,7 @@ monitoring.settings.entity_aggregator:
         label: The field to display
 
 monitoring.settings.monitoring_git_dirty_tree:
-  type: mapping
+  type: monitoring.settings_base
   label: 'Dirty git tree sensor settings'
   mapping:
     repo_path:
