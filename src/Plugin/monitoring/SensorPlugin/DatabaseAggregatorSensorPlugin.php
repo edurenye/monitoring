@@ -6,14 +6,12 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 use Drupal\Core\Entity\DependencyTrait;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Database aggregator able to query a single db table.
@@ -56,6 +54,27 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    * @var mixed
    */
   protected $fetchedObject;
+
+  /**
+   * Allows plugins to control if the conditions table should be shown.
+   *
+   * @var bool
+   */
+  protected $configurableConditions = TRUE;
+
+  /**
+   * Allows plugins to control if the verbose output table should be shown.
+   *
+   * @var bool
+   */
+  protected $configurableVerboseOutput = TRUE;
+
+  /**
+   * Allows plugins to control if the table can be configured.
+   *
+   * @var bool
+   */
+  protected $configurableTable = TRUE;
 
   /**
    * Builds simple aggregate query over one db table.
@@ -138,7 +157,10 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    */
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
-    $this->verboseResultUnaggregated($output);
+
+    if ($this->sensorConfig->getSetting('verbose_fields')) {
+      $this->verboseResultUnaggregated($output);
+    }
 
     // Show query.
     $output['query'] = array(
@@ -267,6 +289,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#maxlength' => 255,
       '#title' => t('Table'),
       '#required' => TRUE,
+      '#access' => $this->configurableTable,
     );
 
     // Add conditions.
@@ -277,6 +300,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#prefix' => '<div id="selected-conditions">',
       '#suffix' => '</div>',
       '#tree' => FALSE,
+      '#access' => $this->configurableConditions,
     );
 
     // Table for included sensors.
@@ -354,6 +378,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#prefix' => '<div id="selected-output">',
       '#suffix' => '</div>',
       '#tree' => FALSE,
+      '#access' => $this->configurableVerboseOutput,
     );
     // Add a table for the fields.
     $form['output_table']['verbose_fields'] = array(
@@ -546,18 +571,20 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     }
 
     // Validate verbose_fields.
-    $fields = $form_state->getValue('verbose_fields');
-    foreach ($fields as $key => $field) {
-      $query = $database->select($table);
-      $field_name = $field['field_key'];
-      if (!empty($field_name) && !$database->schema()->fieldExists($table, $field_name)) {
-        $query->addField($table, $field_name);
-        try {
-          $query->range(0, 1)->execute();
-        }
-        catch (\Exception $e) {
-          $form_state->setErrorByName("verbose_fields][$key][field_key", t('The field %field does not exist in the table "%table".', ['%field' => $field_name, '%table' => $table]));
-          continue;
+    if ($this->configurableConditions) {
+      $fields = $form_state->getValue('verbose_fields', []);
+      foreach ($fields as $key => $field) {
+        $query = $database->select($table);
+        $field_name = $field['field_key'];
+        if (!empty($field_name) && !$database->schema()->fieldExists($table, $field_name)) {
+          $query->addField($table, $field_name);
+          try {
+            $query->range(0, 1)->execute();
+          }
+          catch (\Exception $e) {
+            $form_state->setErrorByName("verbose_fields][$key][field_key", t('The field %field does not exist in the table "%table".', ['%field' => $field_name, '%table' => $table]));
+            continue;
+          }
         }
       }
     }

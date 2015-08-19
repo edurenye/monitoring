@@ -22,10 +22,7 @@ settings:
     -
       field: message
       value: 'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.'
-  verbose_fields:
-    - 'wid'
-    - 'message'
-    - 'variables'
+  verbose_fields: { }
   time_interval_field: timestamp
   time_interval_value: 86400
 thresholds:

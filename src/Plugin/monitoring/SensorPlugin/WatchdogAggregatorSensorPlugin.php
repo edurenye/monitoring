@@ -7,8 +7,6 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\Component\Utility\SafeMarkup;
 
@@ -23,6 +21,17 @@ use Drupal\Component\Utility\SafeMarkup;
  * )
  */
 class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin implements ExtendedInfoSensorPluginInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableTable = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableTimestampField = FALSE;
+
   /**
    * {@inheritdoc}
    */
@@ -33,25 +42,11 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
       unset($output['result']['#header']['variables']);
       // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
-        $output['result']['#rows'][$delta]['message'] = Safemarkup::xssFilter(SafeMarkup::format($row['message'], unserialize($row['variables']), Xss::getAdminTagList()));
+        $output['result']['#rows'][$delta]['message'] = Safemarkup::xssFilter(SafeMarkup::format($row['message'], unserialize($row['variables'])), Xss::getAdminTagList());
         // Do not render the variables in the row.
         unset($output['result']['#rows'][$delta]['variables']);
       };
     }
-  }
-
-  /**
-   * Adds UI for variables table and conditions.
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildConfigurationForm($form, $form_state);
-    $form['#title'] = t('Watchdog Sensor plugin settings');
-    // The following fields should not be edited, so we disable them.
-    $form['table']['#default_value'] = 'watchdog';
-    $form['table']['#disabled'] = TRUE;
-    $form['aggregation']['time_interval_field']['#default_value'] = 'timestamp';
-    $form['aggregation']['time_interval_field']['#disabled'] = TRUE;
-    return $form;
   }
 
 }

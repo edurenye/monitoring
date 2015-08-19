@@ -19,9 +19,7 @@ settings:
       field: type
       value: 'page not found'
   verbose_fields:
-    - 'wid'
     - 'location'
-    - 'referer'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
 thresholds:

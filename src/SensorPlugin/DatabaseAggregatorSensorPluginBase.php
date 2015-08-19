@@ -25,6 +25,13 @@ use Drupal\Core\Form\FormStateInterface;
 abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
 
   /**
+   * Allows plugins to control if a timestamp field can be configured.
+   *
+   * @var bool
+   */
+  protected $configurableTimestampField = TRUE;
+
+  /**
    * Gets conditions to be used in the select query.
    *
    * @return array
@@ -71,11 +78,12 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
       '#weight' => 50,
     );
 
+
     $form['aggregation']['time_interval_field'] = array(
       '#type' => 'textfield',
       '#title' => t('Timestamp field'),
-      '#description' => t('A UNIX timestamp in seconds since epoch.'),
       '#default_value' => $this->sensorConfig->getSetting('time_interval_field'),
+      '#access' => $this->configurableTimestampField,
     );
 
     $form['aggregation']['time_interval_value'] = array(
@@ -84,12 +92,17 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
       '#options' => $this->getTimeIntervalOptions(),
       '#description' => t('Select the time interval for which the results will be aggregated.'),
       '#default_value' => $this->getTimeIntervalValue(),
-      '#states' => array(
+    );
+
+    // Always show the interval value if a timestamp field is forced, otherwise
+    // add states so it is only visible if something is entered.
+    if ($this->configurableTimestampField) {
+      $form['aggregation']['time_interval_value']['#states'] = array(
         'invisible' => array(
           ':input[name="settings[aggregation][time_interval_field]"]' => array('value' => ""),
         ),
-      )
-    );
+      );
+    }
 
     return $form;
   }

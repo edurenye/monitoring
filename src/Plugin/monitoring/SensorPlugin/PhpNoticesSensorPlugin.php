@@ -10,7 +10,6 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal\monitoring\SensorPlugin\DatabaseAggregatorSensorPluginBase;
 
 /**
  * Displays the most frequent PHP notices and errors.
@@ -28,6 +27,16 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
   /**
    * {@inheritdoc}
    */
+  protected $configurableConditions = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableVerboseOutput = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $result) {
     parent::runSensor($result);
     if (!empty($this->fetchedObject->variables)) {
@@ -35,16 +44,6 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $variables['%file'] = $this->shortenFilename($variables['%file']);
       $result->setMessage('@count times: @error', ['@count' => (int) $this->fetchedObject->records_count, '@error' => SafeMarkup::xssFilter(SafeMarkup::format('%type: !message in %function (line %line of %file).', $variables), Xss::getAdminTagList())]);
     };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildConfigurationForm($form, $form_state);
-    unset($form['conditions_table']);
-    unset($form['output_table']);
-    return $form;
   }
 
   /**
@@ -121,12 +120,6 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
    */
   protected function shortenFilename($filename) {
     return str_replace(DRUPAL_ROOT . '/', '', $filename);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
   }
 
 

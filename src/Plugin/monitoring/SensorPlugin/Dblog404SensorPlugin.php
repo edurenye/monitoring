@@ -21,7 +21,18 @@ use Drupal\monitoring\Result\SensorResultInterface;
  *
  * Displays URL with highest occurrence as message.
  */
-class Dblog404SensorPlugin extends DatabaseAggregatorSensorPlugin {
+class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableConditions = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableVerboseOutput = FALSE;
+
 
   /**
    * {@inheritdoc}
@@ -34,6 +45,33 @@ class Dblog404SensorPlugin extends DatabaseAggregatorSensorPlugin {
     $query->orderBy('records_count', 'DESC');
     $query->range(0, 1);
     return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getQuery() {
+    $query = parent::getQuery();
+    $this->addAggregateExpression($query);
+    $query->groupBy('location');
+
+    // Drop the existing order, order by record count instead.
+    $order = &$query->getOrderBy();
+    $order = [];
+    $query->orderBy('records_count', 'DESC');
+    $query->range(0, 20);
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function buildTableHeader($rows = []) {
+    $header = [
+      'type' => $this->t('Path'),
+      'count' => $this->t('Count'),
+    ];
+    return $header;
   }
 
   /**

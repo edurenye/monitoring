@@ -22,7 +22,7 @@ use Drupal;
  *
  * Displays image derivate with highest occurrence as message.
  */
-class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
+class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
 
   /**
    * The path of the most failed image.
@@ -30,6 +30,16 @@ class ImageMissingStyleSensorPlugin extends DatabaseAggregatorSensorPlugin {
    * @var string
    */
   protected $sourceImagePath;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableConditions = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableVerboseOutput = FALSE;
 
   /**
    * {@inheritdoc}
