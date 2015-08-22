@@ -40,7 +40,7 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
     captcha_set_form_id_setting('user_login_form', 'captcha/Math');
 
     // Assert the number of entries in the captcha_session table is 1.
-    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 1);
+    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 0);
     // Try to log in, with invalid captcha answer which should fail.
     $edit = array(
       'name' => $user->getUsername(),
@@ -50,7 +50,7 @@ class MonitoringCaptchaTest extends MonitoringTestBase {
     $this->drupalPostForm('user', $edit, t('Log in'));
 
     // Assert the total number of entries in captcha_sessions table is now 2.
-    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 2);
+    $this->assertEqual(db_query('SELECT COUNT (*) FROM {captcha_sessions}')->fetchField(), 1);
 
     // Run sensor and get the message.
     $message = $this->runSensor('captcha_failed_count')->getMessage();
