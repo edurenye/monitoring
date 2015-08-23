@@ -42,7 +42,7 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
     if (!empty($this->fetchedObject->variables)) {
       $variables = unserialize($this->fetchedObject->variables);
       $variables['%file'] = $this->shortenFilename($variables['%file']);
-      $result->setMessage('@count times: @error', ['@count' => (int) $this->fetchedObject->records_count, '@error' => SafeMarkup::xssFilter(SafeMarkup::format('%type: !message in %function (line %line of %file).', $variables), Xss::getAdminTagList())]);
+      $result->setMessage('@count times: @error', ['@count' => (int) $this->fetchedObject->records_count, '@error' => SafeMarkup::format('%type: @message in %function (Line %line of %file).', $variables)]);
     };
   }
 
@@ -102,7 +102,7 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $variables['%file'] = $this->shortenFilename($variables['%file']);
       $rows[$delta]['count'] = $row->records_count;
       $rows[$delta]['type'] = $variables['%type'];
-      $rows[$delta]['message'] = SafeMarkup::xssFilter($variables['!message'], Xss::getAdminTagList());
+      $rows[$delta]['message'] = $variables['@message'];
       $rows[$delta]['function'] = $variables['%function'];
       $rows[$delta]['file'] = $variables['%file'] . ':' . $variables['%line'];
     }

@@ -132,47 +132,47 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Prepare a fake PHP error.
     $error = [
       '%type' => 'Recoverable fatal error',
-      '!message' => 'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
+      '@message' => 'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
       '%function' => 'Drupal\Core\Form\ConfigFormBase->buildForm()',
       '%line' => '42',
       '%file' => DRUPAL_ROOT . '/core/lib/Drupal/Core/Form/ConfigFormBase.php',
       'severity_level' => 3,
     ];
     // Log it twice.
-    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
-    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
+    \Drupal::logger('php')->log($error['severity_level'], '%type: @message in %function (Line %line of %file).', $error);
+    \Drupal::logger('php')->log($error['severity_level'], '%type: @message in %function (Line %line of %file).', $error);
 
     $result = $this->runSensor('dblog_php_notices');
     $message = $result->getMessage();
     $error['%file'] = str_replace(DRUPAL_ROOT . '/', '', $error['%file']);
     // Assert the message has been set and replaced successfully.
-    $this->assertEqual($message, SafeMarkup::format('2 times: %type: !message in %function (line %line of %file).', $error), 'PHP notice was found and replaced successfully.');
+    $this->assertEqual($message, SafeMarkup::format('2 times: %type: @message in %function (Line %line of %file).', $error));
 
     // Prepare another fake PHP notice.
     $new_error = [
       '%type' => 'Notice',
-      '!message' => 'Use of undefined constant B - assumed \'B\'',
+      '@message' => 'Use of undefined constant B - assumed \'B\'',
       '%function' => 'Drupal\system\Form\CronForm->buildForm()',
       '%line' => '126',
       '%file' => DRUPAL_ROOT . '/core/modules/system/src/Form/CronForm.php',
       'severity_level' => 5,
     ];
-    \Drupal::logger('php')->log($new_error['severity_level'], '%type: !message in %function (line %line of %file).', $new_error);
+    \Drupal::logger('php')->log($new_error['severity_level'], '%type: @message in %function (Line %line of %file).', $new_error);
     $result = $this->runSensor('dblog_php_notices');
     $message = $result->getMessage();
     // Assert the message is still the one from above and not the new message.
-    $this->assertEqual($message, SafeMarkup::format('2 times: %type: !message in %function (line %line of %file).', $error), 'The sensor message is still the old message.');
-    $this->assertNotEqual($message, SafeMarkup::format('%type: !message in %function (line %line of %file).', $new_error), 'The sensor message is not the new message.');
+    $this->assertEqual($message, SafeMarkup::format('2 times: %type: @message in %function (Line %line of %file).', $error), 'The sensor message is still the old message.');
+    $this->assertNotEqual($message, SafeMarkup::format('%type: @message in %function (Line %line of %file).', $new_error), 'The sensor message is not the new message.');
 
     // Log the new error twice more, check it is now the sensor message.
-    \Drupal::logger('php')->log($new_error['severity_level'], '%type: !message in %function (line %line of %file).', $new_error);
-    \Drupal::logger('php')->log($new_error['severity_level'], '%type: !message in %function (line %line of %file).', $new_error);
+    \Drupal::logger('php')->log($new_error['severity_level'], '%type: @message in %function (Line %line of %file).', $new_error);
+    \Drupal::logger('php')->log($new_error['severity_level'], '%type: @message in %function (Line %line of %file).', $new_error);
     $result = $this->runSensor('dblog_php_notices');
     $message = $result->getMessage();
     $new_error['%file'] = str_replace(DRUPAL_ROOT . '/', '', $new_error['%file']);
     // Assert the new message is returned as a message.
-    $this->assertEqual($message, SafeMarkup::format('3 times: %type: !message in %function (line %line of %file).', $new_error), 'The new message is now the sensor message.');
-    $this->assertNotEqual($message, SafeMarkup::format('2 times: %type: !message in %function (line %line of %file).', $error), 'The old message is not the sensor message anymore.');
+    $this->assertEqual($message, SafeMarkup::format('3 times: %type: @message in %function (Line %line of %file).', $new_error), 'The new message is now the sensor message.');
+    $this->assertNotEqual($message, SafeMarkup::format('2 times: %type: @message in %function (Line %line of %file).', $error), 'The old message is not the sensor message anymore.');
   }
 
   /**
@@ -354,9 +354,9 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $type1->save();
     $type2 = NodeType::create(['type' => $this->randomMachineName()]);
     $type2->save();
-    Node::create(array('type' => $type1->id()))->save();
-    Node::create(array('type' => $type1->id()))->save();
-    Node::create(array('type' => $type2->id()))->save();
+    Node::create(array('title' => $this->randomString(), 'type' => $type1->id()))->save();
+    Node::create(array('title' => $this->randomString(), 'type' => $type1->id()))->save();
+    Node::create(array('title' => $this->randomString(), 'type' => $type2->id()))->save();
 
     // Make sure that sensors for the new node types are available.
     monitoring_sensor_manager()->resetCache();

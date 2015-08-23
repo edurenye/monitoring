@@ -198,7 +198,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Prepare a fake PHP error.
     $error = [
       '%type' => 'Recoverable fatal error',
-      '!message' => 'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
+      '@message' => 'Argument 1 passed to Drupal\Core\Form\ConfigFormBase::buildForm() must be of the type array, null given, called in /usr/local/var/www/d8/www/core/modules/system/src/Form/CronForm.php on line 127 and defined',
       '%function' => 'Drupal\Core\Form\ConfigFormBase->buildForm()',
       '%line' => '42',
       '%file' => DRUPAL_ROOT . '/core/lib/Drupal/Core/Form/ConfigFormBase.php',
@@ -207,16 +207,16 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Prepare another fake PHP notice.
     $new_error = [
       '%type' => 'Notice',
-      '!message' => 'Use of undefined constant B - assumed \'B\'',
+      '@message' => 'Use of undefined constant B - assumed \'B\'',
       '%function' => 'Drupal\system\Form\CronForm->buildForm()',
       '%line' => '126',
       '%file' => DRUPAL_ROOT . '/core/modules/system/src/Form/CronForm.php',
       'severity_level' => 5,
     ];
     // Log them.
-    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
-    \Drupal::logger('php')->log($error['severity_level'], '%type: !message in %function (line %line of %file).', $error);
-    \Drupal::logger('php')->log($new_error['severity_level'], '%type: !message in %function (line %line of %file).', $new_error);
+    \Drupal::logger('php')->log($error['severity_level'], '%type: @message in %function (line %line of %file).', $error);
+    \Drupal::logger('php')->log($error['severity_level'], '%type: @message in %function (line %line of %file).', $error);
+    \Drupal::logger('php')->log($new_error['severity_level'], '%type: @message in %function (line %line of %file).', $new_error);
 
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_php_notices');
     $expected_header = [

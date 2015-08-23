@@ -42,8 +42,9 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
       unset($output['result']['#header']['variables']);
       // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
-        $output['result']['#rows'][$delta]['message'] = Safemarkup::xssFilter(SafeMarkup::format($row['message'], unserialize($row['variables'])), Xss::getAdminTagList());
-        // Do not render the variables in the row.
+        $output['result']['#rows'][$delta]['#markup'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        // Do not render the raw message & variables in the row.
+        unset($output['result']['#rows'][$delta]['message']);
         unset($output['result']['#rows'][$delta]['variables']);
       };
     }
