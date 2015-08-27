@@ -102,7 +102,9 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $variables['%file'] = $this->shortenFilename($variables['%file']);
       $rows[$delta]['count'] = $row->records_count;
       $rows[$delta]['type'] = $variables['%type'];
-      $rows[$delta]['message'] = $variables['@message'];
+      // Do not cause a notice for existing records that do not yet use
+      // @message.
+      $rows[$delta]['message'] = isset($variables['@message']) ? $variables['@message'] : $variables['!message'];
       $rows[$delta]['function'] = $variables['%function'];
       $rows[$delta]['file'] = $variables['%file'] . ':' . $variables['%line'];
     }
