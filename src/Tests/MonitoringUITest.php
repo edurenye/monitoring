@@ -16,7 +16,7 @@ use Drupal\monitoring\Entity\SensorConfig;
  */
 class MonitoringUITest extends MonitoringTestBase {
 
-  public static $modules = array('dblog', 'node', 'views');
+  public static $modules = array('dblog', 'node', 'views', 'file');
 
   /**
    * {@inheritdoc}
@@ -91,19 +91,25 @@ class MonitoringUITest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring', 'monitoring reports'));
     $this->drupalLogin($account);
 
+    // Create a node to test verbose fields.
+    $node = $this->drupalCreateNode(array(
+      'type' => 'article',
+    ));
     $this->drupalGet('admin/config/system/monitoring/sensors/add');
 
     $this->assertFieldByName('status', TRUE);
 
-    $this->drupalPostForm(NULL, array(
-      'label' => 'UI created Sensor',
+    // Test creation of Node entity aggregator sensor.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
+      'label' => 'Node Entity Aggregator sensor',
       'id' => 'ui_test_sensor',
       'plugin_id' => 'entity_aggregator',
     ), t('Select sensor'));
 
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array('settings[entity_type]' => 'node'), t('Add another condition'));
-    $this->drupalPostForm(NULL, array(
+
+    $edit = array(
       'description' => 'Sensor created to test UI',
       'value_label' => 'Test Value',
       'caching_time' => 100,
@@ -112,15 +118,40 @@ class MonitoringUITest extends MonitoringTestBase {
       'conditions[0][field]' => 'type',
       'conditions[0][value]' => 'article',
       'conditions[1][field]' => 'sticky',
-      'conditions[1][value]' => '0',
-    ), t('Save'));
+      'conditions[1][value]' => 0,
+    );
 
-    $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'UI created Sensor')));
+    // Available fields for the entity type node.
+    $node_fields = ['nid', 'title', 'langcode', 'sticky', 'status', 'uuid', 'created', 'changed', 'uid'];
+
+    // Add more inputs to the form.
+    $this->postFormMultiple(t('Add another field'), count($node_fields));
+
+    // Add verbose fields based on node fields.
+    $edit = $this->addAllVerboseFields($node_fields, $edit);
+
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+
+    $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'Node Entity Aggregator sensor')));
 
     // Test details page by clicking the link in confirmation message.
-    $this->assertLink(t('UI created Sensor'));
-    $this->clickLink(t('UI created Sensor'));
+    $this->clickLink(t('Node Entity Aggregator sensor'));
+    $this->assertResponse(200);
     $this->assertText('Result');
+    $this->assertRaw('<th>nid</th>');
+    $this->assertRaw('<th>label</th>');
+    $this->assertRaw('<th>langcode');
+    $this->assertRaw('<th>title</th>');
+    $this->assertRaw('<th>status</th>');
+    $this->assertRaw('<th>sticky</th>');
+
+    // Assert that the output is correct.
+    $this->assertLink($node->getTitle());
+    $this->assertLink($node->getOwner()->getUsername());
+    $this->assertFalse($node->isSticky());
+    $this->assertText($node->uuid());
+    $this->assertText(\Drupal::service('date.formatter')->format($node->getCreatedTime(), 'short'));
+    $this->assertText($node->getChangedTime());
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
@@ -128,11 +159,81 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertFieldByName('conditions[0][value]', 'article');
     $this->assertFieldByName('conditions[1][field]', 'sticky');
     $this->assertFieldByName('conditions[1][value]', '0');
+    $i = 2;
+    foreach ($node_fields as $field) {
+      $this->assertFieldByName('settings[verbose_fields][' . $i++ . ']', $field);
+    }
+
+    // Create a file to test.
+    $file_path = file_default_scheme() . '://test';
+    $contents = "some content here!!.";
+    file_put_contents($file_path, $contents);
+
+    // Test if the file exist.
+    $this->assertTrue(is_file($file_path));
+
+    // Create a file entity.
+    $file = entity_create('file', array(
+      'uri' => $file_path,
+      'uid' => 1,
+    ));
+    $file->save();
+
+    // Test if the entity was created.
+    $this->assertTrue($file->id());
+
+    // Test creation of File entity aggregator sensor.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
+      'label' => 'File Entity Aggregator sensor',
+      'id' => 'file_test_sensor',
+      'plugin_id' => 'entity_aggregator',
+    ), t('Select sensor'));
+
+    $this->assertText('Sensor plugin settings');
+    $this->drupalPostForm(NULL, array('settings[entity_type]' => 'file'), t('Add another condition'));
+
+    // Available fields for entity type file.
+    $file_fields = ['fid', 'uuid', 'filename', 'uri', 'filemime', 'filesize', 'status', 'created'];
+    $edit = array();
+
+    // Add more inputs to the form.
+    $this->postFormMultiple(t('Add another field'), count($file_fields));
+
+    // Add verbose fields based on file fields.
+    $edit = $this->addAllVerboseFields($file_fields, $edit);
+
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+
+    $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'File Entity Aggregator sensor')));
+
+    // Test details page by clicking the link in confirmation message.
+    $this->clickLink(t('File Entity Aggregator sensor'));
+    $this->assertResponse(200);
+    $this->assertText('Result');
+    $this->assertRaw('<th>label</th>');
+    $this->assertRaw('<th>uuid</th>');
+    $this->assertRaw('<th>filename</th>');
+    $this->assertRaw('<th>filesize</th>');
+    $this->assertRaw('<th>uri</th>');
+    $this->assertRaw('<th>created</th>');
+
+    // Assert that the output is correct.
+    $this->assertText($file->getFilename());
+    $this->assertText($file->uuid());
+    $this->assertText($file->getSize());
+    $this->assertText($file->getMimeType());
+    $this->assertText(\Drupal::service('date.formatter')->format($file->getCreatedTime(), 'short'));
+
+    $this->drupalGet('admin/config/system/monitoring/sensors/file_test_sensor');
+    $i = 2;
+    foreach ($file_fields as $field) {
+      $this->assertFieldByName('settings[verbose_fields][' . $i++ . ']', $field);
+    }
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor/delete');
     $this->assertText('This action cannot be undone.');
     $this->drupalPostForm(NULL, array(), t('Delete'));
-    $this->assertText('Sensor UI created Sensor has been deleted.');
+    $this->assertText('Node Entity Aggregator sensor has been deleted.');
 
     $this->drupalPostForm('admin/config/system/monitoring/sensors/add', array(
       'label' => 'UI created Sensor config',
@@ -974,4 +1075,36 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('Warning high must be lower than critical high or empty.');
   }
 
+  /**
+   * Add verbose fields to the sensor creation form.
+   *
+   * @param array $fields
+   *   Fields of an entity type to be added to the form.
+   * @param array $edit
+   *   Field data in an associative array.
+   *
+   * @return array
+   *   An array with all verbose fields.
+   */
+  public function addAllVerboseFields($fields = array(), $edit = array()) {
+    $i = 2;
+    foreach ($fields as $field) {
+      $edit['settings[verbose_fields][' . $i++ . ']'] = $field;
+    }
+    return $edit;
+  }
+
+  /**
+   * Add inputs of verbose fields to the form based on $times.
+   *
+   * @param string $button
+   *   Name of the button to be used.
+   * @param int $times
+   *   Times while the loop is executing.
+   */
+  public function postFormMultiple($button, $times) {
+    for ($i = 0; $i < $times; ++$i) {
+      $this->drupalPostForm(NULL, array(), $button);
+    }
+  }
 }
