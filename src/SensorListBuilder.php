@@ -24,6 +24,11 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
   /**
    * {@inheritdoc}
    */
+  protected $limit = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
     // Overrides the original Header completely.
     $header['category'] = $this->t('Category');

@@ -784,6 +784,34 @@ class MonitoringUITest extends MonitoringTestBase {
   }
 
   /**
+   * Tests that the sensor list is displayed completely.
+   */
+  public function testSensorListLimit() {
+    $account = $this->drupalCreateUser(array('administer monitoring'));
+    $this->drupalLogin($account);
+
+    // Check if we can access the sensor overview page.
+    $this->drupalGet('admin/config/system/monitoring/sensors');
+    $this->assertLink('Add Sensor');
+
+    $sensors = count(SensorConfig::loadMultiple());
+    $limit = 51;
+    $values = array(
+      'label' => 'test',
+      'plugin_id' => 'entity_aggregator',
+    );
+    for ($i = 1; $i <= $limit - $sensors; $i++) {
+      $values['id'] = 'test_sensor_overview' . $i;
+      $created = SensorConfig::create($values);
+      $created->save();
+    }
+    $this->drupalGet('admin/config/system/monitoring/sensors');
+
+    // Check that all the rows are listed.
+    $this->assertEqual(count($this->xpath('//tbody/tr')), $limit);
+  }
+
+  /**
    * Submits a threshold settings form for a given sensor.
    *
    * @param string $sensor_name
