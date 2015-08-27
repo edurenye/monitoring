@@ -30,6 +30,14 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
   public function addService($id, $service);
 
   /**
+   * Default configuration for a sensor.
+   *
+   * @return array
+   *   An array of default configurations.
+   */
+  public function getDefaultConfiguration();
+
+  /**
    * Gets service.
    *
    * @param string $id

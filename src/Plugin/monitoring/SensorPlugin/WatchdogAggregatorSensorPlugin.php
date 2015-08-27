@@ -50,4 +50,17 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'settings' => array(
+        'table' => 'watchdog',
+        'time_interval_field' => 'timestamp',
+      ),
+    );
+    return $default_config;
+  }
+
 }

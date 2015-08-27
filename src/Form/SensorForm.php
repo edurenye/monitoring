@@ -210,6 +210,13 @@ class SensorForm extends EntityForm {
    */
   public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
     $this->entity = $this->buildEntity($form, $form_state);
+
+    // Set default configuration of the sensor.
+    $default_config = (array) $this->entity->getPlugin()->getDefaultConfiguration();
+    $default_config += array('settings' => array());
+    foreach ($default_config as $key => $value) {
+      $this->entity->set($key, $value);
+    }
     $form_state->setRebuild();
   }
 

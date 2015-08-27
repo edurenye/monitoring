@@ -68,6 +68,13 @@ abstract class SensorPluginBase implements SensorPluginInterface {
 
   /**
    * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * @todo: Replace with injection
    */

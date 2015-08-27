@@ -278,6 +278,21 @@ class MonitoringUITest extends MonitoringTestBase {
     $sensor_theme = SensorConfig::load('core_theme_default');
     $this->assertTrue($sensor_theme->status());
 
+    // Test the creation of a Watchdog sensor with default configuration.
+    $this->drupalGet('admin/config/system/monitoring/sensors/add');
+    $this->drupalPostForm(NULL, array(
+      'label' => 'Watchdog Sensor',
+      'id' => 'watchdog_sensor',
+      'plugin_id' => 'watchdog_aggregator',
+    ), t('Select sensor'));
+    $this->drupalPostForm(NULL, array(), t('Save'));
+    $this->assertText(t('Sensor Watchdog Sensor saved'));
+
+    // Load the created sensor and assert the default configuration.
+    $sensor_config = SensorConfig::load('watchdog_sensor');
+    $settings = $sensor_config->getSettings();
+    $this->assertEqual($settings['table'], 'watchdog');
+    $this->assertEqual($settings['time_interval_field'], 'timestamp');
   }
 
   /**
