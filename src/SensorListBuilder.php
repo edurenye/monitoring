@@ -137,6 +137,7 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
         $sensor_types[$plugin_label_key] = $plugin_definition['label'];
       }
     }
+    asort($sensor_types);
 
     $form['filters'] = array(
       '#type' => 'fieldset',
