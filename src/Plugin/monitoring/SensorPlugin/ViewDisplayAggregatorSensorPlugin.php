@@ -92,7 +92,7 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
       '#default_value' => $this->sensorConfig->getSetting('view'),
       '#required' => TRUE,
       '#limit_validation_errors' => array(array('settings', 'view')),
-      '#submit' => array('::submitSelectPlugin'),
+      '#submit' => array(array($this, 'submitSelectView')),
       '#executes_submit_callback' => TRUE,
       '#ajax' => array(
         'callback' => '::ajaxReplacePluginSpecificForm',
@@ -104,7 +104,7 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
       '#type' => 'submit',
       '#value' => t('Select view'),
       '#limit_validation_errors' => array(array('settings', 'view')),
-      '#submit' => array('::submitSelectPlugin'),
+      '#submit' => array(array($this, 'submitSelectView')),
       '#attributes' => array('class' => array('js-hide')),
     );
 
@@ -155,4 +155,12 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
     }
     return $options;
   }
+
+  /**
+   * Handles submit call when view type is selected.
+   */
+  public function submitSelectView(array $form, FormStateInterface $form_state) {
+    $form_state->setRebuild();
+  }
+
 }
