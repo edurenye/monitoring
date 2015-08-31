@@ -185,9 +185,14 @@ class SensorRunner {
       $result->setExecutionTime($timer['time']);
 
       // Capture verbose output if requested and if we are able to do so.
-      if ($this->verbose && $sensor_config->isExtendedInfo()) {
-        /** @var \Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface $plugin */
-        $result->setVerboseOutput($plugin->resultVerbose($result));
+      try {
+        if ($this->verbose && $sensor_config->isExtendedInfo()) {
+          /** @var \Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface $plugin */
+          $result->setVerboseOutput($plugin->resultVerbose($result));
+        }
+      }
+      catch (\Exception $e) {
+        $result->setVerboseOutput(array('#markup' => $e->getMessage()));
       }
 
       try {

@@ -682,6 +682,23 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $result = $this->runSensor('watchdog_aggregate_test');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getValue(), 3);
+
+    // Test database aggregator with invalid conditions.
+    $sensor = SensorConfig::create(array(
+      'id' => 'db_test',
+      'label' => 'Database sensor invalid',
+      'plugin_id' => 'database_aggregator',
+      'settings' => array(
+        'table' => 'watchdog',
+      ),
+    ));
+    $sensor->settings['conditions'] = array(
+      array('field' => 'invalid', 'value' => ''),
+    );
+    $sensor->settings['verbose_fields']['0'] = 'wid';
+    $sensor->save();
+    $result = $this->runSensor('db_test');
+    $this->assertTrue($result->isCritical());
   }
 
 }
