@@ -307,6 +307,24 @@ class MonitoringUITest extends MonitoringTestBase {
       'plugin_id' => 'entity_aggregator',
     ), t('Save'));
     $this->assertText('Sensor Test entity id saved.');
+
+    // Test that the description of the verbose output changes.
+    $this->drupalGet('admin/config/system/monitoring/sensors/add');
+    $this->drupalPostForm(NULL, array(
+      'label' => 'Test description Verbose',
+      'id' => 'test_description',
+      'plugin_id' => 'entity_aggregator',
+    ), t('Select sensor'));
+
+    // Change entity type to File.
+    $this->drupalPostAjaxForm(NULL, array('settings[entity_type]' => 'file'), 'settings[entity_type]');
+    $this->assertText(t('Available Fields for entity type File:'));
+    $this->assertText(t('filename, uri, filemime, filesize, status, created, changed'));
+
+    // Change entity type to User.
+    $this->drupalPostAjaxForm(NULL, array('settings[entity_type]' => 'user'), 'settings[entity_type]');
+    $this->assertText(t('Available Fields for entity type User:'));
+    $this->assertText(t('preferred_langcode, preferred_admin_langcode, name, pass, mail, timezone'));
   }
 
   /**

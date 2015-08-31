@@ -317,6 +317,11 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
       '#maxlength' => 255,
       '#options' => $options,
       '#title' => t('Entity Type'),
+      '#ajax' => array(
+        'callback' => array($this, 'fieldsReplace'),
+        'wrapper' => 'selected-output',
+        'method' => 'replace',
+      ),
     );
     if (!isset($settings['entity_type'])) {
       $form['entity_type']['#required'] = TRUE;
