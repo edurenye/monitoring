@@ -293,6 +293,20 @@ class MonitoringUITest extends MonitoringTestBase {
     $settings = $sensor_config->getSettings();
     $this->assertEqual($settings['table'], 'watchdog');
     $this->assertEqual($settings['time_interval_field'], 'timestamp');
+
+    // Test that the entity id is set after selecting a watchdog sensor.
+    $this->drupalGet('admin/config/system/monitoring/sensors/add');
+    $this->drupalPostForm(NULL, array(
+      'label' => 'Test entity id',
+      'id' => 'test_entity',
+      'plugin_id' => 'watchdog_aggregator',
+    ), t('Select sensor'));
+
+    $this->drupalPostAjaxForm(NULL, array('plugin_id' => 'entity_aggregator'), 'plugin_id');
+    $this->drupalPostForm(NULL, array(
+      'plugin_id' => 'entity_aggregator',
+    ), t('Save'));
+    $this->assertText('Sensor Test entity id saved.');
   }
 
   /**

@@ -68,10 +68,10 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
    *   The entity query object.
    */
   protected function getEntityQueryAggregate() {
-    $entity_info = $this->entityManager->getDefinition($this->getEntityTypeId(), TRUE);
+    $entity_info = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'), TRUE);
 
     // Get aggregate query for the entity type.
-    $query = $this->entityQueryFactory->getAggregate($this->getEntityTypeId());
+    $query = $this->entityQueryFactory->getAggregate($this->sensorConfig->getSetting('entity_type'));
     $this->aggregateField = $entity_info->getKey('id');
 
     $this->addAggregate($query);
@@ -103,10 +103,10 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
    * @see getEntityQueryAggregate()
    */
   protected function getEntityQuery() {
-    $entity_info = $this->entityManager->getDefinition($this->getEntityTypeId(), TRUE);
+    $entity_info = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'), TRUE);
 
     // Get query for the entity type.
-    $query = $this->entityQueryFactory->get($this->getEntityTypeId());
+    $query = $this->entityQueryFactory->get($this->sensorConfig->getSetting('entity_type'));
 
     // Add conditions.
     foreach ($this->getConditions() as $condition) {
@@ -155,13 +155,15 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
   }
 
   /**
-   * Gets the entity type setting.
-   *
-   * @return string
-   *   The entity type.
+   * {@inheritdoc}
    */
-  protected function getEntityTypeId() {
-    return $this->sensorConfig->getSetting('entity_type', 'node');
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'settings' => array(
+        'entity_type' => 'node',
+      ),
+    );
+    return $default_config;
   }
 
   /**
@@ -169,7 +171,7 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
    */
   public function runSensor(SensorResultInterface $result) {
     $query_result = $this->getEntityQueryAggregate()->execute();
-    $entity_type = $this->getEntityTypeId();
+    $entity_type = $this->sensorConfig->getSetting('entity_type');
     $entity_info = $this->entityManager->getDefinition($entity_type);
 
     if (isset($query_result[0][$entity_info->getKey('id') . '_count'])) {
@@ -204,8 +206,8 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
     // );
 
     // Load entities.
-    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
-    $entity_type_id = $this->getEntityTypeId();
+    $entity_type = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'));
+    $entity_type_id = $this->sensorConfig->getSetting('entity_type');;
     $entities = $this->entityManager
       ->getStorage($entity_type_id)
       ->loadMultiple($entity_ids);
@@ -285,11 +287,11 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    $entity_type_id = $this->getEntityTypeId();
+    $entity_type_id = $this->sensorConfig->getSetting('entity_type');
     if (!$entity_type_id) {
       throw new \Exception(SafeMarkup::format('Sensor @id is missing the required entity_type setting.', array('@id' => $this->id())));
     }
-    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+    $entity_type = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'));
     $this->addDependency('module', $entity_type->getProvider());
     return $this->dependencies;
   }
@@ -431,7 +433,7 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
       '#suffix' => '</div>',
       '#open' => TRUE,
     );
-    $entity_type = $this->entityManager->getDefinition($this->getEntityTypeId());
+    $entity_type = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'));
     $available_fields = array_merge(['id', 'label'], array_keys($this->entityManager->getBaseFieldDefinitions($entity_type->id())));
     $form['verbose_fields']['#description'] = t('Available Fields for entity type %type: %fields.', [
       '%type' => $entity_type->getLabel(),
@@ -569,9 +571,9 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
       'aggregation',
       'time_interval_field',
     ));
-    if (!empty($field_name)) {
+    $entity_type_id = $form_state->getValue(array('settings', 'entity_type'));
+    if (!empty($field_name) && !empty($entity_type_id)) {
       // @todo instead of validate, switch to a form select.
-      $entity_type_id = $form_state->getValue(array('settings', 'entity_type'));
       $entity_info = $this->entityManager->getFieldStorageDefinitions($entity_type_id);
       $data_type = NULL;
       if (!empty($entity_info[$field_name])) {
