@@ -244,6 +244,13 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('Expected value');
 
     $this->assertText('Sensor plugin settings');
+
+    // Test if the expected value type is no_value, the value label is hidden.
+    $this->drupalPostAjaxForm(NULL, array('value_type' => 'no_value'), 'value_type');
+    $this->assertNoText('The value label represents the units of the sensor value.');
+    $this->drupalPostAjaxForm(NULL, array('value_type' => 'bool'), 'value_type');
+    $this->assertText('The value label represents the units of the sensor value.');
+
     $this->drupalPostForm(NULL, array(
       'description' => 'Sensor created to test UI',
       'value_label' => 'Test Value',

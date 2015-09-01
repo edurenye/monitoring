@@ -156,11 +156,12 @@ class SensorForm extends EntityForm {
         $value_types[$value_type] = $info['label'];
       }
 
+      $value_type = $sensor_config->getValueType();
       $form['plugin_container']['value_type'] = array(
         '#type' => 'select',
         '#title' => $this->t('Expected value type'),
         '#options' => $value_types,
-        '#default_value' => $sensor_config->getValueType(),
+        '#default_value' => $value_type,
         '#limit_validation_errors' => array(array('value_type')),
         '#submit' => array('::submitSelectPlugin'),
         '#required' => TRUE,
@@ -179,6 +180,7 @@ class SensorForm extends EntityForm {
         '#maxlength' => 255,
         '#default_value' => $sensor_config->getValueLabel(),
         '#description' => $this->t("The value label represents the units of the sensor value."),
+        '#access' => $value_type != 'no_value',
       );
 
       if ($this->entity->isNumeric()) {
