@@ -846,6 +846,9 @@ class MonitoringUITest extends MonitoringTestBase {
     $values = array(
       'label' => 'test',
       'plugin_id' => 'entity_aggregator',
+      'settings' => array(
+        'entity_type' => 'node',
+      ),
     );
     for ($i = 1; $i <= $limit - $sensors; $i++) {
       $values['id'] = 'test_sensor_overview' . $i;
