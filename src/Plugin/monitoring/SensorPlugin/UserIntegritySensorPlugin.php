@@ -31,6 +31,11 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
   /**
    * {@inheritdoc}
    */
+  protected $configurableValueType = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $sensor_result) {
 
     // Get role IDs with restricted permissions.
@@ -264,4 +269,5 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       \Drupal::keyValue('monitoring.users')->deleteAll();
       return $form;
   }
+
 }

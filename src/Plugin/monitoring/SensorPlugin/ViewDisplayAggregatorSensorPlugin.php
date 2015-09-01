@@ -28,6 +28,11 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
   /**
    * {@inheritdoc}
    */
+  protected $configurableValueType = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 
@@ -161,6 +166,16 @@ class ViewDisplayAggregatorSensorPlugin extends SensorPluginBase implements Exte
    */
   public function submitSelectView(array $form, FormStateInterface $form_state) {
     $form_state->setRebuild();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'value_type' => 'number',
+    );
+    return $default_config;
   }
 
 }

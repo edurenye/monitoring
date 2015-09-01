@@ -85,4 +85,5 @@ class ConfigValueSensorPlugin extends ValueComparisonSensorPluginBase {
     );
     return $form;
   }
+
 }

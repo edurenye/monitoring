@@ -27,6 +27,11 @@ class UpdateStatusSensorPlugin extends SensorPluginBase {
   /**
    * {@inheritdoc}
    */
+  protected $configurableValueType = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $result) {
     $type = $this->sensorConfig->getSetting('type');
     $status = $this->calculateStatus($type);

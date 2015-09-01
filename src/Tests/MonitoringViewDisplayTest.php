@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Tests;
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\monitoring\Entity\SensorConfig;
 
 /**
  * Tests the view display sensor.
@@ -36,7 +37,6 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     $this->assertText('Sensor plugin settings');
     $this->drupalPostForm(NULL, array(
       'description' => 'Count all users through the users view.',
-      'value_type' => 'number',
       'value_label' => 'Users',
       'caching_time' => 0,
       'settings[view]' => 'user_admin_people',
@@ -46,6 +46,9 @@ class MonitoringViewDisplayTest extends MonitoringTestBase {
     ), t('Save'));
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'All users')));
 
+    // Check the value type has the default value.
+    $sensor_config = SensorConfig::load('view_user_count');
+    $this->assertEqual($sensor_config->getValueType(), 'number');
     // Edit and check selection.
     $this->drupalGet('admin/config/system/monitoring/sensors/view_user_count');
     $this->assertOptionSelected('edit-settings-view', 'user_admin_people');

@@ -39,6 +39,11 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
   /**
    * {@inheritdoc}
    */
+  protected $configurableValueType = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 

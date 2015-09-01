@@ -44,6 +44,14 @@ abstract class SensorPluginBase implements SensorPluginInterface {
   protected $pluginDefinition;
 
   /**
+   * Allows plugins to control if the value type can be configured.
+   *
+   * @var bool
+   */
+  protected $configurableValueType = TRUE;
+
+
+  /**
    * Instantiates a sensor object.
    *
    * @param \Drupal\monitoring\Entity\SensorConfig $sensor_config
@@ -71,6 +79,13 @@ abstract class SensorPluginBase implements SensorPluginInterface {
    */
   public function getDefaultConfiguration() {
     return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfigurableValueType() {
+    return $this->configurableValueType;
   }
 
   /**

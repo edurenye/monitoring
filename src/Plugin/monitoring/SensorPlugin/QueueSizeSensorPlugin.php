@@ -28,6 +28,11 @@ use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 class QueueSizeSensorPlugin extends SensorPluginBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected $configurableValueType = FALSE;
+
+  /**
    * Adds UI to select Queue for the sensor.
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
@@ -49,4 +54,15 @@ class QueueSizeSensorPlugin extends SensorPluginBase {
   public function runSensor(SensorResultInterface $result) {
     $result->setValue(\Drupal::queue($this->sensorConfig->getSetting('queue'))->numberOfItems());
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'value_type' => 'number',
+    );
+    return $default_config;
+  }
+
 }

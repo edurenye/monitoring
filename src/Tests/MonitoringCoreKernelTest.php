@@ -110,6 +110,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $sensor_config = SensorConfig::create(array(
       'id' => 'core_queue_monitoring_test',
       'plugin_id' => 'queue_size',
+      'value_type' => 'number',
       'settings' => array(
         'queue' => 'monitoring_test'
       )

@@ -33,7 +33,6 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
    */
   protected $configurableVerboseOutput = FALSE;
 
-
   /**
    * {@inheritdoc}
    */

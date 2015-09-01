@@ -32,6 +32,11 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
   protected $configurableTimestampField = TRUE;
 
   /**
+   * {@inheritdoc}
+   */
+  protected $configurableValueType = FALSE;
+
+  /**
    * Gets conditions to be used in the select query.
    *
    * @return array
@@ -164,4 +169,15 @@ abstract class DatabaseAggregatorSensorPluginBase extends SensorPluginBase {
     $date_formatter = \Drupal::service('date.formatter');
     return array_map(array($date_formatter, 'formatInterval'), array_combine($time_intervals, $time_intervals)) + array(0 => t('No restriction'));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'value_type' => 'number',
+    );
+    return $default_config;
+  }
+
 }

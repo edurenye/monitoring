@@ -38,6 +38,14 @@ interface SensorPluginInterface extends PluginInspectionInterface, PluginFormInt
   public function getDefaultConfiguration();
 
   /**
+   * Configurable value type.
+   *
+   * @return bool
+   *   If the value type is configurable or not.
+   */
+  public function getConfigurableValueType();
+
+  /**
    * Gets service.
    *
    * @param string $id

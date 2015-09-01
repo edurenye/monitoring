@@ -291,6 +291,7 @@ class MonitoringUITest extends MonitoringTestBase {
     // Load the created sensor and assert the default configuration.
     $sensor_config = SensorConfig::load('watchdog_sensor');
     $settings = $sensor_config->getSettings();
+    $this->assertEqual($sensor_config->getValueType(), 'number');
     $this->assertEqual($settings['table'], 'watchdog');
     $this->assertEqual($settings['time_interval_field'], 'timestamp');
 

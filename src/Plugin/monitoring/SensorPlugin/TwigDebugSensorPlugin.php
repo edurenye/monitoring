@@ -74,4 +74,5 @@ class TwigDebugSensorPlugin extends SensorPluginBase {
       $result->addStatusMessage('Optimal configuration');
     }
   }
+
 }

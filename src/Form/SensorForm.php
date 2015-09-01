@@ -170,6 +170,7 @@ class SensorForm extends EntityForm {
           'wrapper' => 'monitoring-sensor-plugin',
           'method' => 'replace',
         ),
+        '#access' => $sensor_config->getPlugin()->getConfigurableValueType(),
       );
 
       $form['plugin_container']['value_label'] = array(
