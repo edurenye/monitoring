@@ -14,13 +14,15 @@ use Drupal\simpletest\WebTestBase;
  */
 abstract class MonitoringTestBase extends WebTestBase {
 
-  public static $modules = array('monitoring', 'monitoring_test');
+  public static $modules = ['block', 'monitoring', 'monitoring_test'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
     if (!\Drupal::moduleHandler()->moduleExists('monitoring')) {
       throw new \Exception("Failed to install modules, aborting test");
     }
