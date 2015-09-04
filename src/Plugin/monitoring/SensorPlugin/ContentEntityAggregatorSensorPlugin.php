@@ -62,6 +62,13 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
   protected $entityQueryFactory;
 
   /**
+   * Allows plugins to control if the entity type can be configured.
+   *
+   * @var bool
+   */
+  protected $configurableEntityType = TRUE;
+
+  /**
    * Builds the entity aggregate query.
    *
    * @return \Drupal\Core\Entity\Query\QueryAggregateInterface
@@ -322,6 +329,7 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
         'wrapper' => 'selected-output',
         'method' => 'replace',
       ),
+      '#access' => $this->configurableEntityType,
     );
     if (!isset($settings['entity_type'])) {
       $form['entity_type']['#required'] = TRUE;

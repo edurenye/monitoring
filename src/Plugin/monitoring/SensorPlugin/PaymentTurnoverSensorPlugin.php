@@ -28,13 +28,24 @@ class PaymentTurnoverSensorPlugin extends ContentEntityAggregatorSensorPlugin {
   /**
    * {@inheritdoc}
    */
+  protected $configurableEntityType = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $configurableTimestampField = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
   public function runSensor(SensorResultInterface $sensor_result) {
     // @todo This will not perform for large number of payments.
     // @todo Use a condition for the currency when available again.
     $ids = $this->getEntityQuery()->execute();
 
+    $entity_type_id = $this->sensorConfig->getSetting('entity_type');
     $payments = $this->entityManager
-      ->getStorage($this->getEntityTypeId())
+      ->getStorage($entity_type_id)
       ->loadMultiple($ids);
 
     $turnover = 0;
@@ -47,6 +58,18 @@ class PaymentTurnoverSensorPlugin extends ContentEntityAggregatorSensorPlugin {
       }
     }
     $sensor_result->setValue($turnover);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = array(
+      'settings' => array(
+        'entity_type' => 'payment',
+      ),
+    );
+    return $default_config;
   }
 
 }
