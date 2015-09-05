@@ -73,7 +73,7 @@ class SensorList extends ControllerBase {
       $rows[] = array(
         'data' => array(
           'label' => array(
-            'data' => SafeMarkup::set('<h3>' . $category . '</h3>'),
+            'data' => array('#markup' => '<h3>' . $category . '</h3>'),
             'colspan' => 7
           ),
         ),
@@ -93,7 +93,7 @@ class SensorList extends ControllerBase {
           $oldest_sensor_age = $called_before;
         }
 
-        $row['data']['label'] = SafeMarkup::set('<span title="' . $sensor_config->getDescription() . '">' . $sensor_config->getLabel() . '</span>');
+        $row['data']['label']['data'] = array('#markup' => '<span title="' . $sensor_config->getDescription() . '">' . $sensor_config->getLabel() . '</span>');
 
         $row['data']['sensor_status'] = array(
           'data' => $sensor_result->getStatus(),

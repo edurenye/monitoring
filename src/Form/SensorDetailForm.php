@@ -186,7 +186,7 @@ class SensorDetailForm extends EntityForm {
     $form['settings'] = array(
       '#type' => 'details',
       '#title' => $this->t('Settings'),
-      '#description' => SafeMarkup::set('<pre>' . var_export($sensor_config->getSettings(), TRUE) . '</pre>'),
+      '#description' => array('#markup' => '<pre>' . var_export($sensor_config->getSettings(), TRUE) . '</pre>'),
       '#open' => FALSE,
     );
 
