@@ -29,6 +29,5 @@ class CronLastRunAgeSensorPlugin extends SensorPluginBase {
   public function runSensor(SensorResultInterface $result) {
     $last_cron_run_before = REQUEST_TIME - \Drupal::state()->get('system.cron_last');
     $result->setValue($last_cron_run_before);
-    $result->addStatusMessage('@time ago', array('@time' => \Drupal::service('date.formatter')->formatInterval($last_cron_run_before)));
   }
 }
