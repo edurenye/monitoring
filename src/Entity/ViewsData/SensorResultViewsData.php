@@ -18,6 +18,7 @@ class SensorResultViewsData extends EntityViewsData {
    */
   public function getViewsData() {
     $data = parent::getViewsData();
+    $data['monitoring_sensor_result']['sensor_message']['field']['id'] = 'monitoring_sensor_message';
     return $data;
   }
 

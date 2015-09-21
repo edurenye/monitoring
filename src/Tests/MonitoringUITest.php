@@ -464,6 +464,8 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText(t('OK'));
     $this->assertText(t('No value'));
     $this->assertRaw('class="monitoring-ok"');
+    $this->assertRaw('It is <strong>highly recommended</strong> that you configure this.');
+    $this->assertRaw('See <a href="https://www.drupal.org/node/1992030">Protecting against HTTP HOST Header attacks</a>');
     $this->clickLink('test_sensor');
     $this->assertResponse(200);
     $this->assertUrl(SensorConfig::load('test_sensor')->urlInfo('details-form'));
