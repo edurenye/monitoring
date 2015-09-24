@@ -139,6 +139,7 @@ class MonitoringSensorResultResource extends ResourceBase {
         $response = new ResourceResponse($response);
         $response->addCacheableDependency($result[$sensor_name]->getSensorConfig());
         $response->addCacheableDependency($url);
+        $response->addCacheableDependency(CacheableMetadata::createFromRenderArray(['#cache' => ['contexts' => [0 => 'url.query_args']]]));
         if (!$context->isEmpty()) {
           $response->addCacheableDependency($context->pop());
         }
