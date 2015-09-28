@@ -211,10 +211,10 @@ class SensorResult implements SensorResultInterface {
       // Set the default message variables.
       $default_variables = array(
         '@sensor' => $this->getSensorId(),
-        '!formatted_value' => $this->getFormattedValue($this->getValue()),
+        '@formatted_value' => $this->getFormattedValue($this->getValue()),
         '@time' => $this->getTimestamp(),
-        '!expected' => $msg_expected,
-        '!time_interval' => \Drupal::service('date.formatter')->formatInterval($this->getSensorConfig()->getTimeIntervalValue()),
+        '@expected' => $msg_expected,
+        '@time_interval' => \Drupal::service('date.formatter')->formatInterval($this->getSensorConfig()->getTimeIntervalValue()),
       );
 
       // Build an array of message parts.
@@ -226,10 +226,10 @@ class SensorResult implements SensorResultInterface {
         // If the sensor defines time interval value we append
         // the info to the message.
         if ($this->getSensorConfig()->getTimeIntervalValue()) {
-          $messages[] = SafeMarkup::format('!formatted_value in !time_interval', $default_variables);
+          $messages[] = SafeMarkup::format('@formatted_value in @time_interval', $default_variables);
         }
         else {
-          $messages[] = $default_variables['!formatted_value'];
+          $messages[] = $default_variables['@formatted_value'];
         }
       }
       // Avoid an empty sensor message.
@@ -239,7 +239,7 @@ class SensorResult implements SensorResultInterface {
 
       // Set the expected value message if the sensor did not match.
       if ($this->isCritical() && $this->getExpectedValue() !== NULL) {
-        $messages[] = SafeMarkup::format('expected !expected', $default_variables);
+        $messages[] = SafeMarkup::format('expected @expected', $default_variables);
       }
       // Set the threshold message if there is any.
       if ($threshold_message !== NULL) {
@@ -314,7 +314,7 @@ class SensorResult implements SensorResultInterface {
       }
       elseif (empty($value_types[$value_type]['formatter_callback']) && $label = $this->getSensorConfig()->getValueLabel()) {
         $label = Unicode::strtolower($label);
-        return SafeMarkup::format('!value !label', array('!value' => $value, '!label' => $label));
+        return SafeMarkup::format('@value @label', array('@value' => $value, '@label' => $label));
       }
       elseif (isset($value_types[$value_type]['formatter_callback']) && !function_exists($value_types[$value_type]['formatter_callback'])) {
         throw new SensorCompilationException(SafeMarkup::format('Formatter callback @callback for @type does not exist',
@@ -333,10 +333,10 @@ class SensorResult implements SensorResultInterface {
       // @todo This assumption will no longer work when non-english messages
       // supported.
       $label = Unicode::strtolower($label);
-      return SafeMarkup::format('!value !label', array('!value' => $value, '!label' => $label));
+      return SafeMarkup::format('@value @label', array('@value' => $value, '@label' => $label));
     }
 
-    return SafeMarkup::format('Value !value', array('!value' => $value));
+    return SafeMarkup::format('Value @value', array('@value' => $value));
   }
 
   /**
