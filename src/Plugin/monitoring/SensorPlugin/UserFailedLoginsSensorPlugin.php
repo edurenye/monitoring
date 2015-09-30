@@ -29,6 +29,7 @@ class UserFailedLoginsSensorPlugin extends DatabaseAggregatorSensorPlugin {
     $query = parent::getAggregateQuery();
     $query->addField('watchdog', 'variables');
     $query->groupBy('watchdog.variables');
+    $query->orderBy('records_count', 'DESC');
     return $query;
   }
 

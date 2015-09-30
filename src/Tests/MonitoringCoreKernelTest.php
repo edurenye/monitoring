@@ -449,12 +449,15 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user1'));
     \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user2'));
+    \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user2'));
+    \Drupal::logger('user')->notice('Login attempt failed for %user.', array('%user' => 'user2'));
 
     // Run sensor and test the output.
     $result = $this->runSensor('user_failed_logins');
-    $this->assertEqual($result->getValue(), 3);
+    $this->assertEqual($result->getValue(), 5);
     $this->assertTrue(strpos($result->getMessage(), 'user1: 2') !== FALSE);
-    $this->assertTrue(strpos($result->getMessage(), 'user2: 1') !== FALSE);
+    $this->assertTrue(strpos($result->getMessage(), 'user2: 3') !== FALSE);
+    $this->assertTrue(strpos($result->getMessage(), 'user2: 3, user1: 2') !== FALSE);
   }
 
   /**
