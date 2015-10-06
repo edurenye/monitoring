@@ -151,7 +151,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertFalse($node->isSticky());
     $this->assertText($node->uuid());
     $this->assertText(\Drupal::service('date.formatter')->format($node->getCreatedTime(), 'short'));
-    $this->assertText($node->getChangedTime());
+    $this->assertText(\Drupal::service('date.formatter')->format($node->getChangedTime(), 'short'));
 
     $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
     $this->assertFieldByName('caching_time', 100);
