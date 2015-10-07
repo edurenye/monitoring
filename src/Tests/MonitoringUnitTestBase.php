@@ -13,7 +13,7 @@ use Drupal\simpletest\KernelTestBase;
  */
 abstract class MonitoringUnitTestBase extends KernelTestBase {
 
-  public static $modules = array('monitoring', 'monitoring_test', 'field', 'system', 'user', 'views', 'text');
+  public static $modules = array('monitoring', 'monitoring_test', 'field', 'system', 'user', 'views', 'text', 'node');
 
   /**
    * {@inheritdoc}

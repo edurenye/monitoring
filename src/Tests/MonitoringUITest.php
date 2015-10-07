@@ -16,7 +16,7 @@ use Drupal\monitoring\Entity\SensorConfig;
  */
 class MonitoringUITest extends MonitoringTestBase {
 
-  public static $modules = array('dblog', 'node', 'views', 'file');
+  public static $modules = array('dblog', 'node', 'views', 'file', 'automated_cron');
 
   /**
    * {@inheritdoc}
@@ -256,8 +256,8 @@ class MonitoringUITest extends MonitoringTestBase {
       'value_label' => 'Test Value',
       'caching_time' => 100,
       'value_type' => 'bool',
-      'settings[key]' => 'threshold.autorun',
-      'settings[config]' => 'system.cron',
+      'settings[key]' => 'interval',
+      'settings[config]' => 'automated_cron.settings',
     ), t('Save'));
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'UI created Sensor config')));
 

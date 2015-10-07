@@ -118,7 +118,7 @@ class MultigraphServicesTest extends RESTTestBase {
    */
   protected function doRequest($action, $query = array()) {
     $query['_format'] = $this->defaultFormat;
-    $url = $this->container->get('url_generator')->generateFromPath($action, array('absolute' => TRUE, 'query' => $query));
+    $url = Url::fromUri('base:' . $action, array('absolute' => TRUE, 'query' => $query));
     $result = $this->httpRequest($url, 'GET', NULL, $this->defaultMimeType);
     return Json::decode($result);
   }

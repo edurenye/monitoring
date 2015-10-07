@@ -19,7 +19,7 @@ use Drupal\node\Entity\NodeType;
  */
 class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
-  public static $modules = array('dblog', 'image', 'file', 'node', 'taxonomy');
+  public static $modules = array('dblog', 'image', 'file', 'node', 'taxonomy', 'automated_cron');
 
   /**
    * {@inheritdoc}
@@ -71,7 +71,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->assertTrue($result->isOk());
 
     // Enable cron safe threshold and run sensor.
-    $this->config('system.cron')->set('threshold.autorun', 3600)->save();
+    $this->config('automated_cron.settings')->set('interval', 3600)->save();
     $result = $this->runSensor('core_cron_safe_threshold');
     $this->assertTrue($result->isCritical());
     $this->assertEqual($result->getMessage(), 'TRUE, expected FALSE');

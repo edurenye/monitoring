@@ -6,6 +6,9 @@ value_type: 'bool'
 category: 'Cron'
 status: TRUE
 settings:
-  config: 'system.cron'
-  key: 'threshold.autorun'
+  config: 'automated_cron.settings'
+  key: 'interval'
   value: '0'
+dependencies:
+  module:
+    - automated_cron

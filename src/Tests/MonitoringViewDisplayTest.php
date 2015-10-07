@@ -15,7 +15,7 @@ use Drupal\monitoring\Entity\SensorConfig;
  */
 class MonitoringViewDisplayTest extends MonitoringTestBase {
 
-  public static $modules = array('views');
+  public static $modules = array('views', 'node');
 
   /**
    * Tests the view display sensor.
