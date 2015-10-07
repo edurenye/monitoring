@@ -22,7 +22,7 @@ class SensorConfigAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\monitoring\Entity\SensorConfig $entity */
     $plugin_definition = $entity->getPlugin()->getPluginDefinition();
 
@@ -37,6 +37,6 @@ class SensorConfigAccessControlHandler extends EntityAccessControlHandler {
         return AccessResult::allowed()->cachePerUser();
       }
     }
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return parent::checkAccess($entity, $operation, $account);
   }
 }
