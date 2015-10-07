@@ -22,7 +22,7 @@ use Drupal\user\Entity\Role;
  * @SensorPlugin(
  *   id = "user_integrity",
  *   label = @Translation("Privileged user integrity"),
- *   description = @Translation("Monitors name and e-mail changes of users with access to restricted permissions."),
+ *   description = @Translation("Monitors name and e-mail changes of users with access to restricted permissions. Checks if authenticated or anonymous users have privileged access."),
  *   addable = FALSE
  * )
  */
@@ -32,6 +32,13 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
    * {@inheritdoc}
    */
   protected $configurableValueType = FALSE;
+
+  /**
+   * The max number of users to list in the verbose output.
+   *
+   * @var int
+   */
+  protected $listSize = 500;
 
   /**
    * {@inheritdoc}
@@ -74,6 +81,33 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         $sensor_result->setStatus(SensorResultInterface::STATUS_WARNING);
       }
     }
+
+    // Check anonymous and authenticated users with restricted permissions and
+    // show a message.
+    $user_register = \Drupal::config('user.settings')->get('register');
+
+    // Check if authenticated or anonymous users have restrict access perms.
+    $role_ids_after = array_intersect($role_ids, ['authenticated', 'anonymous']);
+    $role_labels = [];
+    foreach (Role::loadMultiple($role_ids_after) as $role) {
+      $role_labels[$role->id()] = $role->label();
+    }
+
+    if (!empty($role_labels)) {
+      $sensor_result->addStatusMessage('Privileged access for roles @roles', array('@roles' => implode(', ', $role_labels)));
+      $sensor_result->setStatus(SensorResultInterface::STATUS_WARNING);
+    }
+
+    // Further escalate if the restricted access is for anonymous.
+    if ((in_array('anonymous', $role_ids))) {
+      $sensor_result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+    }
+
+    // Check if self registration is possible.
+    if ((in_array('authenticated', $role_ids)) && $user_register != USER_REGISTER_ADMINISTRATORS_ONLY) {
+      $sensor_result->addStatusMessage('Self registration possible.');
+      $sensor_result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+    }
   }
 
   /**
@@ -89,9 +123,25 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     if (!$role_ids) {
       return [];
     }
-    $uids = \Drupal::entityQuery('user')
-      ->condition('roles', $role_ids, 'IN')
-      ->execute();
+
+    // Loading all users and managing them will kill the system so we limit
+    // them.
+    $query = \Drupal::entityQuery('user')
+      ->sort('access', 'DESC')
+      ->range(0, $this->listSize);
+
+    // The authenticated role is not persisted and it could have restrict access
+    // so we load every user.
+    if (in_array('authenticated', $role_ids)) {
+      $uids = $query->condition('uid', '0', '<>')
+        ->execute();
+    }
+    else {
+      // Load all users with the roles.
+      $uids = $query->condition('roles', $role_ids, 'IN')
+        ->execute();
+    }
+
     return User::loadMultiple($uids);
   }
 
@@ -173,6 +223,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $processed_users[$id]['mail'] = $user->getEmail();
       $processed_users[$id]['password'] = hash('sha256', $user->getPassword());
       $processed_users[$id]['changed'] = $user->getChangedTime();
+      $processed_users[$id]['last_accessed'] = $user->getLastAccessedTime();
     }
     return $processed_users;
   }
@@ -196,6 +247,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     // Create rows for new users.
     foreach ($new_users_id as $id) {
       $time_stamp = $current_users[$id]['changed'];
+      $last_accessed = $current_users[$id]['last_accessed'];
       $user_name = array(
         '#theme' => 'username',
         '#account' => User::load($id),
@@ -206,6 +258,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $row['expected_value'] = ['#markup' => ''];
 
       $row['time'] = ['#markup' => date("Y-m-d H:i:s", $time_stamp)];
+      $row['last_accessed'] = ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : 'never'];
       $rows[] = $row;
     }
 
@@ -216,6 +269,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $changes = $this->getUserChanges($current_users[$id], $expected_users[$id]);
       foreach ($changes as $key => $value) {
         $time_stamp = $current_users[$id]['changed'];
+        $last_accessed = $current_users[$id]['last_accessed'];
         $user_name = array(
           '#theme' => 'username',
           '#account' => User::load($id),
@@ -226,9 +280,16 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         $row['expected_value'] = ['#markup' => $value['expected_value']];
 
         $row['time'] = ['#markup' => date("Y-m-d H:i:s", $time_stamp)];
+        $row['last_accessed'] = ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : 'never'];
         $rows[] = $row;
       }
     }
+
+    // Show query.
+    $output['message'] = array(
+      '#type' => 'item',
+      '#title' => t('New and changed users with privileged access.'),
+    );
 
     if (count($rows) > 0) {
       $header = [];
@@ -237,11 +298,18 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $header['current_value'] = t('Current value');
       $header['expected_value'] = t('Expected value');
       $header['time'] = t('Changed on');
+      $header['last_accessed'] = t('Last accessed');
 
       $output['users'] = array(
         '#type' => 'table',
         '#header' => $header,
       ) + $rows;
+    }
+    else {
+      $output['result'] = [
+        '#type' => 'item',
+        '#markup' => t('No matching users were found.'),
+      ];
     }
     return $output;
   }

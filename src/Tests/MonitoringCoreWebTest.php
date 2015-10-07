@@ -10,6 +10,7 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\user\RoleInterface;
 
 /**
  * Integration tests for the core pieces of monitoring.
@@ -180,6 +181,48 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     \Drupal::keyValue('monitoring.users')->deleteAll();
     $result = $this->runSensor('user_integrity');
     $this->assertEqual($result->getMessage(), '2 privileged user(s)');
+
+    // Add permissions to authenticated user with no privilege of registration.
+    \Drupal::configFactory()->getEditable('user.settings')->set('register', 'admin_only')->save();
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, array('administer account settings'));
+    \Drupal::keyValue('monitoring.users')->deleteAll();
+    $result = $this->runSensor('user_integrity');
+    $this->assertTrue($result->isWarning());
+
+    // Count users included admin.
+    $this->assertEqual($result->getMessage(), '3 privileged user(s), Privileged access for roles Authenticated user');
+
+    // Add permissions to anonymous user and check the sensor.
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer account settings'));
+    $result = $this->runSensor('user_integrity');
+    $this->assertEqual($result->getMessage(), '3 privileged user(s), Privileged access for roles Anonymous user, Authenticated user');
+
+    // Authenticated user with privilege of register.
+    \Drupal::configFactory()->getEditable('user.settings')->set('register', 'visitors')->save();
+    $result = $this->runSensor('user_integrity');
+    $this->assertTrue($result->isCritical());
+    $this->assertEqual($result->getMessage(), '3 privileged user(s), Privileged access for roles Anonymous user, Authenticated user, Self registration possible.');
+
+    // Create an authenticated user and test that the sensor counter increments.
+    $test_user_third = $this->drupalCreateUser(array(), 'test_user_3');
+    \Drupal::keyValue('monitoring.users')->deleteAll();
+    $result = $this->runSensor('user_integrity');
+    $this->assertEqual($result->getMessage(), '4 privileged user(s), Privileged access for roles Anonymous user, Authenticated user, Self registration possible.');
+
+    $test_user_third->setUsername('changed2');
+    $test_user_third->save();
+
+    // Check sensor message for user changes.
+    $result = $this->runSensor('user_integrity');
+    $this->assertEqual($result->getMessage(), '4 privileged user(s), 1 changed user(s), Privileged access for roles Anonymous user, Authenticated user, Self registration possible.');
+
+    // Check sensor message with permissions revoked.
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('administer account settings'));
+    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, array('administer account settings'));
+    \Drupal::keyValue('monitoring.users')->deleteAll();
+    $result = $this->runSensor('user_integrity');
+    $this->assertEqual($result->getMessage(), '2 privileged user(s)');
+
   }
 
   /**

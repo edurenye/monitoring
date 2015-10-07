@@ -1,6 +1,6 @@
 id: user_integrity
 label: 'Privileged user integrity'
-description: 'Monitors name and e-mail changes of users with access to restricted permissions.'
+description: 'Monitors name and e-mail changes of users with access to restricted permissions. Checks if authenticated or anonymous users have privileged access'
 category: 'User activity'
 plugin_id: user_integrity
 value_type: 'no_value'
