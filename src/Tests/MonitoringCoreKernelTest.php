@@ -455,9 +455,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Run sensor and test the output.
     $result = $this->runSensor('user_failed_logins');
     $this->assertEqual($result->getValue(), 5);
-    $this->assertTrue(strpos($result->getMessage(), 'user1: 2') !== FALSE);
-    $this->assertTrue(strpos($result->getMessage(), 'user2: 3') !== FALSE);
-    $this->assertTrue(strpos($result->getMessage(), 'user2: 3, user1: 2') !== FALSE);
+    $this->assertEqual($result->getMessage(), '5 login attempts in 1 day, user2: 3, user1: 2');
   }
 
   /**
