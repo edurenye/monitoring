@@ -231,6 +231,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $processed_users[$id]['password'] = hash('sha256', $user->getPassword());
       $processed_users[$id]['changed'] = $user->getChangedTime();
       $processed_users[$id]['last_accessed'] = $user->getLastAccessedTime();
+      $processed_users[$id]['created'] = $user->getCreatedTime();
+      $processed_users[$id]['roles'] = implode(", ", $user->getRoles());
     }
     return $processed_users;
   }
@@ -249,29 +251,47 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     $current_users = $this->processUsers($this->loadCurrentUsers($role_ids));
 
     $new_users_id = array_diff(array_keys($current_users), array_keys($expected_users));
+
+    // Verbose output for new users.
     $rows = [];
 
-    // Create rows for new users.
     foreach ($new_users_id as $id) {
-      $time_stamp = $current_users[$id]['changed'];
+      $time_stamp = $current_users[$id]['created'];
       $last_accessed = $current_users[$id]['last_accessed'];
       $user_name = array(
         '#theme' => 'username',
         '#account' => User::load($id),
       );
-      $row['user'] = $user_name;
-      $row['field'] = ['#markup' => ''];
-      $row['current_value'] = ['#markup' => ''];
-      $row['expected_value'] = ['#markup' => ''];
-
-      $row['time'] = ['#markup' => date("Y-m-d H:i:s", $time_stamp)];
-      $row['last_accessed'] = ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : 'never'];
-      $rows[] = $row;
+      $rows[] = [
+        'user' => $user_name,
+        'roles' => ['#markup' => $current_users[$id]['roles']],
+        'created' => ['#markup' => date("Y-m-d H:i:s", $time_stamp)],
+        'last_accessed' => ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : t('never')],
+      ];
     }
 
-    $old_user_ids = array_keys($expected_users);
+    if (count($rows) > 0) {
+      $output['new_title'] = array(
+        '#type' => 'item',
+        '#title' => t('New users with privileged access.'),
+      );
+      $header = [
+        'user' => t('User'),
+        'roles' => t('Roles'),
+        'created' => t('Created'),
+        'last_accessed' => t('Last accessed'),
+      ];
 
-    // Create rows for old users.
+      $output['new_table'] = array(
+        '#type' => 'table',
+        '#header' => $header,
+      ) + $rows;
+    }
+
+    // Verbose output for users with changes.
+    $rows = [];
+
+    $old_user_ids = array_keys($expected_users);
     foreach ($old_user_ids as $id) {
       $changes = $this->getUserChanges($current_users[$id], $expected_users[$id]);
       foreach ($changes as $key => $value) {
@@ -281,42 +301,68 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
           '#theme' => 'username',
           '#account' => User::load($id),
         );
-        $row['user'] = $user_name;
-        $row['field'] = ['#markup' => $key];
-        $row['current_value'] = ['#markup' => $value['current_value']];
-        $row['expected_value'] = ['#markup' => $value['expected_value']];
-
-        $row['time'] = ['#markup' => date("Y-m-d H:i:s", $time_stamp)];
-        $row['last_accessed'] = ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : 'never'];
-        $rows[] = $row;
+        $rows[] = [
+          'user' => $user_name,
+          'field' => ['#markup' => $key],
+          'current_value' => ['#markup' => $value['current_value']],
+          'expected_value' => ['#markup' => $value['expected_value']],
+          'changed' => ['#markup' => date("Y-m-d H:i:s", $time_stamp)],
+          'last_accessed' => ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : t('never')],
+        ];
       }
     }
 
-    // Show query.
-    $output['message'] = array(
-      '#type' => 'item',
-      '#title' => t('New and changed users with privileged access.'),
-    );
-
     if (count($rows) > 0) {
-      $header = [];
-      $header['user'] = t('User');
-      $header['Field'] = t('Field');
-      $header['current_value'] = t('Current value');
-      $header['expected_value'] = t('Expected value');
-      $header['time'] = t('Changed on');
-      $header['last_accessed'] = t('Last accessed');
-
-      $output['users'] = array(
+      $output['changes_title'] = array(
+        '#type' => 'item',
+        '#title' => t('Changed users with privileged access.'),
+      );
+      $header = [
+        'user' => t('User'),
+        'Field' => t('Field'),
+        'current_value' => t('Current value'),
+        'expected_value' => t('Expected value'),
+        'changed' => t('Changed'),
+        'last_accessed' => t('Last accessed'),
+      ];
+      $output['changes_table'] = array(
         '#type' => 'table',
         '#header' => $header,
       ) + $rows;
     }
-    else {
-      $output['result'] = [
-        '#type' => 'item',
-        '#markup' => t('No matching users were found.'),
+
+    // Verbose output for all privileged users.
+    $rows = [];
+
+    foreach ($current_users as $user) {
+      $created = $user['created'];
+      $user_name = array(
+        '#theme' => 'username',
+        '#account' => User::load($user['id']),
+      );
+      $rows[] = [
+        'user' => $user_name,
+        'roles' => ['#markup' => $user['roles']],
+        'created' => ['#markup' => date("Y-m-d H:i:s", $created)],
+        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? date("Y-m-d H:i:s", $user['last_accessed']) : t('never')],
       ];
+    }
+
+    if (count($rows) > 0) {
+      $output['message_privileges'] = array(
+        '#type' => 'item',
+        '#title' => t('All users with privileged access.'),
+      );
+      $header = [
+        'user' => t('User'),
+        'roles' => t('Roles'),
+        'created' => t('Created'),
+        'last_accessed' => t('Last accessed')
+      ];
+      $output['users_privileged'] = array(
+        '#type' => 'table',
+        '#header' => $header,
+      ) + $rows;
     }
 
     // Show roles list with the permissions that are restricted for each.
@@ -332,6 +378,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       '#title' => t('List of roles with restricted permissions.'),
       '#markup' => implode('<br>', $roles_list),
     );
+
     return $output;
   }
 

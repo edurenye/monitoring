@@ -577,6 +577,27 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('List of roles with restricted permissions');
     $this->assertText('Authenticated user: administer account settings');
 
+    // Check table of users with privileged access.
+    $expected_header = [
+      'User',
+      'Roles',
+      'Created',
+      'Last accessed',
+    ];
+    $xpath = $this->xpath('//table[@id="edit-users-privileged"]');
+    $header = (array) $xpath[0]->thead->tr->th;
+    $body = (array) $xpath[0]->tbody;
+    $first_row = $body['tr'][0]->td;
+    $second_row = $body['tr'][1]->td;
+
+    $this->assertText('All users with privileged access.');
+    $this->assertEqual(count($body['tr']), 3);
+    $this->assertEqual($expected_header, $header);
+
+    // Assert roles are listed on the table.
+    $this->assertEqual($first_row[1], implode(", ", $test_user->getRoles()));
+    $this->assertEqual($second_row[1], implode(", ", $account->getRoles()));
+
     // Check the new user name in verbose output.
     $this->assertText('test_user');
     // Reset the user data and run the sensor again.
