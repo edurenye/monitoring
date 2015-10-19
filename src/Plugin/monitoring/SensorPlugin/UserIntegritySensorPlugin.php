@@ -41,6 +41,13 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
   protected $listSize = 500;
 
   /**
+   * The list of restricted permissions.
+   *
+   * @var array
+   */
+  protected $restrictedPermissions = array();
+
+  /**
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $sensor_result) {
@@ -187,17 +194,17 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     /** @var \Drupal\user\PermissionHandlerInterface $permission_handler */
     $permission_handler = \Drupal::service('user.permissions');
     $available_permissions = $permission_handler->getPermissions();;
-    $restricted_permissions = array();
+    $this->restrictedPermissions = array();
     foreach ($available_permissions as $key => $value) {
       if (!empty($value['restrict access'])) {
-        $restricted_permissions[] = $key;
+        $this->restrictedPermissions[] = $key;
       }
     }
     $avaliable_roles = Role::loadMultiple();
     $restricted_roles = array();
     foreach ($avaliable_roles as $role) {
       $permissions = $role->getPermissions();
-      if ($role->isAdmin() ||  array_intersect($permissions, $restricted_permissions)) {
+      if ($role->isAdmin() ||  array_intersect($permissions, $this->restrictedPermissions)) {
         $restricted_roles[] = $role->id();
       }
     }
@@ -311,6 +318,20 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         '#markup' => t('No matching users were found.'),
       ];
     }
+
+    // Show roles list with the permissions that are restricted for each.
+    $roles_list = [];
+    foreach (Role::loadMultiple($role_ids) as $role) {
+      if (!$role->isAdmin()) {
+        $restricted_permissions = array_intersect($this->restrictedPermissions, $role->getPermissions());
+        $roles_list[] = $role->label() . ': ' . implode(", ", $restricted_permissions);
+      }
+    }
+    $output['roles_list'] = array(
+      '#type' => 'item',
+      '#title' => t('List of roles with restricted permissions.'),
+      '#markup' => implode('<br>', $roles_list),
+    );
     return $output;
   }
 

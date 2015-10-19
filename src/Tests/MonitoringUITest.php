@@ -566,8 +566,17 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->runSensor('user_integrity');
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
     $this->assertText('2 privileged user(s), 1 new user(s)');
+
+    // Grant restricted permission to authenticated users.
+    user_role_grant_permissions('authenticated', array('administer account settings'));
+
     // Run the sensor to check verbose output.
     $this->drupalPostForm(NULL, array(), t('Run now'));
+
+    // Check restricted permissions of Authenticated users.
+    $this->assertText('List of roles with restricted permissions');
+    $this->assertText('Authenticated user: administer account settings');
+
     // Check the new user name in verbose output.
     $this->assertText('test_user');
     // Reset the user data and run the sensor again.
@@ -581,7 +590,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $test_user->save();
     $this->runSensor('user_integrity');
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
-    $this->assertText('2 privileged user(s), 1 changed user(s)');
+    $this->assertText('3 privileged user(s), 1 changed user(s)');
 
     // Reset user data again and check sensor message.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/user_integrity', array(), t('Reset user data'));
