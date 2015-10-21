@@ -50,7 +50,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Test output and default message replacement.
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
     $xpath = $this->xpath('//table[@id="edit-result"]/tbody/tr');
-    $wid = (string) $xpath[0]->td[0];
+    $wid = $xpath[0]->td[0]->a;
     $message = (string) $xpath[0]->td[1];
     $this->assertEqual(count($xpath), 5, 'There are 5 results in the table.');
     $this->assertTrue($wid, 'Found WID in verbose output');
@@ -320,7 +320,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/user_failed_logins');
     $xpath = $this->xpath('//table[@id="edit-result"]');
     $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
-    $this->assertEqual((string) ($xpath[0]->tbody->tr->td[1]), 'Login attempt failed for admin');
+    // The username has a <em> tag so we have to concatenate it.
+    $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[2]), '.') . ($xpath[0]->tbody->tr->td[2]->em), 'Login attempt failed for admin');
   }
 
   /**

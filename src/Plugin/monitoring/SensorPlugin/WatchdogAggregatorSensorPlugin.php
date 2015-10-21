@@ -6,6 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Core\Url;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\Component\Utility\SafeMarkup;
 
@@ -41,10 +42,13 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
       unset($output['result']['#header']['variables']);
       // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
-        $output['result']['#rows'][$delta]['#markup'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        $output['result']['#rows'][$delta]['message'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        $output['result']['#rows'][$delta]['wid'] = \Drupal::l($row['wid'], Url::fromUserInput('/admin/reports/dblog/event/' . $row['wid']));
+        if (isset($row['timestamp'])) {
+          $output['result']['#rows'][$delta]['timestamp'] = date("Y-m-d H:i:s", $row['timestamp']);
+        }
 
         // Do not render the raw message & variables in the row.
-        unset($output['result']['#rows'][$delta]['message']);
         unset($output['result']['#rows'][$delta]['variables']);
       };
     }

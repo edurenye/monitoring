@@ -6,7 +6,6 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Core\Url;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -48,28 +47,4 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
     $result->setValue($records_count);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildTableHeader($rows = []) {
-    $header = [
-      'wid' => $this->t('WID'),
-      'message' => $this->t('Message'),
-      'date' => $this->t('Date'),
-    ];
-    return $header;
-  }
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildTableRows(array $results) {
-    $rows = [];
-    foreach ($results as $delta => $row) {
-      $variables = unserialize($row->variables);
-      $rows[$delta]['wid'] = \Drupal::l($row->wid, Url::fromUserInput('/admin/reports/dblog/event/' . $row->wid));
-      $rows[$delta]['message'] = 'Login attempt failed for ' . $variables['%user'];
-      $rows[$delta]['date'] = date("Y-m-d H:i:s", $row->timestamp);
-    }
-    return $rows;
-  }
 }
