@@ -303,6 +303,27 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
   }
 
   /**
+   * Tests the user failed login sensor.
+   *
+   * @see UserFailedLoginsSensorPlugin
+   */
+  protected function testUserFailedLoginSensorPlugin() {
+
+    // Add a failed attempt for the admin account.
+    $this->drupalPostForm('user/login', [
+      'name' => 'admin',
+      'pass' => '123'
+    ], t('Log in'));
+
+    // Check the verbose sensor result.
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('admin/reports/monitoring/sensors/user_failed_logins');
+    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
+    $this->assertEqual((string) ($xpath[0]->tbody->tr->td[1]), 'Login attempt failed for admin');
+  }
+
+  /**
    * Tests for disappearing sensors.
    *
    * We provide a separate test method for the DisappearedSensorsSensorPlugin as we

@@ -6,7 +6,6 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Component\Utility\Xss;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\Component\Utility\SafeMarkup;
 
@@ -43,6 +42,7 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
       // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
         $output['result']['#rows'][$delta]['#markup'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+
         // Do not render the raw message & variables in the row.
         unset($output['result']['#rows'][$delta]['message']);
         unset($output['result']['#rows'][$delta]['variables']);

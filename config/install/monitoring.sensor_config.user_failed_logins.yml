@@ -18,8 +18,9 @@ settings:
       value: 'Login attempt failed for %user.'
   verbose_fields:
     - 'wid'
-    - 'message'
     - 'variables'
+    - 'timestamp'
+    - 'message'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
 thresholds:
