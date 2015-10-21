@@ -18,6 +18,9 @@ interface ExtendedInfoSensorPluginInterface {
   /**
    * Provide additional info about sensor call.
    *
+   * This method is only executed on request. It is guaranteed that runSensor()
+   * is executed before this method.
+   *
    * @param \Drupal\monitoring\Result\SensorResultInterface $result
    *   Sensor result.
    *
