@@ -588,6 +588,22 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
           }
         }
       }
+      // Validate conditions.
+      $fields = $form_state->getValue('conditions', []);
+      foreach ($fields as $key => $field) {
+        $query = $database->select($table);
+        $field_name = $field['field'];
+        if (!empty($field_name) && !$database->schema()->fieldExists($table, $field_name)) {
+          $query->addField($table, $field_name);
+          try {
+            $query->range(0, 1)->execute();
+          }
+          catch (\Exception $e) {
+            $form_state->setErrorByName("conditions][$key][field", t('The field %field does not exist in the table "%table".', ['%field' => $field_name, '%table' => $table]));
+            continue;
+          }
+        }
+      }
     }
   }
 

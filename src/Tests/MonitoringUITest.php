@@ -295,6 +295,15 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalPostForm(NULL, array(), t('Save'));
     $this->assertText(t('Sensor Watchdog Sensor saved'));
 
+    // Edit sensor with invalid fields.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/watchdog_sensor', array(
+      'conditions[0][field]' => 'condition_invalid',
+      'verbose_fields[0][field_key]' => 'verbose_invalid',
+    ), t('Save'));
+
+    $this->assertText('The field condition_invalid does not exist in the table "watchdog".');
+    $this->assertText('The field verbose_invalid does not exist in the table "watchdog".');
+
     // Load the created sensor and assert the default configuration.
     $sensor_config = SensorConfig::load('watchdog_sensor');
     $settings = $sensor_config->getSettings();
