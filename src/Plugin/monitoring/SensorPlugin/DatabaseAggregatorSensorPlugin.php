@@ -193,6 +193,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     $query_result = $this->getQuery()
       ->range(0, 10)
       ->execute();
+    $this->queryString = $query_result->getQueryString();
 
     $rows = $this->buildTableRows($query_result->fetchAll());
     $output['result'] = array(
