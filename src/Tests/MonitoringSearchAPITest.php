@@ -9,6 +9,7 @@ namespace Drupal\monitoring\Tests;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\search_api\Entity\Index;
+use Drupal\search_api\Utility;
 use Drupal\search_api_db\Tests;
 
 /**
@@ -51,6 +52,8 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     $this->createEntityTestBundles();
     // Install the test search API index and server used by the test.
     $this->installConfig(['search_api_test_db']);
+
+    Utility::getIndexTaskManager()->addItemsAll(Index::load('database_search_index'));
   }
 
   /**
