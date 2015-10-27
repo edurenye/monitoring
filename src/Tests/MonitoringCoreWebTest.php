@@ -332,7 +332,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $xpath = $this->xpath('//table[@id="edit-result"]');
     $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
     // The username has a <em> tag so we have to concatenate it.
-    $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[2]), '.') . ($xpath[0]->tbody->tr->td[2]->em), 'Login attempt failed for admin');
+    $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[1]), '.') . ($xpath[0]->tbody->tr->td[1]->em), 'Login attempt failed for admin');
   }
 
   /**

@@ -42,14 +42,18 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
       unset($output['result']['#header']['variables']);
       // Replace the message for every row.
       foreach ($output['result']['#rows'] as $delta => $row) {
-        $output['result']['#rows'][$delta]['message'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        // Link the watchdog id to the dblog.
         $output['result']['#rows'][$delta]['wid'] = \Drupal::l($row['wid'], Url::fromUserInput('/admin/reports/dblog/event/' . $row['wid']));
+
+        // Replace variables in message.
+        $output['result']['#rows'][$delta]['message'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        // Do not render the raw message & variables in the row.
+        unset($output['result']['#rows'][$delta]['variables']);
+
+        // Reformat the timestamp.
         if (isset($row['timestamp'])) {
           $output['result']['#rows'][$delta]['timestamp'] = date("Y-m-d H:i:s", $row['timestamp']);
         }
-
-        // Do not render the raw message & variables in the row.
-        unset($output['result']['#rows'][$delta]['variables']);
       };
     }
   }

@@ -22,6 +22,7 @@ settings:
     - 'wid'
     - 'message'
     - 'variables'
+    - 'timestamp'
   time_interval_field: timestamp
   time_interval_value: 86400
 thresholds:
