@@ -163,18 +163,28 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
    * @see UserIntegritySensorPlugin
    */
   protected function doTestUserIntegritySensorPlugin() {
+    $test_user_first = $this->drupalCreateUser(array('administer monitoring'), 'test_user');
+    $this->runSensor('user_integrity');
+
+    // Delete the user and run the sensor.
+    $test_user_first->delete();
+    $result = $this->runSensor('user_integrity');
+    $this->assertTrue($result->isOk());
+
+    // Create the user again.
     $test_user_first = $this->drupalCreateUser(array('administer monitoring'), 'test_user_1');
     $this->drupalLogin($test_user_first);
+
     // Check sensor message after first privilege user creation.
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '1 privileged user(s)');
+    $this->assertEqual($result->getMessage(), '1 privileged user(s), 1 new user(s)');
 
     // Create second privileged user.
     $test_user_second = $this->drupalCreateUser(array(), 'test_user_2', TRUE);
     $this->drupalLogin($test_user_second);
     // Check sensor message after new privilege user creation.
     $result = $this->runSensor('user_integrity');
-    $this->assertEqual($result->getMessage(), '2 privileged user(s), 1 new user(s)');
+    $this->assertEqual($result->getMessage(), '2 privileged user(s), 2 new user(s)');
 
     // Reset the user data, button is tested in UI tests.
     \Drupal::keyValue('monitoring.users')->deleteAll();

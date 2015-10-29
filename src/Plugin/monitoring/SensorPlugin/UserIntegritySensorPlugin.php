@@ -252,6 +252,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
 
     $new_users_id = array_diff(array_keys($current_users), array_keys($expected_users));
 
+    $deleted_users = array_diff_key($expected_users, $current_users);
+
     // Verbose output for new users.
     $rows = [];
 
@@ -293,7 +295,10 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
 
     $old_user_ids = array_keys($expected_users);
     foreach ($old_user_ids as $id) {
-      $changes = $this->getUserChanges($current_users[$id], $expected_users[$id]);
+      $changes = [];
+      if (isset($current_users[$id])) {
+        $changes = $this->getUserChanges($current_users[$id], $expected_users[$id]);
+      }
       foreach ($changes as $key => $value) {
         $time_stamp = $current_users[$id]['changed'];
         $last_accessed = $current_users[$id]['last_accessed'];
@@ -360,6 +365,35 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         'last_accessed' => t('Last accessed')
       ];
       $output['users_privileged'] = array(
+        '#type' => 'table',
+        '#header' => $header,
+      ) + $rows;
+    }
+
+    // Verbose output for deleted users.
+    $rows = [];
+
+    foreach ($deleted_users as $user) {
+      $rows[] = [
+        'user' => ['#markup' => $user['name']],
+        'roles' => ['#markup' => $user['roles']],
+        'created' => ['#markup' => date("Y-m-d H:i:s", $user['created'])],
+        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? date("Y-m-d H:i:s", $user['last_accessed']) : t('never')],
+      ];
+    }
+
+    if (count($rows) > 0) {
+      $output['message_deleted'] = array(
+        '#type' => 'item',
+        '#title' => t('Deleted users with privileged access.'),
+      );
+      $header = [
+        'user' => t('User'),
+        'roles' => t('Roles'),
+        'created' => t('Created'),
+        'last_accessed' => t('Last accessed')
+      ];
+      $output['deleted_users'] = array(
         '#type' => 'table',
         '#header' => $header,
       ) + $rows;

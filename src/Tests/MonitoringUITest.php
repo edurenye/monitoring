@@ -642,6 +642,15 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->runSensor('user_integrity');
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
     $this->assertText('2 privileged user(s)');
+
+    // Check the list of deleted users.
+    $account->delete();
+    $this->drupalPostForm('admin/reports/monitoring/sensors/user_integrity', array(), t('Run now'));
+    $this->assertText('Deleted users with privileged access.');
+
+    // Assert the deleted user is listed.
+    $xpath = $this->xpath('//table[@id="edit-deleted-users"]');
+    $this->assertEqual((string) $xpath[0]->tbody->tr->td[0], 'integrity_test_user');
   }
 
   /**
