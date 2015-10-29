@@ -7,6 +7,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\monitoring\SensorPlugin\ValueComparisonSensorPluginBase;
 
@@ -21,6 +22,8 @@ use Drupal\monitoring\SensorPlugin\ValueComparisonSensorPluginBase;
  * )
  */
 class ConfigValueSensorPlugin extends ValueComparisonSensorPluginBase {
+
+  use DependencyTrait;
 
   /**
    * {@inheritdoc}
@@ -84,6 +87,19 @@ class ConfigValueSensorPlugin extends ValueComparisonSensorPluginBase {
       '#weight' => -1,
     );
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    $config_object = $this->sensorConfig->getSetting('config');
+    $config = \Drupal::config($config_object);
+    if (isset($config) && isset($config->getOriginal()['dependencies'])) {
+      $this->addDependency('config', $config_object);
+    }
+    $this->addDependency('module', strtok($config_object, '.'));
+    return $this->dependencies;
   }
 
 }
