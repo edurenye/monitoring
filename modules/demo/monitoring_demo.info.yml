@@ -12,3 +12,4 @@ dependencies:
  - monitoring
  - rest
  - hal
+ - dblog

@@ -74,7 +74,13 @@ function monitoring_demo_install() {
     \Drupal::logger('sensor_demo')->warning($random->name());
   }
   for($i = 0; $i < 50; $i++) {
-    \Drupal::logger('page not found')->notice('not/found');
+    db_insert('watchdog')->fields(array(
+      'type' => 'page not found',
+      'message' => '@uri',
+      'variables' => serialize(['@uri' => 'not/found']),
+      'location' => 'http://example.com/not/found',
+      'timestamp' => '1999999999',
+    ))->execute();
   }
 
   // Enable Enabled modules and Disappeared sensors for the "interactive" demo.
