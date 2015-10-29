@@ -186,7 +186,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   public function verboseResultUnaggregated(array &$output) {
     $output['result_title'] = array(
       '#type' => 'item',
-      '#title' => t('RESULT'),
+      '#title' => t('Result'),
     );
 
     // Fetch the last 10 matching entries, unaggregated.
