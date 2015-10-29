@@ -376,7 +376,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     $output['roles_list'] = array(
       '#type' => 'item',
       '#title' => t('List of roles with restricted permissions.'),
-      '#markup' => implode('<br>', $roles_list),
+      '#markup' => !empty($roles_list) ? implode('<br>', $roles_list) : t('None'),
     );
 
     return $output;

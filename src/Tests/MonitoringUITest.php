@@ -569,6 +569,10 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
     $this->assertText('1 privileged user(s)');
 
+    // Assert None output when we don't have restricted roles with permissions.
+    $this->assertText('List of roles with restricted permissions.');
+    $this->assertText('None');
+
     $test_user = $this->drupalCreateUser(array('administer monitoring'), 'test_user');
     $test_user->save();
     $this->drupalLogin($test_user);
