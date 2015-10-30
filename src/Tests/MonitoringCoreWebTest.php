@@ -346,6 +346,28 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
   }
 
   /**
+   * Tests the non existing user failed login sensor.
+   */
+  protected function testNonExistingUserFailedLoginSensorPlugin() {
+    // Insert a failed login event.
+    db_insert('watchdog')->fields(array(
+      'type' => 'user',
+      'message' => 'Login attempt failed from %ip.',
+      'variables' => serialize(['%ip' => '127.0.0.1']),
+      'location' => 'http://d8.dev/user/login',
+      'timestamp' => '1999999999',
+    ))->execute();
+
+    // Check the verbose sensor result.
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('admin/reports/monitoring/sensors/user_void_failed_logins');
+    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
+    // The ip has a <em> tag so we have to concatenate it.
+    $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[1]), '.') . ($xpath[0]->tbody->tr->td[1]->em), 'Login attempt failed from 127.0.0.1');
+  }
+
+  /**
    * Tests for disappearing sensors.
    *
    * We provide a separate test method for the DisappearedSensorsSensorPlugin as we

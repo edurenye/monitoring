@@ -235,6 +235,10 @@ monitoring.settings.user_failed_logins:
   type: monitoring.settings.watchdog_aggregator
   label: 'Failed user sensor settings'
 
+monitoring.settings.user_void_failed_logins:
+  type: monitoring.settings.watchdog_aggregator
+  label: 'Failed user sensor settings'
+
 monitoring.settings.twig_debug_mode:
   type: monitoring.settings_base
   label: 'Monitor twig settings'
