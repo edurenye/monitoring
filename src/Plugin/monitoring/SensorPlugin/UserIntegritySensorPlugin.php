@@ -267,8 +267,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $rows[] = [
         'user' => $user_name,
         'roles' => ['#markup' => $current_users[$id]['roles']],
-        'created' => ['#markup' => date("Y-m-d H:i:s", $time_stamp)],
-        'last_accessed' => ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : t('never')],
+        'created' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')],
+        'last_accessed' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')],
       ];
     }
 
@@ -311,8 +311,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
           'field' => ['#markup' => $key],
           'current_value' => ['#markup' => $value['current_value']],
           'expected_value' => ['#markup' => $value['expected_value']],
-          'changed' => ['#markup' => date("Y-m-d H:i:s", $time_stamp)],
-          'last_accessed' => ['#markup' => $last_accessed != 0 ? date("Y-m-d H:i:s", $last_accessed) : t('never')],
+          'changed' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')],
+          'last_accessed' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')],
         ];
       }
     }
@@ -348,8 +348,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $rows[] = [
         'user' => $user_name,
         'roles' => ['#markup' => $user['roles']],
-        'created' => ['#markup' => date("Y-m-d H:i:s", $created)],
-        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? date("Y-m-d H:i:s", $user['last_accessed']) : t('never')],
+        'created' => ['#markup' => \Drupal::service('date.formatter')->format($created, 'short')],
+        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')],
       ];
     }
 
@@ -377,8 +377,8 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       $rows[] = [
         'user' => ['#markup' => $user['name']],
         'roles' => ['#markup' => $user['roles']],
-        'created' => ['#markup' => date("Y-m-d H:i:s", $user['created'])],
-        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? date("Y-m-d H:i:s", $user['last_accessed']) : t('never')],
+        'created' => ['#markup' => \Drupal::service('date.formatter')->format($user['created'], 'short')],
+        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')],
       ];
     }
 

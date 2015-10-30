@@ -52,7 +52,7 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
 
         // Reformat the timestamp.
         if (isset($row['timestamp'])) {
-          $output['result']['#rows'][$delta]['timestamp'] = date("Y-m-d H:i:s", $row['timestamp']);
+          $output['result']['#rows'][$delta]['timestamp'] = \Drupal::service('date.formatter')->format($row['timestamp'], 'short');
         }
       };
     }
