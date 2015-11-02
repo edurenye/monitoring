@@ -53,7 +53,11 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     // Install the test search API index and server used by the test.
     $this->installConfig(['search_api_test_db']);
 
-    Utility::getIndexTaskManager()->addItemsAll(Index::load('database_search_index'));
+    // @todo Remove workaround for outdated SearchAPI Version on testbot.
+    if (\Drupal::hasService('search_api.index_task_manager')) {
+      Utility::getIndexTaskManager()
+        ->addItemsAll(Index::load('database_search_index'));
+    }
   }
 
   /**

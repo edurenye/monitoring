@@ -28,6 +28,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     parent::setUp();
 
     $this->installSchema('dblog', ['watchdog']);
+    $this->installConfig(array('system'));
 
     \Drupal::moduleHandler()->loadAllIncludes('install');
     monitoring_install();
