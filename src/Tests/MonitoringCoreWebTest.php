@@ -355,7 +355,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'message' => 'Login attempt failed from %ip.',
       'variables' => serialize(['%ip' => '127.0.0.1']),
       'location' => 'http://d8.dev/user/login',
-      'timestamp' => '1999999999',
+      'timestamp' => REQUEST_TIME,
     ))->execute();
 
     // Check the verbose sensor result.

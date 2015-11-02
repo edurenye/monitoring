@@ -79,7 +79,7 @@ function monitoring_demo_install() {
       'message' => '@uri',
       'variables' => serialize(['@uri' => 'not/found']),
       'location' => 'http://example.com/not/found',
-      'timestamp' => '1999999999',
+      'timestamp' => REQUEST_TIME,
     ))->execute();
   }
 
