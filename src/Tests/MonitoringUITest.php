@@ -651,6 +651,19 @@ class MonitoringUITest extends MonitoringTestBase {
     // Assert the deleted user is listed.
     $xpath = $this->xpath('//table[@id="edit-deleted-users"]');
     $this->assertEqual((string) $xpath[0]->tbody->tr->td[0], 'integrity_test_user');
+
+    // Test enabled sensor link works after save.
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_integrity', array(), 'Save');
+    $this->clickLink('Privileged user integrity');
+    $this->assertResponse(200);
+    $this->assertUrl('admin/reports/monitoring/sensors/user_integrity');
+
+    // Test disabled sensor link works and redirect to edit page.
+    monitoring_sensor_manager()->disableSensor('user_integrity');
+    $this->drupalPostForm('admin/config/system/monitoring/sensors/user_integrity', array(), 'Save');
+    $this->clickLink('Privileged user integrity');
+    $this->assertResponse(200);
+    $this->assertUrl('admin/config/system/monitoring/sensors/user_integrity');
   }
 
   /**

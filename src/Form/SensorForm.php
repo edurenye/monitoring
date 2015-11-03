@@ -272,10 +272,17 @@ class SensorForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     parent::save($form, $form_state);
-
+    $sensor_config = $this->entity;
     $sensor_id = $form_state->getValue('id');
+
+    if ($sensor_config->isEnabled()) {
+      $route = 'entity.monitoring_sensor_config.details_form';
+    }
+    else {
+      $route = 'entity.monitoring_sensor_config.edit_form';
+    }
     $form_state->setRedirect('monitoring.sensors_overview_settings');
-    $url = Url::fromRoute('entity.monitoring_sensor_config.details_form', array('monitoring_sensor_config' => $sensor_id));
+    $url = Url::fromRoute($route, array('monitoring_sensor_config' => $sensor_id));
 
     // Message with the link to sensor details page.
     drupal_set_message(t('Sensor <a href="@url">@label</a> saved.', array(
