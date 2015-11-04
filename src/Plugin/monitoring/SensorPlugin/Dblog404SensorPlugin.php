@@ -38,9 +38,9 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
    */
   public function getAggregateQuery() {
     $query = parent::getAggregateQuery();
-    $query->addField('watchdog', 'message');
+    $query->addField('watchdog', 'location');
     // The message is the requested 404 URL.
-    $query->groupBy('message');
+    $query->groupBy('location');
     $query->orderBy('records_count', 'DESC');
     $query->range(0, 1);
     return $query;
@@ -78,8 +78,9 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
    */
   public function runSensor(SensorResultInterface $result) {
     parent::runSensor($result);
-    if (!empty($this->fetchedObject) && !empty($this->fetchedObject->message)) {
-      $result->addStatusMessage($this->fetchedObject->message);
+    if (!empty($this->fetchedObject) && !empty($this->fetchedObject->location)) {
+      $result->addStatusMessage($this->fetchedObject->location);
     }
   }
+
 }

@@ -185,8 +185,16 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
    * @see Dblog404SensorPlugin
    */
   public function testDblog404SensorPlugin() {
-    // Fake some not found errors
-    \Drupal::logger('page not found')->notice('not/found');
+    // Fake some not found errors.
+    \Drupal::service('logger.dblog')->log(RfcLogLevel::NOTICE, '@uri', [
+      'request_uri' => 'not/found',
+      'uid' => 0,
+      'channel' => 'page not found',
+      'link' => '',
+      'referer' => '',
+      'ip' => '127.0.0.1',
+      'timestamp' => REQUEST_TIME,
+    ]);
 
     // Run sensor and test the output.
     $result = $this->runSensor('dblog_404');
@@ -196,7 +204,15 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     // Fake more 404s.
     for ($i = 1; $i <= 20; $i++) {
-      \Drupal::logger('page not found')->notice('not/found');
+      \Drupal::service('logger.dblog')->log(RfcLogLevel::NOTICE, '@uri', [
+        'request_uri' => 'not/found',
+        'uid' => 0,
+        'channel' => 'page not found',
+        'link' => '',
+        'referer' => '',
+        'ip' => '127.0.0.1',
+        'timestamp' => REQUEST_TIME,
+      ]);
     }
 
     // Run sensor and check the aggregate value.
@@ -206,7 +222,15 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
 
     // Fake more 404s.
     for ($i = 0; $i <= 100; $i++) {
-      \Drupal::logger('page not found')->notice('not/found/another');
+      \Drupal::service('logger.dblog')->log(RfcLogLevel::NOTICE, '@uri', [
+        'request_uri' => 'not/found/another',
+        'uid' => 0,
+        'channel' => 'page not found',
+        'link' => '',
+        'referer' => '',
+        'ip' => '127.0.0.1',
+        'timestamp' => REQUEST_TIME,
+      ]);
     }
 
     // Run sensor and check the aggregate value.
