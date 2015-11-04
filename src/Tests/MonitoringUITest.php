@@ -764,6 +764,11 @@ class MonitoringUITest extends MonitoringTestBase {
     $account = $this->drupalCreateUser(array('administer monitoring'));
     $this->drupalLogin($account);
 
+    $this->drupalGet('admin/reports/monitoring/sensors/core_requirements_system');
+    $this->assertNoText('Array');
+    $this->assertText('You can run cron manually.');
+    $this->assertText('To run cron from outside the site, go to');
+
     $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
 
     // Verify the current keys to exclude.

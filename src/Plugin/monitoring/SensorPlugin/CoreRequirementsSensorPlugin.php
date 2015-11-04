@@ -94,7 +94,14 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       }
       $description = '';
       if (isset($value['description'])) {
-        $description = $value['description'];
+        if (is_array($value['description'])) {
+          // A few requirements such as cron attach a render array.
+          $description = \Drupal::service('renderer')
+            ->renderPlain($value['description']);
+        }
+        else {
+          $description = $value['description'];
+        }
       }
       $message = array(
         '#type' => 'item',
