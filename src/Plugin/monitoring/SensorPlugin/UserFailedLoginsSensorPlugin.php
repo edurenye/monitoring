@@ -51,23 +51,11 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    $output = [];
-
     // The unaggregated result in a fieldset.
-    $output['unaggregated'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Unaggregated attempts'),
-      '#attributes' => array(),
-    );
-    $output['unaggregated'] += parent::resultVerbose($result);
+    $output = parent::resultVerbose($result);
 
     // The result aggregated per user.
-    $output['attempts_per_user'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Attempts per user'),
-      '#attributes' => array(),
-    );
-    $output['attempts_per_user'] += $this->verboseResultCounting();
+    $this->verboseResultCounting($output);
 
     return $output;
   }
@@ -75,18 +63,11 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
   /**
    * Get the verbose results of the attempts per user.
    *
-   * @return array
-   *   Return the table with the attempts per user.
+   * @param array $output
+   *   The output array, at which we will add the attempts per user result.
    */
-  public function verboseResultCounting() {
-    $output = [];
-
+  public function verboseResultCounting(array &$output) {
     if ($this->sensorConfig->getSetting('verbose_fields')) {
-      $output['result_title'] = array(
-        '#type' => 'item',
-        '#title' => t('Result'),
-      );
-
       // Fetch the last 20 matching entries, aggregated.
       $query_result = $this->getAggregateQuery()
         ->range(0, 20)
@@ -101,27 +82,16 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
         $results[$key]['user'] = $variables['%user'];
         $results[$key]['attempts'] = $row['records_count'];
       }
-      $output['result'] = array(
-        '#type' => 'table',
-        '#rows' => $results,
+
+      $output['attempts_per_user'] = array(
+        '#type' => 'verbose_table_result',
+        '#title' => t('Attempts per user'),
         '#header' => $this->buildTableHeader($results),
-        '#empty' => $this->t('There are no results for this sensor to display.'),
+        '#rows' => $results,
+        '#query' => $this->queryString,
+        '#query_args' => $this->queryArguments,
       );
     }
-
-    // Show query.
-    $output['query'] = array(
-      '#type' => 'item',
-      '#title' => t('Query'),
-      '#markup' => '<pre>' . $this->queryString . '</pre>',
-    );
-    $output['arguments'] = array(
-      '#type' => 'item',
-      '#title' => t('Arguments'),
-      '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
-    );
-
-    return $output;
   }
 
 }

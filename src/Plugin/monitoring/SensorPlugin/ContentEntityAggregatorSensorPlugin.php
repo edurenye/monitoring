@@ -272,20 +272,16 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
         'class' => 'entity',
       );
     }
-    if (count($rows) > 0) {
-      $header = $this->sensorConfig->getSetting('verbose_fields', ['id', 'label']);
-      $output['entities'] = array(
-        '#type' => 'table',
-        '#header' => $header,
-        '#rows' => $rows,
-      );
-    }
-    else {
-      $output['result'] = [
-        '#type' => 'item',
-        '#markup' => t('No matching entities were found.'),
-      ];
-    }
+    $header = $this->sensorConfig->getSetting('verbose_fields', [
+      'id',
+      'label'
+    ]);
+    $output['entities'] = array(
+      '#type' => 'verbose_table_result',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#empty' => t('No matching entities were found.'),
+    );
 
     return $output;
   }

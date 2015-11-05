@@ -51,23 +51,11 @@ class NonExistingUserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPl
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
-    $output = [];
-
     // The unaggregated result in a fieldset.
-    $output['unaggregated'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Unaggregated attempts'),
-      '#attributes' => array(),
-    );
-    $output['unaggregated'] += parent::resultVerbose($result);
+    $output = parent::resultVerbose($result);
 
     // The result aggregated per ip.
-    $output['attempts_per_ip'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Attempts per ip'),
-      '#attributes' => array(),
-    );
-    $output['attempts_per_ip'] += $this->verboseResultCounting();
+    $this->verboseResultCounting($output);
 
     return $output;
   }
@@ -75,18 +63,11 @@ class NonExistingUserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPl
   /**
    * Get the verbose results of the attempts per ip.
    *
-   * @return array
-   *   Return the table with the attempts per ip.
+   * @param array $output
+   *   The output array, at which we will add the attempts per user result.
    */
-  public function verboseResultCounting() {
-    $output = [];
-
+  public function verboseResultCounting(array &$output) {
     if ($this->sensorConfig->getSetting('verbose_fields')) {
-      $output['result_title'] = array(
-        '#type' => 'item',
-        '#title' => t('Result'),
-      );
-
       // Fetch the last 20 matching entries, aggregated.
       $query_result = $this->getAggregateQuery()
         ->range(0, 20)
@@ -101,27 +82,15 @@ class NonExistingUserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPl
         $results[$key]['ip'] = $variables['%ip'];
         $results[$key]['attempts'] = $row['records_count'];
       }
-      $output['result'] = array(
-        '#type' => 'table',
+      $output['attempts_per_ip'] = array(
+        '#type' => 'verbose_table_result',
+        '#title' => t('Attempts per ip'),
         '#rows' => $results,
         '#header' => $this->buildTableHeader($results),
-        '#empty' => $this->t('There are no results for this sensor to display.'),
+        '#query' => $this->queryString,
+        '#query_args' => $this->queryArguments,
       );
     }
-
-    // Show query.
-    $output['query'] = array(
-      '#type' => 'item',
-      '#title' => t('Query'),
-      '#markup' => '<pre>' . $this->queryString . '</pre>',
-    );
-    $output['arguments'] = array(
-      '#type' => 'item',
-      '#title' => t('Arguments'),
-      '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
-    );
-
-    return $output;
   }
 
 }

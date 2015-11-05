@@ -100,7 +100,7 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $message = t('File @file record not found in the file_managed table.', array('@file' => $result->getMessage()));
     }
 
-    $output['message'] = array(
+    $output['verbose_sensor_result']['message'] = array(
       '#type' => 'item',
       '#title' => t('Message'),
       '#markup' => $message,

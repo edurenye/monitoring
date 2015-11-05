@@ -132,3 +132,11 @@ div.view-id-monitoring_sensor_results table tr.monitoring-ok {
   background: #a683ee;
   padding: 0 4px;
 }
+
+.monitoring-verbose-query {
+  border: none;
+}
+
+.monitoring-verbose-query summary {
+  text-transform: none;
+}

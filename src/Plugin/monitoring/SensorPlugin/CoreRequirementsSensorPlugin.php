@@ -123,7 +123,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       $header['message'] = t('Message');
 
       $output['requirements'] = array(
-        '#type' => 'table',
+        '#type' => 'verbose_table_result',
         '#header' => $header,
         '#rows' => $rows,
       );

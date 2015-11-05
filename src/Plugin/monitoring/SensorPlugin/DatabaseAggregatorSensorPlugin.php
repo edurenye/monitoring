@@ -162,18 +162,6 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       $this->verboseResultUnaggregated($output);
     }
 
-    // Show query.
-    $output['query'] = array(
-      '#type' => 'item',
-      '#title' => t('Query'),
-      '#markup' => '<pre>' . $this->queryString . '</pre>',
-    );
-    $output['arguments'] = array(
-      '#type' => 'item',
-      '#title' => t('Arguments'),
-      '#markup' => '<pre>' . var_export($this->queryArguments, TRUE) . '</pre>',
-    );
-
     return $output;
   }
 
@@ -184,9 +172,9 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
    *   Render array where the result will be added.
    */
   public function verboseResultUnaggregated(array &$output) {
-    $output['result_title'] = array(
-      '#type' => 'item',
-      '#title' => t('Result'),
+    $output['verbose_sensor_result'] = array(
+      '#type' => 'verbose_table_result',
+      '#title' => t('Unaggregated result'),
     );
 
     // Fetch the last 10 matching entries, unaggregated.
@@ -196,12 +184,12 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     $this->queryString = $query_result->getQueryString();
 
     $rows = $this->buildTableRows($query_result->fetchAll());
-    $output['result'] = array(
-      '#type' => 'table',
-      '#rows' => $rows,
-      '#header' => $this->buildTableHeader($rows),
-      '#empty' => $this->t('There are no results for this sensor to display.'),
-    );
+    $output['verbose_sensor_result']['#header'] = $this->buildTableHeader($rows);
+    $output['verbose_sensor_result']['#rows'] = $rows;
+
+    // Show query.
+    $output['verbose_sensor_result']['#query'] = $this->queryString;
+    $output['verbose_sensor_result']['#query_args'] = $this->queryArguments;
   }
 
   /**

@@ -260,23 +260,22 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     foreach ($new_users_id as $id) {
       $time_stamp = $current_users[$id]['created'];
       $last_accessed = $current_users[$id]['last_accessed'];
-      $user_name = array(
-        '#theme' => 'username',
-        '#account' => User::load($id),
-      );
+      // Do this for all, and delete drupal render.
+      $user_name = [
+        'data' => [
+          '#theme' => 'username',
+          '#account' => User::load($id),
+        ]
+      ];
       $rows[] = [
         'user' => $user_name,
-        'roles' => ['#markup' => $current_users[$id]['roles']],
-        'created' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')],
-        'last_accessed' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')],
+        'roles' => ['data' => ['#markup' => $current_users[$id]['roles']]],
+        'created' => ['data' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')]],
+        'last_accessed' => ['data' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')]],
       ];
     }
 
     if (count($rows) > 0) {
-      $output['new_title'] = array(
-        '#type' => 'item',
-        '#title' => t('New users with privileged access.'),
-      );
       $header = [
         'user' => t('User'),
         'roles' => t('Roles'),
@@ -284,10 +283,12 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         'last_accessed' => t('Last accessed'),
       ];
 
-      $output['new_table'] = array(
-        '#type' => 'table',
+      $output['new_table'] = [
+        '#type' => 'verbose_table_result',
+        '#title' => t('New users with privileged access.'),
         '#header' => $header,
-      ) + $rows;
+        '#rows' => $rows,
+      ];
     }
 
     // Verbose output for users with changes.
@@ -302,26 +303,24 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       foreach ($changes as $key => $value) {
         $time_stamp = $current_users[$id]['changed'];
         $last_accessed = $current_users[$id]['last_accessed'];
-        $user_name = array(
-          '#theme' => 'username',
-          '#account' => User::load($id),
-        );
+        $user_name = [
+          'data' => [
+            '#theme' => 'username',
+            '#account' => User::load($id),
+          ]
+        ];
         $rows[] = [
           'user' => $user_name,
-          'field' => ['#markup' => $key],
-          'current_value' => ['#markup' => $value['current_value']],
-          'expected_value' => ['#markup' => $value['expected_value']],
-          'changed' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')],
-          'last_accessed' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')],
+          'field' => ['data' => ['#markup' => $key]],
+          'current_value' => ['data' => ['#markup' => $value['current_value']]],
+          'expected_value' => ['data' => ['#markup' => $value['expected_value']]],
+          'changed' => ['data' => ['#markup' => \Drupal::service('date.formatter')->format($time_stamp, 'short')]],
+          'last_accessed' => ['data' => ['#markup' => $last_accessed != 0 ? \Drupal::service('date.formatter')->format($last_accessed, 'short') : t('never')]],
         ];
       }
     }
 
     if (count($rows) > 0) {
-      $output['changes_title'] = array(
-        '#type' => 'item',
-        '#title' => t('Changed users with privileged access.'),
-      );
       $header = [
         'user' => t('User'),
         'Field' => t('Field'),
@@ -330,10 +329,12 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         'changed' => t('Changed'),
         'last_accessed' => t('Last accessed'),
       ];
-      $output['changes_table'] = array(
-        '#type' => 'table',
+      $output['changes_table'] = [
+        '#type' => 'verbose_table_result',
+        '#title' => t('Changed users with privileged access.'),
         '#header' => $header,
-      ) + $rows;
+        '#rows' => $rows,
+      ];
     }
 
     // Verbose output for all privileged users.
@@ -341,33 +342,33 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
 
     foreach ($current_users as $user) {
       $created = $user['created'];
-      $user_name = array(
-        '#theme' => 'username',
-        '#account' => User::load($user['id']),
-      );
+      $user_name = [
+        'data' => [
+          '#theme' => 'username',
+          '#account' => User::load($user['id']),
+        ]
+      ];
       $rows[] = [
         'user' => $user_name,
-        'roles' => ['#markup' => $user['roles']],
-        'created' => ['#markup' => \Drupal::service('date.formatter')->format($created, 'short')],
-        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')],
+        'roles' => ['data' => ['#markup' => $user['roles']]],
+        'created' => ['data' => ['#markup' => \Drupal::service('date.formatter')->format($created, 'short')]],
+        'last_accessed' => ['data' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')]],
       ];
     }
 
     if (count($rows) > 0) {
-      $output['message_privileges'] = array(
-        '#type' => 'item',
-        '#title' => t('All users with privileged access.'),
-      );
       $header = [
         'user' => t('User'),
         'roles' => t('Roles'),
         'created' => t('Created'),
         'last_accessed' => t('Last accessed')
       ];
-      $output['users_privileged'] = array(
-        '#type' => 'table',
+      $output['users_privileged'] = [
+        '#type' => 'verbose_table_result',
+        '#title' => t('All users with privileged access.'),
         '#header' => $header,
-      ) + $rows;
+        '#rows' => $rows,
+      ];
     }
 
     // Verbose output for deleted users.
@@ -375,28 +376,26 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
 
     foreach ($deleted_users as $user) {
       $rows[] = [
-        'user' => ['#markup' => $user['name']],
-        'roles' => ['#markup' => $user['roles']],
-        'created' => ['#markup' => \Drupal::service('date.formatter')->format($user['created'], 'short')],
-        'last_accessed' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')],
+        'user' => ['data' => ['#markup' => $user['name']]],
+        'roles' => ['data' => ['#markup' => $user['roles']]],
+        'created' => ['data' => ['#markup' => \Drupal::service('date.formatter')->format($user['created'], 'short')]],
+        'last_accessed' => ['data' => ['#markup' => $user['last_accessed'] != 0 ? \Drupal::service('date.formatter')->format($user['last_accessed'], 'short') : t('never')]],
       ];
     }
 
     if (count($rows) > 0) {
-      $output['message_deleted'] = array(
-        '#type' => 'item',
-        '#title' => t('Deleted users with privileged access.'),
-      );
       $header = [
         'user' => t('User'),
         'roles' => t('Roles'),
         'created' => t('Created'),
         'last_accessed' => t('Last accessed')
       ];
-      $output['deleted_users'] = array(
-        '#type' => 'table',
+      $output['deleted_users'] = [
+        '#type' => 'verbose_table_result',
+        '#title' => t('Deleted users with privileged access.'),
         '#header' => $header,
-      ) + $rows;
+        '#rows' => $rows,
+      ];
     }
 
     // Show roles list with the permissions that are restricted for each.
@@ -407,11 +406,11 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
         $roles_list[] = $role->label() . ': ' . implode(", ", $restricted_permissions);
       }
     }
-    $output['roles_list'] = array(
-      '#type' => 'item',
+    $output['roles_list'] = [
+      '#type' => 'fieldset',
       '#title' => t('List of roles with restricted permissions.'),
-      '#markup' => !empty($roles_list) ? implode('<br>', $roles_list) : t('None'),
-    );
+      ['#type' => 'item', '#markup' => !empty($roles_list) ? implode('<br>', $roles_list) : t('None')],
+    ];
 
     return $output;
   }

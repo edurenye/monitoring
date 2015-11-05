@@ -608,7 +608,7 @@ class MonitoringUITest extends MonitoringTestBase {
       'Created',
       'Last accessed',
     ];
-    $xpath = $this->xpath('//table[@id="edit-users-privileged"]');
+    $xpath = $this->xpath('//*[@id="all_users_with_privileged_access."]/div/table');
     $header = (array) $xpath[0]->thead->tr->th;
     $body = (array) $xpath[0]->tbody;
     $first_row = $body['tr'][0]->td;
@@ -649,7 +649,7 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('Deleted users with privileged access.');
 
     // Assert the deleted user is listed.
-    $xpath = $this->xpath('//table[@id="edit-deleted-users"]');
+    $xpath = $this->xpath('//*[@id="deleted_users_with_privileged_access."]/div/table');
     $this->assertEqual((string) $xpath[0]->tbody->tr->td[0], 'integrity_test_user');
 
     // Test enabled sensor link works after save.

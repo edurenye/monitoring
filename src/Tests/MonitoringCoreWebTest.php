@@ -49,7 +49,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->drupalLogin($test_user);
     // Test output and default message replacement.
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
-    $xpath = $this->xpath('//table[@id="edit-result"]/tbody/tr');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody/tr');
     $wid = $xpath[0]->td[0]->a;
     $message = (string) $xpath[0]->td[1];
     $this->assertEqual(count($xpath), 5, 'There are 5 results in the table.');
@@ -59,7 +59,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Remove variables from the fields and assert message has no replacements.
     $this->drupalPostForm('admin/config/system/monitoring/sensors/user_successful_logins', ['verbose_fields[variables][field_key]' => ''], t('Save'));
     $this->drupalGet('admin/reports/monitoring/sensors/user_successful_logins');
-    $xpath = $this->xpath('//table[@id="edit-result"]/tbody/tr');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody/tr');
     $wid = (string) $xpath[0]->td[0];
     $message = (string) $xpath[0]->td[1];
     $this->assertTrue($wid, 'Found WID in verbose output');
@@ -97,7 +97,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->drupalLogin($test_user);
     $this->drupalGet('/admin/reports/monitoring/sensors/user_sessions_authenticated');
     // 3 fields are expected to be displayed.
-    $query = $this->xpath('//div[@id="edit-query"]');
+    $query = $this->xpath('//*[@id="unaggregated_result"]/div/details/div/div[1]');
     // Find the query and explode it on line breaks.
     $query_array = explode(PHP_EOL, ((string) $query[0]->pre));
     $this->assertEqual(count($query_array), 6, 'Correct query count.');
@@ -307,7 +307,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
 
     // Check out sensor result page.
     $this->drupalPostForm('/admin/reports/monitoring/sensors/dblog_php_notices', [], t('Run now'));
-    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table');
     $header = (array) $xpath[0]->thead->tr->th;
     $body = (array) $xpath[0]->tbody;
     $this->assertEqual($expected_header, $header, 'The header is correct.');
@@ -339,7 +339,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Check the verbose sensor result.
     $this->drupalLogin($this->rootUser);
     $this->drupalGet('admin/reports/monitoring/sensors/user_failed_logins');
-    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table');
     $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
     // The username has a <em> tag so we have to concatenate it.
     $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[1]), '.') . ($xpath[0]->tbody->tr->td[1]->em), 'Login attempt failed for admin');
@@ -361,7 +361,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     // Check the verbose sensor result.
     $this->drupalLogin($this->rootUser);
     $this->drupalGet('admin/reports/monitoring/sensors/user_void_failed_logins');
-    $xpath = $this->xpath('//table[@id="edit-result"]');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table');
     $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
     // The ip has a <em> tag so we have to concatenate it.
     $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[1]), '.') . ($xpath[0]->tbody->tr->td[1]->em), 'Login attempt failed from 127.0.0.1');
