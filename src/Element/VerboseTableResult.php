@@ -40,7 +40,7 @@ class VerboseTableResult extends FormElement {
       '#rows' => [],
       '#empty' => 'There are no results for this sensor to display.',
       '#query' => '',
-      '#arguments' => [],
+      '#query_args' => [],
       '#pre_render' => [
         [$class, 'preRenderVerboseTableResult'],
       ],
@@ -70,7 +70,7 @@ class VerboseTableResult extends FormElement {
       '#rows' => $element['#rows'],
       '#empty' => t(':empty', [':empty' => $element['#empty']]),
     ];
-    if (isset($element['#query'])) {
+    if (!empty($element['#query'])) {
       $element[$id]['query'] = [
         '#type' => 'details',
         '#open' => FALSE,
@@ -81,7 +81,7 @@ class VerboseTableResult extends FormElement {
         '#type' => 'item',
         '#markup' => '<pre>' . $element['#query'] . '</pre>',
       ];
-      if (isset($element['#query_args'])) {
+      if (!empty($element['#query_args'])) {
         $element[$id]['query']['query_args'] = [
           '#type' => 'item',
           '#title' => t('Arguments'),
