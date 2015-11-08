@@ -325,8 +325,6 @@ class MonitoringApiTest extends MonitoringUnitTestBase {
     $sensor->settings['result_logging'] = TRUE;
     $sensor->save();
 
-    // Set the service before the sensor runs.
-    $this->container->set('monitoring.sensor_runner', NULL);
     $this->runSensor('test_sensor');
 
     $logs = $this->loadSensorLog('test_sensor');

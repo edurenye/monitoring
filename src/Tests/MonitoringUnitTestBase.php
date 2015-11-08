@@ -23,6 +23,9 @@ abstract class MonitoringUnitTestBase extends KernelTestBase {
 
     $this->installEntitySchema('monitoring_sensor_result');
     $this->installConfig(array('monitoring', 'monitoring_test'));
+    // Ensure that the sensor runner will use the correct configuration, might
+    // have been instantiated before the config was fully saved.
+    $this->container->set('monitoring.sensor_runner', NULL);
   }
 
   /**
