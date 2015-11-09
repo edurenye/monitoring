@@ -8,6 +8,7 @@ namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\user\RoleInterface;
@@ -641,6 +642,56 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $result = $this->runSensor('entity_aggregate_test');
     // There should be one nodes with those references.
     $this->assertEqual($result->getValue(), 1);
+  }
+
+  /**
+   * Tests the page not found errors.
+   *
+   * @see Dblog404SensorPlugin
+   */
+  public function testPageNotFoundErrors() {
+    $test_user = $this->drupalCreateUser([
+      'administer monitoring',
+      'monitoring reports',
+      'monitoring verbose',
+    ]);
+    $this->drupalLogin($test_user);
+
+    $event_time = REQUEST_TIME;
+
+    // Insert three page not found events.
+    Database::getConnection('default')->insert('watchdog')->fields([
+      'type' => 'page not found',
+      'message' => '@uri',
+      'variables' => serialize(['%ip' => '127.0.0.1']),
+      'location' => 'http://d8.dev/non_existing_page',
+      'timestamp' => $event_time - 10,
+    ])->execute();
+    Database::getConnection('default')->insert('watchdog')->fields([
+      'type' => 'page not found',
+      'message' => '@uri',
+      'variables' => serialize(['%ip' => '127.0.0.1']),
+      'location' => 'http://d8.dev/non_existing_page',
+      'timestamp' => $event_time,
+    ])->execute();
+    Database::getConnection('default')->insert('watchdog')->fields([
+      'type' => 'page not found',
+      'message' => '@uri',
+      'variables' => serialize(['%ip' => '127.0.0.1']),
+      'location' => 'http://d8.dev/another_non_existing_page',
+      'timestamp' => $event_time - 10,
+    ])->execute();
+
+    $this->drupalGet('admin/reports/monitoring/sensors/dblog_404');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody');
+
+    $this->assertEqual(count($xpath[0]->tr), 2, 'Two rows found.');
+    $this->assertEqual($xpath[0]->tr[0]->td[1], 2, 'Two access to "/non_existing_page"');
+
+    // Test the timestamp is the last one and that is formatted correctly.
+    $login_time = (string) $xpath[0]->tr[0]->td[2];
+    $expected_time = \Drupal::service('date.formatter')->format($event_time, 'short');
+    $this->assertEqual($expected_time, $login_time);
   }
 
   /**

@@ -53,6 +53,10 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
     $query = parent::getQuery();
     $this->addAggregateExpression($query);
     $query->groupBy('location');
+    // Get just the max timestamp, drop the rest.
+    $fields = &$query->getFields();
+    unset($fields['timestamp']);
+    $query->addExpression('MAX(timestamp)', 'timestamp');
 
     // Drop the existing order, order by record count instead.
     $order = &$query->getOrderBy();
@@ -65,10 +69,21 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
   /**
    * {@inheritdoc}
    */
+  public function verboseResultUnaggregated(array &$output) {
+    parent::verboseResultUnaggregated($output);
+    foreach ($output['verbose_sensor_result']['#rows'] as $key => $value) {
+      $output['verbose_sensor_result']['#rows'][$key]['timestamp'] = \Drupal::service('date.formatter')->format($value['timestamp'], 'short');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function buildTableHeader($rows = []) {
     $header = [
       'type' => $this->t('Path'),
       'count' => $this->t('Count'),
+      'last' => $this->t('Last access'),
     ];
     return $header;
   }
