@@ -13,8 +13,8 @@ settings:
   time_interval_field: created
   verbose_fields:
     - id
-    - comment_type
     - label
+    - comment_type
 thresholds:
   type: exceeds
   warning: 10
