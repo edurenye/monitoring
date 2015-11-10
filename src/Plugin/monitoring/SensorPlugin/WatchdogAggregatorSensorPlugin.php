@@ -49,11 +49,6 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
         $output['verbose_sensor_result']['#rows'][$delta]['message'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
         // Do not render the raw message & variables in the row.
         unset($output['verbose_sensor_result']['#rows'][$delta]['variables']);
-
-        // Reformat the timestamp.
-        if (isset($row['timestamp'])) {
-          $output['verbose_sensor_result']['#rows'][$delta]['timestamp'] = \Drupal::service('date.formatter')->format($row['timestamp'], 'short');
-        }
       };
     }
   }

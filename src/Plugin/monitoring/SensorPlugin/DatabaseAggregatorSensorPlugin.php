@@ -184,6 +184,16 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     $this->queryString = $query_result->getQueryString();
 
     $rows = $this->buildTableRows($query_result->fetchAll());
+
+    // Reformat the timestamp.
+    $fields = $this->sensorConfig->getSetting('verbose_fields');
+    $timestamp_field_name = $this->getTimeIntervalField();
+    if ($timestamp_field_name && in_array($timestamp_field_name, $fields)) {
+      foreach ($rows as $key => $row) {
+        $rows[$key][$timestamp_field_name] = \Drupal::service('date.formatter')->format($row[$timestamp_field_name], 'short');
+      }
+    }
+
     $output['verbose_sensor_result']['#header'] = $this->buildTableHeader($rows);
     $output['verbose_sensor_result']['#rows'] = $rows;
 

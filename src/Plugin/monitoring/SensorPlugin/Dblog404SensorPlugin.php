@@ -69,16 +69,6 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
   /**
    * {@inheritdoc}
    */
-  public function verboseResultUnaggregated(array &$output) {
-    parent::verboseResultUnaggregated($output);
-    foreach ($output['verbose_sensor_result']['#rows'] as $key => $value) {
-      $output['verbose_sensor_result']['#rows'][$key]['timestamp'] = \Drupal::service('date.formatter')->format($value['timestamp'], 'short');
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function buildTableHeader($rows = []) {
     $header = [
       'type' => $this->t('Path'),
