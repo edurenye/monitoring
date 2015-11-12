@@ -21,6 +21,10 @@ abstract class MonitoringTestBase extends WebTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    // @todo Remove when this issue is fixed: https://www.drupal.org/node/2611082
+    date_default_timezone_set('Australia/Sydney');
+
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
     if (!\Drupal::moduleHandler()->moduleExists('monitoring')) {

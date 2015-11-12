@@ -285,7 +285,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
 
       $output['new_table'] = [
         '#type' => 'verbose_table_result',
-        '#title' => t('New users with privileged access.'),
+        '#title' => t('New users with privileged access'),
         '#header' => $header,
         '#rows' => $rows,
       ];
@@ -331,7 +331,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       ];
       $output['changes_table'] = [
         '#type' => 'verbose_table_result',
-        '#title' => t('Changed users with privileged access.'),
+        '#title' => t('Changed users with privileged access'),
         '#header' => $header,
         '#rows' => $rows,
       ];
@@ -365,7 +365,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       ];
       $output['users_privileged'] = [
         '#type' => 'verbose_table_result',
-        '#title' => t('All users with privileged access.'),
+        '#title' => t('All users with privileged access'),
         '#header' => $header,
         '#rows' => $rows,
       ];
@@ -392,7 +392,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
       ];
       $output['deleted_users'] = [
         '#type' => 'verbose_table_result',
-        '#title' => t('Deleted users with privileged access.'),
+        '#title' => t('Deleted users with privileged access'),
         '#header' => $header,
         '#rows' => $rows,
       ];
@@ -408,7 +408,7 @@ class UserIntegritySensorPlugin extends SensorPluginBase implements ExtendedInfo
     }
     $output['roles_list'] = [
       '#type' => 'fieldset',
-      '#title' => t('List of roles with restricted permissions.'),
+      '#title' => t('List of roles with restricted permissions'),
       ['#type' => 'item', '#markup' => !empty($roles_list) ? implode('<br>', $roles_list) : t('None')],
     ];
 

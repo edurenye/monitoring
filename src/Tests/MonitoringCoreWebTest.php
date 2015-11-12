@@ -344,6 +344,16 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertEqual(count($xpath[0]->tbody->tr), 1, 'Found 1 results in table');
     // The username has a <em> tag so we have to concatenate it.
     $this->assertEqual(rtrim((string) ($xpath[0]->tbody->tr->td[1]), '.') . ($xpath[0]->tbody->tr->td[1]->em), 'Login attempt failed for admin');
+
+    // Test the timestamp is formatted correctly.
+    $wid = (string) $xpath[0]->tbody->tr->td[0]->a;
+    $query = \Drupal::database()->select('watchdog');
+    $query->addField('watchdog', 'timestamp');
+    $query->condition('wid', $wid);
+    $result = $query->range(0, 10)->execute()->fetchObject();
+    $login_time = (string) $xpath[0]->tbody->tr->td[2];
+    $expected_time = \Drupal::service('date.formatter')->format($result->timestamp, 'short');
+    $this->assertEqual($expected_time, $login_time);
   }
 
   /**

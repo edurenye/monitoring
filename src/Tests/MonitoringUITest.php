@@ -8,6 +8,7 @@ namespace Drupal\monitoring\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\user\Entity\User;
 
 /**
  * Tests for the Monitoring UI.
@@ -577,11 +578,20 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertResponse(404);
 
     // Test user integrity sensor detail page.
+    /** @var User $account */
+    $account = User::load($account->id());
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
     $this->assertText('1 privileged user(s)');
 
+    // Test the timestamp is formatted correctly.
+    $xpath = $this->xpath('//*[@id="all_users_with_privileged_access"]/div/table/tbody');
+    $expected_time = \Drupal::service('date.formatter')->format($account->getCreatedTime(), 'short');
+    $this->assertEqual($xpath[0]->tr->td[2], $expected_time);
+    $expected_time = \Drupal::service('date.formatter')->format($account->getLastAccessedTime(), 'short');
+    $this->assertEqual($xpath[0]->tr->td[3], $expected_time);
+
     // Assert None output when we don't have restricted roles with permissions.
-    $this->assertText('List of roles with restricted permissions.');
+    $this->assertText('List of roles with restricted permissions');
     $this->assertText('None');
 
     $test_user = $this->drupalCreateUser(array('administer monitoring'), 'test_user');
@@ -608,13 +618,13 @@ class MonitoringUITest extends MonitoringTestBase {
       'Created',
       'Last accessed',
     ];
-    $xpath = $this->xpath('//*[@id="all_users_with_privileged_access."]/div/table');
+    $xpath = $this->xpath('//*[@id="all_users_with_privileged_access"]/div/table');
     $header = (array) $xpath[0]->thead->tr->th;
     $body = (array) $xpath[0]->tbody;
     $first_row = $body['tr'][0]->td;
     $second_row = $body['tr'][1]->td;
 
-    $this->assertText('All users with privileged access.');
+    $this->assertText('All users with privileged access');
     $this->assertEqual(count($body['tr']), 3);
     $this->assertEqual($expected_header, $header);
 
@@ -646,10 +656,10 @@ class MonitoringUITest extends MonitoringTestBase {
     // Check the list of deleted users.
     $account->delete();
     $this->drupalPostForm('admin/reports/monitoring/sensors/user_integrity', array(), t('Run now'));
-    $this->assertText('Deleted users with privileged access.');
+    $this->assertText('Deleted users with privileged access');
 
     // Assert the deleted user is listed.
-    $xpath = $this->xpath('//*[@id="deleted_users_with_privileged_access."]/div/table');
+    $xpath = $this->xpath('//*[@id="deleted_users_with_privileged_access"]/div/table');
     $this->assertEqual((string) $xpath[0]->tbody->tr->td[0], 'integrity_test_user');
 
     // Test enabled sensor link works after save.
