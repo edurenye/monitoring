@@ -77,6 +77,17 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   protected $configurableTable = TRUE;
 
   /**
+   * {@inheritdoc}
+   */
+  public function getDefaultConfiguration() {
+    $default_config = parent::getDefaultConfiguration();
+    $default_config['settings'] = [
+      'history_status' => TRUE,
+    ];
+    return $default_config;
+  }
+
+  /**
    * Builds simple aggregate query over one db table.
    *
    * @return \Drupal\Core\Database\Query\Select
@@ -153,6 +164,54 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
+   * Builds history query over one db table.
+   *
+   * @return \Drupal\Core\Database\Query\Select
+   *   The select query object.
+   */
+  protected function getHistoryQuery() {
+    /* @var \Drupal\Core\Database\Connection $database */
+    $database = $this->getService('database');
+    // Get aggregate query for the table.
+    $query = $database->select($this->sensorConfig->getSetting('table'));
+
+    // Add conditions.
+    foreach ($this->getConditions() as $condition) {
+      $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
+    }
+
+    // Group by time intervals of timestamp.
+    $query->addExpression('MIN(' . $this->getTimeIntervalField() . ') DIV ' . $this->getTimeIntervalValue() . ' * ' . $this->getTimeIntervalValue(), 'timestamp');
+    $query->groupBy($this->getTimeIntervalField() . ' DIV ' . $this->getTimeIntervalValue());
+
+    $this->addAggregateExpression($query);
+
+    return $query;
+  }
+
+  /**
+   * Get the timestamp of the oldest entry that fits owr conditions.
+   *
+   * @return \Drupal\Core\Database\Query\Select
+   *   The timestamp of the oldest entry.
+   */
+  protected function getOldestEntry() {
+    /* @var \Drupal\Core\Database\Connection $database */
+    $database = $this->getService('database');
+    $query = $database->select($this->sensorConfig->getSetting('table'));
+
+    // Add conditions.
+    foreach ($this->getConditions() as $condition) {
+      $query->condition($condition['field'], $condition['value'], isset($condition['operator']) ? $condition['operator'] : NULL);
+    }
+
+    // Get the oldest entry.
+    $query->addExpression('MIN(' . $this->getTimeIntervalField() . ')', 'timestamp');
+
+    return $query->range(0, 1)->execute()->fetchField();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
@@ -160,6 +219,9 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     if ($this->sensorConfig->getSetting('verbose_fields')) {
       $this->verboseResultUnaggregated($output);
+    }
+    if ($this->sensorConfig->getSetting('history_status')) {
+      $this->verboseResultHistory($output);
     }
 
     return $output;
@@ -203,7 +265,46 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
   }
 
   /**
-   * Builds the header for a table.
+   * Adds history verbose output to the render array $output.
+   *
+   * @param array &$output
+   *   Render array where the result will be added.
+   */
+  public function verboseResultHistory(array &$output) {
+    $output['verbose_sensor_history'] = array(
+      '#type' => 'verbose_table_result',
+      '#title' => t('History'),
+    );
+
+    // Fetch the last 10 matching entries, aggregated.
+    $query = $this->getHistoryQuery();
+    $query_result = $query->range(0, 10)->execute();
+    $rows = $this->buildTableRows($query_result->fetchAll());
+
+    // Reformat the timestamp.
+    foreach ($rows as $key => $row) {
+      $rows[$key]['timestamp'] = \Drupal::service('date.formatter')->format($row['timestamp'], 'short');
+    }
+
+    $output['verbose_sensor_history']['#header'] = $this->buildTableHeader($rows);
+    $output['verbose_sensor_history']['#rows'] = $rows;
+
+    // Show query.
+    $output['verbose_sensor_history']['#query'] = $query_result->getQueryString();
+    $output['verbose_sensor_history']['#query_args'] = $query->getArguments();
+
+    // Add oldest record info message.
+    if ($oldest_entry = $this->getOldestEntry()) {
+      $output['verbose_sensor_history']['#info'] = t('Oldest timestamp record is from :oldest_timestamp', [
+        ':oldest_timestamp' => \Drupal::service('date.formatter')->format($oldest_entry, 'short'),
+      ]);
+    }
+  }
+
+  /**
+   * Builds the header for a table based on rows.
+   *
+   * Do not override this method to define a static header.
    *
    * @param array $rows
    *   The array of rows for which a header will be built.
@@ -419,6 +520,24 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       '#submit' => array(array($this, 'addFieldSubmit')),
     );
 
+    // Enable history results in time aggregation.
+    $form['aggregation']['history_status'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $this->sensorConfig->getSetting('history_status'),
+      '#title' => t('Enable history'),
+      '#description' => t('Check to show history results.'),
+    ];
+
+    // Always show the enable history checkbox if a timestamp field is forced,
+    // otherwise add states so it is only visible if something is entered.
+    if ($this->configurableTimestampField) {
+      $form['aggregation']['history_status']['#states'] = [
+        'invisible' => [
+          ':input[name="settings[aggregation][time_interval_field]"]' => ['value' => ''],
+        ],
+      ];
+    }
+
     return $form;
   }
 
@@ -471,6 +590,14 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
       if (!empty($field['field_key'])) {
         $settings['verbose_fields'][] = $field['field_key'];
       }
+    }
+
+    // Update the history status.
+    if ($form_state->getValue('settings')['aggregation']['time_interval_field']) {
+      $settings['history_status'] = $form_state->getValue('settings')['aggregation']['history_status'];
+    }
+    else {
+      $settings['history_status'] = FALSE;
     }
 
     $this->sensorConfig->set('settings', $settings);

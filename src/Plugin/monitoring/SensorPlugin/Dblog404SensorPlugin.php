@@ -70,11 +70,14 @@ class Dblog404SensorPlugin extends WatchdogAggregatorSensorPlugin {
    * {@inheritdoc}
    */
   protected function buildTableHeader($rows = []) {
-    $header = [
-      'type' => $this->t('Path'),
-      'count' => $this->t('Count'),
-      'last' => $this->t('Last access'),
-    ];
+    $header = parent::buildTableHeader($rows);
+    if (isset($header['location'])) {
+      // A static override of the labels.
+      // OK because sensor does not support configurability / instances.
+      $header['location'] = $this->t('Path');
+      $header['records_count'] = $this->t('Count');
+      $header['timestamp'] = $this->t('Last access');
+    }
     return $header;
   }
 

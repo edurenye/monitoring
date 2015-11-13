@@ -11,6 +11,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\monitoring\Entity\SensorConfig;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 
 /**
@@ -80,7 +81,6 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'monitoring verbose',
     ]);
     $this->drupalLogin($test_user);
-    $test_user_name = $test_user->label();
 
     $result = $this->runSensor('user_sessions_authenticated');
     $this->assertEqual($result->getValue(), 1);
@@ -96,6 +96,8 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
 
     // Check verbose output.
     $this->drupalLogin($test_user);
+    /** @var User $test_user */
+    $test_user = User::load($test_user->id());
     $this->drupalGet('/admin/reports/monitoring/sensors/user_sessions_authenticated');
     // 3 fields are expected to be displayed.
     $query = $this->xpath('//*[@id="unaggregated_result"]/div/details/div/div[1]');
@@ -108,8 +110,16 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertEqual(trim($query_array[3]), 'WHERE  (uid != :db_condition_placeholder_0) AND (timestamp > :db_condition_placeholder_1)', 'Found fourth query line.');
     $this->assertEqual(trim($query_array[4]), 'ORDER BY timestamp DESC', 'Found fifth query line.');
     $this->assertEqual(trim($query_array[5]), 'LIMIT 10 OFFSET 0', 'Found sixth query line.');
-    $results = $this->xpath('//fieldset[@id="edit-verbose"]//table//tbody//tr')[0]->td;
+    $results = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody/tr')[0]->td;
     $this->assertTrue(count($results) == 3, '3 fields have been found in the verbose result.');
+
+    // Test DatabaseAggregator history table result.
+    $xpath = $this->xpath('//*[@id="history"]/div/table/tbody/tr');
+    $this->assertEqual($xpath[0]->td[1], 1, 'record_count found in History.');
+    // Test the timestamp is shown and formatted correctly.
+    $login_time = (string) $xpath[0]->td[0];
+    $expected_time = \Drupal::service('date.formatter')->format(floor($test_user->getLastLoginTime() / 86400) * 86400, 'short');
+    $this->assertEqual($expected_time, $login_time);
 
     // The username should be replaced in the message.
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_event_severity_notice');
@@ -285,11 +295,11 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
 
     $this->drupalGet('/admin/reports/monitoring/sensors/dblog_php_notices');
     $expected_header = [
-      'Count',
-      'Type',
-      'Message',
-      'Caller',
-      'File',
+      'count',
+      'type',
+      'message',
+      'caller',
+      'file',
     ];
     $expected_body_one = [
       '2',

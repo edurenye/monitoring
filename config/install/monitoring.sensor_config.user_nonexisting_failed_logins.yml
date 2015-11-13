@@ -23,6 +23,7 @@ settings:
     - 'timestamp'
   time_interval_field: 'timestamp'
   time_interval_value: 86400
+  history_status: true
 thresholds:
   type: exceeds
   warning: 50

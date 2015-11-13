@@ -9,6 +9,7 @@ status: TRUE
 caching_time: 3600
 settings:
   table: 'captcha_sessions'
+  history_status: false
   conditions:
       -
         field: 'status'

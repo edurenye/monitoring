@@ -6,9 +6,7 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\Component\Utility\Xss;
-use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\monitoring\Result\SensorResultInterface;
 
 /**
@@ -42,7 +40,7 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
     if (!empty($this->fetchedObject->variables)) {
       $variables = unserialize($this->fetchedObject->variables);
       $variables['%file'] = $this->shortenFilename($variables['%file']);
-      $result->setMessage('@count times: @error', ['@count' => (int) $this->fetchedObject->records_count, '@error' => SafeMarkup::format('%type: @message in %function (Line %line of %file).', $variables)]);
+      $result->setMessage('@count times: @error', ['@count' => (int) $this->fetchedObject->records_count, '@error' => new FormattableMarkup('%type: @message in %function (Line %line of %file).', $variables)]);
     };
   }
 
@@ -81,34 +79,20 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
   /**
    * {@inheritdoc}
    */
-  protected function buildTableHeader($rows = []) {
-    $header = [
-      'count' => $this->t('Count'),
-      'type' => $this->t('Type'),
-      'message' => $this->t('Message'),
-      'function' => $this->t('Caller'),
-      'file' => $this->t('File'),
-    ];
-    return $header;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildTableRows(array $results) {
+  public function verboseResultUnaggregated(array &$output) {
+    parent::verboseResultUnaggregated($output);
     $rows = [];
-    foreach ($results as $delta => $row) {
-      $variables = unserialize($row->variables);
+    foreach ($output['verbose_sensor_result']['#rows'] as $delta => $row) {
+      $variables = unserialize($row['variables']);
       $variables['%file'] = $this->shortenFilename($variables['%file']);
-      $rows[$delta]['count'] = $row->records_count;
+      $rows[$delta]['count'] = $row['records_count'];
       $rows[$delta]['type'] = $variables['%type'];
-      // Do not cause a notice for existing records that do not yet use
-      // @message.
-      $rows[$delta]['message'] = isset($variables['@message']) ? $variables['@message'] : $variables['!message'];
-      $rows[$delta]['function'] = $variables['%function'];
+      $rows[$delta]['message'] = $variables['@message'];
+      $rows[$delta]['caller'] = $variables['%function'];
       $rows[$delta]['file'] = $variables['%file'] . ':' . $variables['%line'];
     }
-    return $rows;
+    $output['verbose_sensor_result']['#rows'] = $rows;
+    $output['verbose_sensor_result']['#header'] = $this->buildTableHeader($rows);
   }
 
   /**
@@ -123,6 +107,5 @@ class PhpNoticesSensorPlugin extends WatchdogAggregatorSensorPlugin {
   protected function shortenFilename($filename) {
     return str_replace(DRUPAL_ROOT . '/', '', $filename);
   }
-
 
 }

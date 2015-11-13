@@ -6,9 +6,9 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Watchdog aggregator which handles replacement of variables in the message.
@@ -46,10 +46,24 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
         $output['verbose_sensor_result']['#rows'][$delta]['wid'] = \Drupal::l($row['wid'], Url::fromUserInput('/admin/reports/dblog/event/' . $row['wid']));
 
         // Replace variables in message.
-        $output['verbose_sensor_result']['#rows'][$delta]['message'] = SafeMarkup::format($row['message'], unserialize($row['variables']));
+        $output['verbose_sensor_result']['#rows'][$delta]['message'] = new FormattableMarkup($row['message'], unserialize($row['variables']));
         // Do not render the raw message & variables in the row.
         unset($output['verbose_sensor_result']['#rows'][$delta]['variables']);
       };
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function verboseResultHistory(array &$output) {
+    parent::verboseResultHistory($output);
+    // Add cutoff info message.
+    if (isset($output['verbose_sensor_history']['#info'])) {
+      $output['verbose_sensor_history']['#info'] = t('Records in dblog limited to :limit records. :parent_info', [
+        ':limit' => \Drupal::configFactory()->get('dblog.settings')->get('row_limit'),
+        ':parent_info' => $output['verbose_sensor_history']['#info'],
+      ]);
     }
   }
 

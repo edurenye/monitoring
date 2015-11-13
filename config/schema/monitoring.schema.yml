@@ -114,6 +114,9 @@ monitoring.settings.database_aggregator:
     table:
       type: string
       label: 'Table'
+    history_status:
+      type: boolean
+      label: 'History status'
 
 monitoring.settings.entity_aggregator:
   type: monitoring.settings.aggregator_base

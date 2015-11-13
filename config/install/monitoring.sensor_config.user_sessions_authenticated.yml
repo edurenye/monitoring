@@ -10,6 +10,7 @@ settings:
   table: sessions
   time_interval_value: 86400
   time_interval_field: 'timestamp'
+  history_status: true
   conditions:
     -
       field: 'uid'

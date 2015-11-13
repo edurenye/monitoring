@@ -9,6 +9,7 @@ settings:
   table: 'maillog'
   time_interval_field: 'sent_date'
   time_interval_value: '86400'
+  history_status: true
   verbose_fields:
     - 'idmaillog'
     - 'message_id'

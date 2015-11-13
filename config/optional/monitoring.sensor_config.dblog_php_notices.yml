@@ -16,6 +16,7 @@ settings:
   table: watchdog
   time_interval_field: 'timestamp'
   time_interval_value: 86400
+  history_status: true
   verbose_fields:
     - variables
 thresholds:
