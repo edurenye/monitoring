@@ -7,7 +7,6 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\monitoring\Result\SensorResultInterface;
-use Drupal;
 
 /**
  * Monitors image derivate creation errors from dblog.
@@ -95,7 +94,6 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $usage = \Drupal::service('file.usage');
       $message = t('File managed records: <pre>@file_managed</pre>', array('@file_managed' => var_export($usage->listUsage($file), TRUE)));
     }
-
     if (empty($message)) {
       $message = t('File @file record not found in the file_managed table.', array('@file' => $result->getMessage()));
     }
@@ -108,4 +106,25 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
 
     return $output;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function verboseResultUnaggregated(array &$output) {
+    parent::verboseResultUnaggregated($output);
+    foreach ($output['verbose_sensor_result']['#rows'] as $key => $row) {
+      /** @var \Drupal\Component\Render\FormattableMarkup $message */
+      $message = $row['message'];
+      $tmp_str = substr($message->jsonSerialize(), strpos($message->jsonSerialize(), '>') + 1);
+      $output['verbose_sensor_result']['#rows'][$key]['path'] = substr($tmp_str, 0, strpos($tmp_str, '<'));
+      unset($output['verbose_sensor_result']['#rows'][$key]['message']);
+      unset($output['verbose_sensor_result']['#rows'][$key]['timestamp']);
+      $output['verbose_sensor_result']['#rows'][$key]['timestamp'] = $row['timestamp'];
+    }
+    $output['verbose_sensor_result']['#header']['path'] = 'image path';
+    unset($output['verbose_sensor_result']['#header']['message']);
+    unset($output['verbose_sensor_result']['#header']['timestamp']);
+    $output['verbose_sensor_result']['#header']['timestamp'] = 'timestamp';
+  }
+
 }

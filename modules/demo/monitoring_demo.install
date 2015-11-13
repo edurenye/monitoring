@@ -86,6 +86,32 @@ function monitoring_demo_install() {
   // Enable Enabled modules and Disappeared sensors for the "interactive" demo.
   $sensor_manager->enableSensor('monitoring_installed_modules');
   $sensor_manager->enableSensor('monitoring_disappeared_sensors');
+
+  // Generate some image style derivative errors.
+  $file = file_save_data($random->name());
+  /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
+  $usage = \Drupal::service('file.usage');
+  $usage->add($file, 'monitoring_test', 'node', $node->id());
+
+  // We use the logger.dblog service to be able to set the referer.
+  \Drupal::service('logger.dblog')->log(LOG_NOTICE,
+    'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', [
+      '%source_image_path' => $file->getFileUri(),
+      '%derivative_path' => 'hash://styles/preview/1234.jpeg',
+      'request_uri' => '',
+      'uid' => 0,
+      'channel' => 'image',
+      'link' => '',
+      'referer' => 'http://d8.dev/node/' . $node->id(),
+      'ip' => '127.0.0.1',
+      'timestamp' => REQUEST_TIME,
+    ]
+  );
+  \Drupal::logger('image')->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', [
+      '%source_image_path' => 'public://portrait-pictures/bluemouse.jpeg',
+      '%derivative_path' => 'hash://styles/preview/5678.jpeg',
+    ]
+  );
 }
 
 

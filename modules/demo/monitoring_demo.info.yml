@@ -13,3 +13,4 @@ dependencies:
  - rest
  - hal
  - dblog
+ - file

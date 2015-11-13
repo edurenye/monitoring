@@ -255,13 +255,21 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $file = file_save_data($this->randomMachineName());
     /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
     $usage = \Drupal::service('file.usage');
-    $usage->add($file, 'monitoring_test', 'test_object', 123456789);
+    $usage->add($file, 'monitoring_test', 'node', 123456789);
     for ($i = 0; $i <= 5; $i++) {
-      \Drupal::logger('image')->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
-        array(
+      // We use the logger.dblog service to be able to set the referer.
+      \Drupal::service('logger.dblog')->log(LOG_NOTICE,
+        'Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', [
           '%source_image_path' => $file->getFileUri(),
           '%derivative_path' => 'hash://styles/preview/1234.jpeg',
-        ));
+          'request_uri' => '',
+          'uid' => 0,
+          'channel' => 'image',
+          'link' => '',
+          'referer' => 'http://d8.dev/node/123456789',
+          'ip' => '127.0.0.1',
+          'timestamp' => REQUEST_TIME,
+        ]);
     }
     \Drupal::logger('image')->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
       array(
@@ -276,9 +284,10 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->assertTrue($result->isWarning());
     $verbose_output = $result->getVerboseOutput();
     $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
-    $this->assertText('monitoring_test');
-    $this->assertText('test_object');
-    $this->assertText('123456789');
+    $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody');
+    $this->assertEqual($xpath[0]->tr[0]->td[2], 'public://portrait-pictures/bluemouse.jpeg');
+    $this->assertEqual($xpath[0]->tr[6]->td[1], 'http://d8.dev/node/123456789');
+    $this->assertLink('7');
   }
 
 
