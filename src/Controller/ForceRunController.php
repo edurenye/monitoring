@@ -13,13 +13,15 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class ForceRunController extends ControllerBase {
 
   /**
-   * Stores the sensor manager.
+   * The sensor manager.
    *
    * @var \Drupal\monitoring\Sensor\SensorManager
    */
   protected $sensorManager;
 
   /**
+   * The sensor runner.
+   *
    * @var \Drupal\monitoring\SensorRunner
    */
   protected $sensorRunner;

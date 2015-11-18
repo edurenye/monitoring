@@ -14,14 +14,14 @@ use Drupal\Component\Utility\SafeMarkup;
 class SensorList extends ControllerBase {
 
   /**
-   * Stores the sensor runner.
+   * The sensor runner.
    *
    * @var \Drupal\monitoring\SensorRunner
    */
   protected $sensorRunner;
 
   /**
-   * Stores the sensor manager.
+   * The sensor manager.
    *
    * @var \Drupal\monitoring\Sensor\SensorManager
    */

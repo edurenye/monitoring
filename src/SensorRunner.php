@@ -25,7 +25,7 @@ use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 class SensorRunner {
 
   /**
-   * Sensor manager.
+   * The sensor manager.
    *
    * @var \Drupal\monitoring\Sensor\SensorManager
    */

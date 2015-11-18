@@ -24,14 +24,14 @@ use Drupal\Core\Form\FormStateInterface;
 class SensorDetailForm extends EntityForm {
 
   /**
-   * Stores the sensor runner.
+   * The sensor runner.
    *
    * @var \Drupal\monitoring\SensorRunner
    */
   protected $sensorRunner;
 
   /**
-   * Stores the sensor manager.
+   * The sensor manager.
    *
    * @var \Drupal\monitoring\Sensor\SensorManager
    */
