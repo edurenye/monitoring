@@ -8,6 +8,7 @@ namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\ExtendedInfoSensorPluginInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
@@ -110,6 +111,31 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       );
       $row['message'] = \Drupal::service('renderer')->renderPlain($message);
 
+      // Map column actions.
+      $row['actions'] = array();
+      if (!in_array($key, $excluded_keys)) {
+        $row['actions']['data'] = array(
+          '#type' => 'link',
+          '#title' => $this->t('Ignore'),
+          '#url' => Url::fromRoute('monitoring.requirements_sensor_ignore_key', array(
+            'monitoring_sensor_config' => $this->sensorConfig->id(),
+            'key' => $key,
+          )),
+          '#access' => \Drupal::currentUser()->hasPermission('administer monitoring'),
+        );
+      }
+      else {
+        $row['actions']['data'] = array(
+          '#type' => 'link',
+          '#title' => $this->t('Unignore'),
+          '#url' => Url::fromRoute('monitoring.requirements_sensor_unignore_key', array(
+            'monitoring_sensor_config' => $this->sensorConfig->id(),
+            'key' => $key,
+          )),
+          '#access' => \Drupal::currentUser()->hasPermission('administer monitoring'),
+        );
+      }
+
       $rows[] = array(
         'data' => $row,
       );
@@ -121,6 +147,7 @@ class CoreRequirementsSensorPlugin extends SensorPluginBase implements ExtendedI
       $header['excluded'] = t('Excluded');
       $header['severity'] = t('Severity');
       $header['message'] = t('Message');
+      $header['actions'] = t('Actions');
 
       $output['requirements'] = array(
         '#type' => 'verbose_table_result',

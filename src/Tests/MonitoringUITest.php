@@ -786,8 +786,8 @@ class MonitoringUITest extends MonitoringTestBase {
 
     // Change the excluded keys.
     $this->drupalPostForm(NULL, array(
-      'settings[exclude_keys]' => 'requirement_excluded'
-    ),  t('Save'));
+      'settings[exclude_keys]' => 'requirement_excluded',
+    ), t('Save'));
 
     $this->assertText(SafeMarkup::format('Sensor @label saved.', array('@label' => 'Module system')));
     $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
@@ -795,8 +795,39 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->assertText('requirement_excluded');
     $this->assertNoText('cron');
 
+    // Test the 'Ignore' link to exclude a required sensor key.
+    $this->drupalGet('admin/reports/monitoring/sensors/core_requirements_system');
+    $this->assertFieldByXPath('//div/table/tbody/tr[1]/td[2]', '');
+    $this->clickLink(t('Ignore'), 0);
 
-   // $this->drupalGet('admin/config/system/monitoring/sensors/ui_test_sensor');
+    // Assert drupal_set_message for successful excluded sensor key.
+    $this->assertText(t('Added the sensor @label (@key) into the excluded list.',
+      array('@label' => 'Module system', '@key' => 'drupal')
+    ));
+    $this->assertFieldByXPath('//div/table/tbody/tr[1]/td[2]', 'Yes');
+
+    // Verify the current keys to exclude.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
+    $sensor_config = SensorConfig::load('core_requirements_system');
+    $this->assertTrue(in_array('drupal', $sensor_config->settings['exclude_keys']));
+
+    // Test the 'Unignore' link to re-include a required sensor key.
+    $this->drupalGet('admin/reports/monitoring/sensors/core_requirements_system');
+    $this->drupalPostForm(NULL, array(), 'Run now');
+    $this->assertFieldByXPath('//div/table/tbody/tr[1]/td[2]', 'Yes');
+    $this->clickLink(t('Unignore'), 0);
+
+    // Assert drupal_set_message for successful re-included sensor key.
+    $this->assertText(t('Removed the sensor @label (@key) from the excluded list.',
+      array('@label' => 'Module system', '@key' => 'drupal')
+    ));
+    $this->assertFieldByXPath('//div/table/tbody/tr[1]/td[2]', '');
+
+    // Verify the current keys to exclude.
+    $this->drupalGet('admin/config/system/monitoring/sensors/core_requirements_system');
+    $sensor_config = SensorConfig::load('core_requirements_system');
+    $this->assertFalse(in_array('drupal', $sensor_config->settings['exclude_keys']));
+
   }
 
   /**

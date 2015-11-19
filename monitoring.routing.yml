@@ -30,6 +30,24 @@ entity.monitoring_sensor_config.details_form:
   requirements:
     _entity_access: 'monitoring_sensor_config.view'
 
+monitoring.requirements_sensor_ignore_key:
+  path: '/admin/reports/monitoring/requirements_ignore_key/{monitoring_sensor_config}/{key}'
+  defaults:
+    _controller: '\Drupal\monitoring\Controller\RequirementsIgnore::sensorIgnoreKey'
+    _entity_form: 'monitoring_sensor_config.details'
+  requirements:
+    _permission: 'administer monitoring'
+    _csrf_token: 'TRUE'
+
+monitoring.requirements_sensor_unignore_key:
+  path: '/admin/reports/monitoring/requirements_unignore_key/{monitoring_sensor_config}/{key}'
+  defaults:
+    _controller: '\Drupal\monitoring\Controller\RequirementsIgnore::sensorUnignoreKey'
+    _entity_form: 'monitoring_sensor_config.details'
+  requirements:
+    _permission: 'administer monitoring'
+    _csrf_token: 'TRUE'
+
 monitoring.force_run_all:
   path: 'monitoring/sensors/force'
   defaults:
