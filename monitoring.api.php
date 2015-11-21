@@ -4,9 +4,6 @@
  * Monitoring API documentation.
  */
 
-use Drupal\monitoring\Result\SensorResultInterface;
-
-
 /**
  * Allows to alter sensor links on the sensor overview page.
  *
