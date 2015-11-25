@@ -583,6 +583,10 @@ class MonitoringUITest extends MonitoringTestBase {
     $this->drupalGet('admin/reports/monitoring/sensors/user_integrity');
     $this->assertText('1 privileged user(s)');
 
+    // Check that is not showing the query or the query arguments.
+    $this->assertNoText(t('Query'));
+    $this->assertNoText(t('Arguments'));
+
     // Test the timestamp is formatted correctly.
     $xpath = $this->xpath('//*[@id="all_users_with_privileged_access"]/div/table/tbody');
     $expected_time = \Drupal::service('date.formatter')->format($account->getCreatedTime(), 'short');
