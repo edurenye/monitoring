@@ -240,10 +240,10 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     );
 
     // Fetch the last 10 matching entries, unaggregated.
-    $query_result = $this->getQuery()
+    $query = $this->getQuery();
+    $query_result = $query
       ->range(0, 10)
       ->execute();
-    $this->queryString = $query_result->getQueryString();
 
     $rows = $this->buildTableRows($query_result->fetchAll());
 
@@ -260,8 +260,8 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
     $output['verbose_sensor_result']['#rows'] = $rows;
 
     // Show query.
-    $output['verbose_sensor_result']['#query'] = $this->queryString;
-    $output['verbose_sensor_result']['#query_args'] = $this->queryArguments;
+    $output['verbose_sensor_result']['#query'] = $query_result->getQueryString();
+    $output['verbose_sensor_result']['#query_args'] = $query->getArguments();
   }
 
   /**
