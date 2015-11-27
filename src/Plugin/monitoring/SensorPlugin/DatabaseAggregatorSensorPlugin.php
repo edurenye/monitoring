@@ -295,7 +295,7 @@ class DatabaseAggregatorSensorPlugin extends DatabaseAggregatorSensorPluginBase 
 
     // Add oldest record info message.
     if ($oldest_entry = $this->getOldestEntry()) {
-      $output['verbose_sensor_history']['#info'] = t('Oldest timestamp record is from :oldest_timestamp', [
+      $output['verbose_sensor_history']['#description'] = t('Oldest timestamp record is from :oldest_timestamp', [
         ':oldest_timestamp' => \Drupal::service('date.formatter')->format($oldest_entry, 'short'),
       ]);
     }

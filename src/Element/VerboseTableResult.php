@@ -44,7 +44,7 @@ class VerboseTableResult extends FormElement {
       '#pre_render' => [
         [$class, 'preRenderVerboseTableResult'],
       ],
-      '#info' => '',
+      '#description' => '',
     ];
   }
 
@@ -62,9 +62,9 @@ class VerboseTableResult extends FormElement {
     $id = $string = str_replace(" ", "_", strtolower($element['#title']));
     $element[$id] = [
       '#type' => 'fieldset',
-      '#title' => t(':title', [':title' => $element['#title']]),
+      '#title' => $element['#title'],
       '#attributes' => ['id' => $id],
-      '#description' => t(':info', [':info' => $element['#info']]),
+      '#description' => $element['#description'],
     ];
     $element[$id]['table'] = [
       '#type' => 'table',

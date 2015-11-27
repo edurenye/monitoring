@@ -59,10 +59,10 @@ class WatchdogAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin impl
   public function verboseResultHistory(array &$output) {
     parent::verboseResultHistory($output);
     // Add cutoff info message.
-    if (isset($output['verbose_sensor_history']['#info'])) {
-      $output['verbose_sensor_history']['#info'] = t('Records in dblog limited to :limit records. :parent_info', [
+    if (isset($output['verbose_sensor_history']['#description'])) {
+      $output['verbose_sensor_history']['#description'] = t('Records in dblog limited to :limit records. :parent_info', [
         ':limit' => \Drupal::configFactory()->get('dblog.settings')->get('row_limit'),
-        ':parent_info' => $output['verbose_sensor_history']['#info'],
+        ':parent_info' => $output['verbose_sensor_history']['#description'],
       ]);
     }
   }
