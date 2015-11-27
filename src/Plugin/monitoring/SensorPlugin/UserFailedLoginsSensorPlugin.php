@@ -69,9 +69,8 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
   public function verboseResultCounting(array &$output) {
     if ($this->sensorConfig->getSetting('verbose_fields')) {
       // Fetch the last 20 matching entries, aggregated.
-      $query_result = $this->getAggregateQuery()
-        ->range(0, 20)
-        ->execute();
+      $query = $this->getAggregateQuery();
+      $query_result = $query->range(0, 20)->execute();
       $this->queryString = $query_result->getQueryString();
 
       $rows = $this->buildTableRows($query_result->fetchAll());
@@ -88,8 +87,8 @@ class UserFailedLoginsSensorPlugin extends WatchdogAggregatorSensorPlugin {
         '#title' => t('Attempts per user'),
         '#header' => $this->buildTableHeader($results),
         '#rows' => $results,
-        '#query' => $this->queryString,
-        '#query_args' => $this->queryArguments,
+        '#query' => $query_result->getQueryString(),
+        '#query_args' => $query->getArguments(),
       );
     }
   }
