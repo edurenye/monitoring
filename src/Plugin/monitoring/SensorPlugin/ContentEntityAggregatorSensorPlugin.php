@@ -7,6 +7,7 @@
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\Entity;
@@ -114,7 +115,6 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
 
     // Get query for the entity type.
     $query = $this->entityQueryFactory->get($this->sensorConfig->getSetting('entity_type'));
-
     // Add conditions.
     foreach ($this->getConditions() as $condition) {
       if (empty($condition['field'])) {
@@ -199,21 +199,17 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
 
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+    Database::startLog('monitoring_ceasp');
+
     // Fetch the last 10 matching entries, unaggregated.
     $entity_ids = $this->getEntityQuery()
       ->range(0, 10)
       ->execute();
+
     // Show query.
-    // @todo show query. This needs an injected FakeStatement.
-    // $query = '';
-    // $output['query'] = array(
-    //   '#type' => 'item',
-    //   '#title' => t('Query'),
-    //   '#markup' => '<pre>' . $query . '</pre>',
-    // );
+    $query_log = Database::getLog('monitoring_ceasp')[0];
 
     // Load entities.
-    $entity_type = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'));
     $entity_type_id = $this->sensorConfig->getSetting('entity_type');;
     $entities = $this->entityManager
       ->getStorage($entity_type_id)
@@ -281,6 +277,8 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
       '#header' => $header,
       '#rows' => $rows,
       '#empty' => t('No matching entities were found.'),
+      '#query' => $query_log['query'],
+      '#query_args' => $query_log['args'],
     );
 
     return $output;

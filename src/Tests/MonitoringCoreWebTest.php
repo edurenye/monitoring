@@ -621,6 +621,10 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertLink($node1->label());
     $this->assertLink($node2->label());
     $this->assertLink($node3->label());
+    // Assert Query result appears.
+    $xpath = $this->xpath('//*[@id="result"]/div/details/div/div[1]')[0];
+    $this->assertTrue(strpos((string) $xpath->pre, 'base_table') !== FALSE);
+
     $this->clickLink(t('Edit'));
     // Assert some of the 'available fields'.
     $this->assertText('Available Fields for entity type Content: id, label, nid, uuid, vid, type, langcode, title, uid, status, created, changed, promote, sticky, revision_timestamp, revision_uid, revision_log, revision_translation_affected, default_langcode.');
