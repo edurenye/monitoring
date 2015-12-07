@@ -15,6 +15,7 @@ settings:
     - id
     - label
     - comment_type
+    - created
 thresholds:
   type: exceeds
   warning: 10

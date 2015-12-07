@@ -16,6 +16,7 @@ settings:
     - module
     - machine_name
     - message
+    - timestamp
   conditions:
     -
       field: 'severity'

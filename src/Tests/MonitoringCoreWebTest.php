@@ -621,9 +621,14 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
     $this->assertLink($node1->label());
     $this->assertLink($node2->label());
     $this->assertLink($node3->label());
+
     // Assert Query result appears.
     $xpath = $this->xpath('//*[@id="result"]/div/details/div/div[1]')[0];
     $this->assertTrue(strpos((string) $xpath->pre, 'base_table') !== FALSE);
+
+    // Check timestamp is formated correctly.
+    $xpath = $this->xpath('//*[@id="result"]/div/table/tbody/tr[1]')[0];
+    $this->assertEqual($xpath->td[2], \Drupal::service('date.formatter')->format($node1->getCreatedTime(), 'short'));
 
     $this->clickLink(t('Edit'));
     // Assert some of the 'available fields'.

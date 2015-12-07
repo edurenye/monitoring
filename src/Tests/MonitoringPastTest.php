@@ -27,6 +27,7 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
     $this->installEntitySchema('past_event');
     $this->installSchema('past_db', array('past_event_argument', 'past_event_data'));
     $this->installSchema('system', ['router']);
+    $this->installConfig(['system']);
     \Drupal::service('router.builder')->rebuild();
   }
 
@@ -74,7 +75,7 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
 
     // Prepare some logs.
     for ($i = 0; $i <= $count; $i++) {
-      $event = past_event_create('past_db', $machine_name, $event_desc . ($i + 1));
+      $event = past_event_create('past_db', $machine_name, $event_desc . ($i + 1), ['timestamp' => REQUEST_TIME]);
       $event->setReferer('http://example.com/test-referer');
       $event->setLocation('http://example.com/this-url-gets-heavy-long/testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest-testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest-testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest-testtesttesttesttesttesttest/seeme.htm');
       $event->addArgument('arg1', 'First Argument');

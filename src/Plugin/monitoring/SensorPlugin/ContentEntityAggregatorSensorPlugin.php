@@ -197,6 +197,22 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
   public function resultVerbose(SensorResultInterface $result) {
     $output = [];
 
+    if ($this->sensorConfig->getSetting('verbose_fields')) {
+      $this->verboseResultUnaggregated($output);
+    }
+
+    return $output;
+  }
+
+  /**
+   * Adds unaggregated verbose output to the render array $output.
+   *
+   * @param array &$output
+   *   Render array where the result will be added.
+   */
+  public function verboseResultUnaggregated(array &$output) {
+    $output = [];
+
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     Database::startLog('monitoring_ceasp');
@@ -227,6 +243,10 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
         switch ($field) {
           case 'id':
             $row[] = $entity->id();
+            break;
+
+          case $this->getTimeIntervalField():
+            $row[] = \Drupal::service('date.formatter')->format($entity->get($this->getTimeIntervalField())[0]->value, 'short');
             break;
 
           case 'label':
