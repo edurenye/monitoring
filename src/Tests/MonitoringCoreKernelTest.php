@@ -266,7 +266,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
           'uid' => 0,
           'channel' => 'image',
           'link' => '',
-          'referer' => 'http://d8.dev/node/123456789',
+          'referer' => 'http://example.com/node/123456789',
           'ip' => '127.0.0.1',
           'timestamp' => REQUEST_TIME,
         ]);
@@ -286,7 +286,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     $this->setRawContent(\Drupal::service('renderer')->renderPlain($verbose_output));
     $xpath = $this->xpath('//*[@id="unaggregated_result"]/div/table/tbody');
     $this->assertEqual($xpath[0]->tr[0]->td[2], 'public://portrait-pictures/bluemouse.jpeg');
-    $this->assertEqual($xpath[0]->tr[6]->td[1], 'http://d8.dev/node/123456789');
+    $this->assertEqual($xpath[0]->tr[6]->td[1], 'http://example.com/node/123456789');
     $this->assertLink('7');
   }
 

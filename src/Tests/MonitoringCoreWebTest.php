@@ -375,7 +375,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'type' => 'user',
       'message' => 'Login attempt failed from %ip.',
       'variables' => serialize(['%ip' => '127.0.0.1']),
-      'location' => 'http://d8.dev/user/login',
+      'location' => 'http://example.com/user/login',
       'timestamp' => REQUEST_TIME,
     ))->execute();
 
@@ -693,21 +693,21 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
       'type' => 'page not found',
       'message' => '@uri',
       'variables' => serialize(['%ip' => '127.0.0.1']),
-      'location' => 'http://d8.dev/non_existing_page',
+      'location' => 'http://example.com/non_existing_page',
       'timestamp' => $event_time - 10,
     ])->execute();
     Database::getConnection('default')->insert('watchdog')->fields([
       'type' => 'page not found',
       'message' => '@uri',
       'variables' => serialize(['%ip' => '127.0.0.1']),
-      'location' => 'http://d8.dev/non_existing_page',
+      'location' => 'http://example.com/non_existing_page',
       'timestamp' => $event_time,
     ])->execute();
     Database::getConnection('default')->insert('watchdog')->fields([
       'type' => 'page not found',
       'message' => '@uri',
       'variables' => serialize(['%ip' => '127.0.0.1']),
-      'location' => 'http://d8.dev/another_non_existing_page',
+      'location' => 'http://example.com/another_non_existing_page',
       'timestamp' => $event_time - 10,
     ])->execute();
 

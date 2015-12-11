@@ -6,7 +6,12 @@
 
 namespace Drupal\monitoring\Plugin\monitoring\SensorPlugin;
 
+use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Url;
 use Drupal\monitoring\Result\SensorResultInterface;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Monitors image derivate creation errors from dblog.
@@ -22,13 +27,6 @@ use Drupal\monitoring\Result\SensorResultInterface;
  * Displays image derivate with highest occurrence as message.
  */
 class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
-
-  /**
-   * The path of the most failed image.
-   *
-   * @var string
-   */
-  protected $sourceImagePath;
 
   /**
    * {@inheritdoc}
@@ -47,7 +45,9 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
     // Extends the watchdog query.
     $query = parent::getAggregateQuery();
     $query->addField('watchdog', 'variables');
+    $query->addField('watchdog', 'timestamp');
     $query->groupBy('variables');
+    $query->groupBy('timestamp');
     $query->orderBy('records_count', 'DESC');
     return $query;
   }
@@ -61,7 +61,6 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
       $variables = unserialize($this->fetchedObject->variables);
       if (isset($variables['%source_image_path'])) {
         $result->addStatusMessage($variables['%source_image_path']);
-        $this->sourceImagePath = $variables['%source_image_path'];
       }
     }
   }
@@ -70,39 +69,70 @@ class ImageMissingStyleSensorPlugin extends WatchdogAggregatorSensorPlugin {
    * {@inheritdoc}
    */
   public function resultVerbose(SensorResultInterface $result) {
+    // The unaggregated result in a fieldset.
     $output = parent::resultVerbose($result);
 
-    // If non found, no reason to query file_managed table.
-    if ($result->getValue() == 0) {
-      return $output;
-    }
+    // The result aggregated per user.
+    $this->verboseResultCounting($output);
 
-    // In case we were not able to retrieve this info from the watchdog
-    // variables.
-    if (empty($this->sourceImagePath)) {
-      $message = t('Source image path is empty, cannot query file_managed table');
-    }
-    else {
-      $query_result = \Drupal::entityQuery('file')
-        ->condition('uri', $this->sourceImagePath)
-        ->execute();
-    }
+    return $output;
+  }
 
-    if (!empty($query_result)) {
-      $file = file_load(array_shift($query_result));
-      /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
-      $usage = \Drupal::service('file.usage');
-      $message = t('File managed records: <pre>@file_managed</pre>', array('@file_managed' => var_export($usage->listUsage($file), TRUE)));
-    }
-    if (empty($message)) {
-      $message = t('File @file record not found in the file_managed table.', array('@file' => $result->getMessage()));
-    }
+  /**
+   * Get the aggregated table verbose output.
+   *
+   * @param array $output
+   *   The output array, at which we will add the aggregated table
+   *   verbose output.
+   *
+   * @return array
+   *   Aggregated result table.
+   */
+  public function verboseResultCounting(array &$output) {
+    if ($this->sensorConfig->getSetting('verbose_fields')) {
+      // Fetch the last 20 matching entries, aggregated.
+      $query = $this->getAggregateQuery();
+      $query_result = $query->range(0, 20)->execute();
+      $this->queryString = $query_result->getQueryString();
 
-    $output['verbose_sensor_result']['message'] = array(
-      '#type' => 'item',
-      '#title' => t('Message'),
-      '#markup' => $message,
-    );
+      $rows = $this->buildTableRows($query_result->fetchAll());
+      $results = [];
+      foreach ($rows as $key => $row) {
+        $results[$key] = [];
+        $variables = unserialize($row['variables']);
+        $results[$key]['file'] = $variables['%source_image_path'];
+        $results[$key]['count'] = $row['records_count'];
+        $file = \Drupal::entityQuery('file')
+          ->condition('uri', $variables['%source_image_path'])
+          ->execute();
+        if (!empty($file)) {
+          $file = file_load(array_shift($file));
+          /** @var \Drupal\file\FileUsage\FileUsageInterface $usage */
+          $list_usages = \Drupal::service('file.usage')->listUsage($file);
+          $usages = 0;
+          foreach (new RecursiveIteratorIterator(new RecursiveArrayIterator($list_usages)) as $sub) {
+            $usages += (int) $sub;
+          }
+          $results[$key]['usages'] = Link::fromTextAndUrl(
+            \Drupal::translation()
+              ->formatPlural($usages, '1 place', '@count places'),
+            Url::fromUserInput('/admin/content/files/usage/' . $file->id()));
+        }
+        else {
+          $results[$key]['usages'] = ['#markup' => ''];
+        }
+        $results[$key]['timestamp'] = \Drupal::service('date.formatter')->format($row['timestamp'], 'short');
+      }
+
+      $output['aggregated_result'] = array(
+        '#type' => 'verbose_table_result',
+        '#title' => t('Aggregated result'),
+        '#header' => $this->buildTableHeader($results),
+        '#rows' => $results,
+        '#query' => $query_result->getQueryString(),
+        '#query_args' => $query->getArguments(),
+      );
+    }
 
     return $output;
   }
