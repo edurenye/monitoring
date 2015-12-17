@@ -119,6 +119,10 @@ class SensorListBuilder extends ConfigEntityListBuilder implements FormInterface
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $categories = [];
+    $options = [];
+    $default_value = [];
+
     /** @var \Drupal\monitoring\Entity\SensorConfig $entity */
     foreach ($this->load() as $entity) {
       $row = $this->buildRow($entity);
