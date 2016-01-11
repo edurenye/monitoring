@@ -6,6 +6,7 @@
 
 
 namespace Drupal\monitoring\Tests;
+use Drupal\Core\Logger\RfcLogLevel;
 
 /**
  * Tests for the past sensors in monitoring.
@@ -41,22 +42,22 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
 
     // Run each sensor and test output.
     $result = $this->runSensor('past_db_critical');
-    $this->assertEqual($result->getMessage(), '2 events in 1 day');
-
-    $result = $this->runSensor('past_db_debug');
     $this->assertEqual($result->getMessage(), '3 events in 1 day');
 
-    $result = $this->runSensor('past_db_emergency');
+    $result = $this->runSensor('past_db_debug');
     $this->assertEqual($result->getMessage(), '2 events in 1 day');
+
+    $result = $this->runSensor('past_db_emergency');
+    $this->assertEqual($result->getMessage(), '3 events in 1 day');
 
     $result = $this->runSensor('past_db_error');
     $this->assertEqual($result->getMessage(), '3 events in 1 day');
 
     $result = $this->runSensor('past_db_info');
-    $this->assertEqual($result->getMessage(), '3 events in 1 day');
+    $this->assertEqual($result->getMessage(), '2 events in 1 day');
 
     $result = $this->runSensor('past_db_notice');
-    $this->assertEqual($result->getMessage(), '3 events in 1 day');
+    $this->assertEqual($result->getMessage(), '2 events in 1 day');
 
     $result = $this->runSensor('past_db_warning');
     $this->assertEqual($result->getMessage(), '3 events in 1 day');
@@ -68,7 +69,7 @@ class MonitoringPastTest extends MonitoringUnitTestBase {
   protected function createEvents($count = 20) {
     // Set some for log creation.
     $machine_name = 'machine name';
-    $severities = past_event_severities();
+    $severities = RfcLogLevel::getLevels();
     $severities_codes = array_keys($severities);
     $severities_count = count($severities);
     $event_desc = 'message #';
