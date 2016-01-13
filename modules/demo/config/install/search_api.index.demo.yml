@@ -5,14 +5,14 @@ read_only: false
 options:
   index_directly: true
   cron_limit: 50
-  processors:
-    language:
-      processor_id: language
-      weights: {  }
-      settings: {  }
-  fields:
-    search_api_language:
-      type: string
+processors:
+  language:
+    processor_id: language
+    weights: {  }
+    settings: {  }
+fields:
+  search_api_language:
+    type: string
 datasources:
   - 'entity:node'
 datasource_configs:

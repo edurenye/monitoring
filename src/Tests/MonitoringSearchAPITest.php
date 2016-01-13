@@ -42,7 +42,7 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     parent::setUp();
     // Install required database tables for each module.
     $this->installSchema('search_api', ['search_api_item', 'search_api_task']);
-    $this->installSchema('system', ['router']);
+    $this->installSchema('system', ['router', 'queue', 'key_value_expire']);
     $this->installSchema('user', ['users_data']);
 
     // Install the schema for entity entity_test.
@@ -53,11 +53,8 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     // Install the test search API index and server used by the test.
     $this->installConfig(['search_api_test_db']);
 
-    // @todo Remove workaround for outdated SearchAPI Version on testbot.
-    if (\Drupal::hasService('search_api.index_task_manager')) {
-      Utility::getIndexTaskManager()
-        ->addItemsAll(Index::load('database_search_index'));
-    }
+    \Drupal::service('search_api.index_task_manager')
+      ->addItemsAll(Index::load('database_search_index'));
   }
 
   /**
@@ -77,7 +74,7 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
 
     // Update the index to test sensor result.
     $index = Index::load('database_search_index');
-    $index->index();
+    $index->indexItems();
 
     $entity = EntityTest::create(array('type' => 'article'));
     $entity->save();
@@ -91,7 +88,7 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     $this->assertEqual($result->getValue(), 3);
 
     $index = Index::load('database_search_index');
-    $index->index();
+    $index->indexItems();
 
     // Everything should be indexed.
     $result = $this->runSensor('search_api_database_search_index');
