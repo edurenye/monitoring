@@ -248,6 +248,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
    */
   public function testImageMissingStyleSensorPlugin() {
     $this->installSchema('file', ['file_usage']);
+    $this->installSchema('system', ['router']);
     $this->installEntitySchema('file');
     $this->installConfig(['system']);
 
