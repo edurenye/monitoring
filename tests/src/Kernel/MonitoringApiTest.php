@@ -1,16 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Tests\MonitoringApiTest.
+ * Contains \Drupal\Tests\monitoring\Kernel\MonitoringApiTest.
  */
 
-namespace Drupal\monitoring\Tests;
+namespace Drupal\Tests\monitoring\Kernel;
 
-use Drupal\monitoring\SensorConfigInterface;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\Sensor\DisabledSensorException;
 use Drupal\monitoring\Sensor\NonExistingSensorException;
-use Drupal\monitoring\SensorRunner;
 use Drupal\monitoring\Entity\SensorConfig;
 
 /**

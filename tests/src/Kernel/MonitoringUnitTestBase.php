@@ -4,9 +4,9 @@
  * Contains \Drupal\monitoring\Tests\MonitoringTestBase.
  */
 
-namespace Drupal\monitoring\Tests;
+namespace Drupal\Tests\monitoring\Kernel;
 
-use Drupal\simpletest\KernelTestBase;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Base class for all monitoring unit tests.

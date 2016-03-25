@@ -1,15 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Tests\MonitoringSearchAPITest.
+ * Contains \Drupal\Tests\monitoring\Kernel\MonitoringSearchAPITest.
  */
 
-namespace Drupal\monitoring\Tests;
+namespace Drupal\Tests\monitoring\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\search_api\Entity\Index;
-use Drupal\search_api\Utility;
 use Drupal\search_api_db\Tests;
 
 /**

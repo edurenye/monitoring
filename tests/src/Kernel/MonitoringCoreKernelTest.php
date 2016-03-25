@@ -4,7 +4,7 @@
  * Contains \Drupal\monitoring\Tests\MonitoringCoreWebTest.
  */
 
-namespace Drupal\monitoring\Tests;
+namespace Drupal\Tests\monitoring\Kernel;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -379,7 +379,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
    *
    * @see SensorDatabaseAggregator
    */
-  protected function testDefaultNodeTypeSensors() {
+  public function testDefaultNodeTypeSensors() {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
@@ -519,7 +519,7 @@ class MonitoringCoreKernelTest extends MonitoringUnitTestBase {
     // Enable the sensor and set cmd to output something.
     // The command creates a line for every file in unexpected state.
     $sensor_config = SensorConfig::load('monitoring_git_dirty_tree');
-    $sensor_config->status = TRUE;
+    $sensor_config->enable();
     // Ensure that newlines are treated correctly, see
     // http://unix.stackexchange.com/questions/48106/what-does-it-mean-to-have-a-dollarsign-prefixed-string-in-a-script.
     $sensor_config->settings['status_cmd'] = 'printf "A addedfile.txt\nM sites/all/modules/monitoring/test/tests/monitoring.core.test\nD deleted file.txt"';

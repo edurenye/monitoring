@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Contains \Drupal\monitoring\Tests\MonitoringPastTest.
+ * Contains \Drupal\Tests\monitoring\Kernel\MonitoringPastTest.
  */
 
+namespace Drupal\Tests\monitoring\Kernel;
 
-namespace Drupal\monitoring\Tests;
 use Drupal\Core\Logger\RfcLogLevel;
 
 /**
