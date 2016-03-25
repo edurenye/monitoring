@@ -348,12 +348,12 @@ class MonitoringUITest extends MonitoringTestBase {
     // Change entity type to File.
     $this->drupalPostAjaxForm(NULL, array('settings[entity_type]' => 'file'), 'settings[entity_type]');
     $this->assertText(t('Available Fields for entity type File:'));
-    $this->assertText(t('filename, uri, filemime, filesize, status, created, changed'));
+    $this->assertText('changed, created, fid, filemime, filename, filesize, id, label, langcode, status, uid, uri, uuid');
 
     // Change entity type to User.
     $this->drupalPostAjaxForm(NULL, array('settings[entity_type]' => 'user'), 'settings[entity_type]');
     $this->assertText(t('Available Fields for entity type User:'));
-    $this->assertText(t('preferred_langcode, preferred_admin_langcode, name, pass, mail, timezone'));
+    $this->assertText('access, changed, created, default_langcode, id, init, label, langcode, login, mail, name, pass, preferred_admin_langcode, preferred_langcode, roles, status, timezone, uid, uuid');
   }
 
   /**

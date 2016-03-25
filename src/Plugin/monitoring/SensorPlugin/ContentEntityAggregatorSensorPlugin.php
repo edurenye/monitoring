@@ -462,6 +462,7 @@ class ContentEntityAggregatorSensorPlugin extends DatabaseAggregatorSensorPlugin
     );
     $entity_type = $this->entityManager->getDefinition($this->sensorConfig->getSetting('entity_type'));
     $available_fields = array_merge(['id', 'label'], array_keys($this->entityManager->getBaseFieldDefinitions($entity_type->id())));
+    sort($available_fields);
     $form['verbose_fields']['#description'] = t('Available Fields for entity type %type: %fields.', [
       '%type' => $entity_type->getLabel(),
       '%fields' => implode(', ', $available_fields)

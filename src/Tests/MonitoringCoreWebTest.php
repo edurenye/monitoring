@@ -632,7 +632,7 @@ class MonitoringCoreWebTest extends MonitoringTestBase {
 
     $this->clickLink(t('Edit'));
     // Assert some of the 'available fields'.
-    $this->assertText('Available Fields for entity type Content: id, label, nid, uuid, vid, type, langcode, title, uid, status, created, changed, promote, sticky, revision_timestamp, revision_uid, revision_log, revision_translation_affected, default_langcode.');
+    $this->assertText('Available Fields for entity type Content: changed, created, default_langcode, id, label, langcode, nid, promote, revision_log, revision_timestamp, revision_translation_affected, revision_uid, status, sticky, title, type, uid, uuid, vid.');
     $this->assertFieldByName('conditions[0][field]', 'term_reference.target_id');
     $this->assertFieldByName('conditions[0][value]', $term1->id());
 
