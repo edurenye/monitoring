@@ -51,7 +51,7 @@ class MonitoringSearchAPITest extends MonitoringUnitTestBase {
     // Set up the required bundles.
     $this->createEntityTestBundles();
     // Install the test search API index and server used by the test.
-    $this->installConfig(['search_api_test_db']);
+    $this->installConfig(['search_api_test_db', 'search_api']);
 
     \Drupal::service('search_api.index_task_manager')
       ->addItemsAll(Index::load('database_search_index'));

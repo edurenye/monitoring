@@ -35,10 +35,11 @@ class SearchApiUnindexedSensorPlugin extends SensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
+    /** @var \Drupal\search_api\IndexInterface $index */
     $index = Index::load($this->sensorConfig->getSetting('index_id'));
 
     /* @var \Drupal\search_api\Tracker\TrackerInterface $tracker */
-    $tracker = $index->getTracker();
+    $tracker = $index->getTrackerInstance();
 
     // Set amount of unindexed items.
     $result->setValue($tracker->getRemainingItemsCount());
