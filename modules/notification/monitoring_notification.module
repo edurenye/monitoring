@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Main module file for the Monitoring notification module.
+ */
+
+use Drupal\monitoring\Entity\SensorResultEntity;
+
+/**
+ * Implements hook_theme().
+ */
+function monitoring_notification_theme() {
+  return [
+    'monitoring_result' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_tmgmt_courier_trigger_types().
+ */
+function monitoring_notification_tmgmt_courier_trigger_types(&$types) {
+  $types['monitoring_result'] = [
+    'context' => 'monitoring_notification',
+    'label' => 'Monitoring result',
+    'description' => 'Sent when a new result is available.',
+  ];
+}
+
+/**
+ * Implements hook_tmgmt_job_item_create().
+ */
+function monitoring_notification_monitoring_sensor_result_create(SensorResultEntity $job_item) {
+  \Drupal::service('tmgmt_courier.notification')->sendNotification('monitoring_result', ['monitoring_sensor_result' => $job_item]);
+}
