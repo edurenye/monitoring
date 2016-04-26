@@ -32,6 +32,6 @@ function monitoring_notification_tmgmt_courier_trigger_types(&$types) {
 /**
  * Implements hook_tmgmt_job_item_create().
  */
-function monitoring_notification_monitoring_sensor_result_create(SensorResultEntity $job_item) {
-  \Drupal::service('tmgmt_courier.notification')->sendNotification('monitoring_result', ['monitoring_sensor_result' => $job_item]);
+function monitoring_notification_monitoring_sensor_result_create(SensorResultEntity $sensor) {
+  \Drupal::service('tmgmt_courier.notification')->sendNotification('monitoring_result', ['monitoring_sensor_result' => $sensor], \Drupal::config('system.site')->get('mail'));
 }
