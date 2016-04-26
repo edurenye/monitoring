@@ -1,0 +1,8 @@
+name: Monitoring notification
+type: module
+description: 'Add notifications support for Monitoring.'
+core: 8.x
+dependencies:
+  - monitoring
+  - tmgmt_courier
+  - token

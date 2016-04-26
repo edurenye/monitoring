@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: monitoring_notification
+label: 'Monitoring notification'
+tokens:
+  - monitoring_sensor_result

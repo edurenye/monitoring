@@ -14,3 +14,4 @@ dependencies:
  - hal
  - dblog
  - file
+ - monitoring_notification
